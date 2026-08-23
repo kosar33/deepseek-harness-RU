@@ -4,7 +4,7 @@ on:
   schedule:
     # Запуск каждый день в 00:00 UTC
     - cron: '0 0 * * *'
-  # Возможность запустить синхронизацию вручную кнопкой в Actions
+  # Кнопка ручного запуска в Actions
   workflow_dispatch:
 
 jobs:
@@ -14,15 +14,22 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout target branch
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Sync with Upstream
-        uses: aormsby/Fork-Sync-With-Upstream@v3.4.1
         with:
-          upstream_sync_repo: deepseek-ai/deepseek-harness
-          upstream_sync_branch: master
-          target_sync_branch: master
-          target_branch_checkout_repo_path: ''
-          # Если возникнет конфликт слияния, воркфлоу упадет с понятной ошибкой
-          test_mode: false
+          fetch-depth: 0
+
+      - name: Merge changes from upstream
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # Подключаем оригинальный репозиторий DeepSeek
+          git remote add upstream https://github.com/deepseek-ai/deepseek-harness.git
+          git fetch upstream master
+          
+          # Сливаем изменения из оригинала в ваш master
+          git merge upstream/master --no-edit
+          
+          # Пушим обновленный результат
+          git push origin master

@@ -1,0 +1,28 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    # Запуск каждый день в 00:00 UTC
+    - cron: '0 0 * * *'
+  # Возможность запустить синхронизацию вручную кнопкой в Actions
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+
+      - name: Sync with Upstream
+        uses: aormsby/Fork-Sync-With-Upstream@v3.4.1
+        with:
+          upstream_sync_repo: deepseek-ai/deepseek-harness
+          upstream_sync_branch: master
+          target_sync_branch: master
+          target_branch_checkout_repo_path: ''
+          # Если возникнет конфликт слияния, воркфлоу упадет с понятной ошибкой
+          test_mode: false

@@ -1,6 +1,6 @@
 # @deepseek-ai/dsh-attachment-local
 
-[English](README.md) | 中文
+[English](README.md) | 中文 | [Русский](README.ru.md)
 
 这是 [`@deepseek-ai/dsh-attachment`](../attachment) 的私有本地实现。对象存放在 `<DSH_HOME>/attachments/v1/objects/<sha256-prefix>/<sha256>`，并通过不透明的 `sha256:` 标识符寻址。每个进程都会把每级祖先目录项同步到文件系统根目录，以此一次性证明 home 已持久化。写入使用私有暂存目录、仅所有者可访问的文件、经过同步的临时文件、原子且排他的硬链接发布，并对发布路径执行目录同步（适用于 POSIX；Windows 依赖文件系统元数据日志），确保已报告的引用能够在崩溃后继续存在。
 

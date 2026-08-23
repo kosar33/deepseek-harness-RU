@@ -1,6 +1,6 @@
 # host/ — Web GUI 宿主侧
 
-[English](README.md) | 中文
+[English](README.md) | 中文 | [Русский](README.ru.md)
 
 dsh Web GUI 的宿主侧：所有客户端形态共享的 API 网关，以及承载它的普通 HTTP 服务器。浏览器侧位于 [`client/`](../client/README.zh.md)；组合应用是 [`apps/cli`](../../apps/cli/README.zh.md)，它启动 [`dsh-base` 组合包](../bundle/base/cordis.patch.yml) 来提供 [`apps/web`](../../apps/web/)。这些全是**产品**包。
 

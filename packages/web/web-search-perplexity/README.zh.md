@@ -1,6 +1,6 @@
 # @deepseek-ai/dsh-web-search-perplexity
 
-[English](README.md) | 中文
+[English](README.md) | 中文 | [Русский](README.ru.md)
 
 由 [Perplexity](https://perplexity.ai) 支持的 `WebSearchProvider`，用于 harness [web 能力 seam](../web/README.zh.md)（`ctx.web`）。它调用 Perplexity 的 OpenAI 兼容 `POST /chat/completions` 端点，把生成答案与引用映射为 seam 规范化的 `WebSearchResult`。
 

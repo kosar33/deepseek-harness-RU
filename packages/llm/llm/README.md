@@ -1,6 +1,6 @@
 # dsh-llm
 
-English | [中文](README.zh.md)
+English | [中文](README.zh.md) | [Русский](README.ru.md)
 
 Provider-neutral LLM vocabulary and abstract service. This package defines the canonical language spoken by the agent loop, session logs, and every plugin.
 

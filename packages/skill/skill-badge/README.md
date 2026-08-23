@@ -1,6 +1,6 @@
 # @deepseek-ai/dsh-skill-badge
 
-English | [中文](README.zh.md)
+English | [中文](README.zh.md) | [Русский](README.ru.md)
 
 Optional bundled skill provider that contributes `dsh-badge` to `ctx.skills`. The skill supplies the official “powered by dsh” Markdown snippets and the packaged PNG for systems that cannot import a remote image reliably.
 

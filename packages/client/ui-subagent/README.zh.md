@@ -1,6 +1,6 @@
 # @deepseek-ai/dsh-client-ui-subagent
 
-[English](README.md) | 中文
+[English](README.md) | 中文 | [Русский](README.ru.md)
 
 Web subagent 功能 owner：向 `conversation.session.header.lineage` 贡献当前 title 谱系导航，向会话编辑器链贡献按原因区分的只读替代呈现，并保留注册到 `ctx.inputTriggers` 的既有 `@` 引用 source。
 

@@ -1,6 +1,6 @@
 # credentials/：凭据与授权
 
-[English](README.md) | 中文
+[English](README.md) | 中文 | [Русский](README.ru.md)
 
 凭据能力家族将引用解析与提供方分离，并把二者与"必须开口去要才能拿到的凭据"再分开：
 

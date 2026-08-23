@@ -64,7 +64,7 @@ const TEMPLATE_OPEN = '## 模板正文\n\n````text\n'
 const TEMPLATE_CLOSE = '\n````'
 const RESPONSE_SECTIONS = ['translation', 'review', 'final'] as const
 const RESPONSE_DELIMITERS = new Set(RESPONSE_SECTIONS.flatMap(section => [`<${section}>`, `</${section}>`]))
-const LANGUAGE_SWITCHER = /^(?:English \| \[中文\]\(.+\)|\[English\]\(.+\) \| 中文)$/
+const LANGUAGE_SWITCHER = /^(?:English \| \[中文\]\(.+\)(?: \| \[Русский\]\(.+\))?|\[English\]\(.+\) \| 中文(?: \| \[Русский\]\(.+\))?)$/
 
 interface TranslationFiles {
   targetFilename: string

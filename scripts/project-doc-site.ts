@@ -223,8 +223,9 @@ export function addProjectionFrontmatter(markdown: string, page: Pick<DocsPage, 
 /** The switcher line a canonical page carries so its GitHub reader can reach the other language. */
 const ZH_LINK = String.raw`\[中文\]\([^)]*\)`
 const EN_LINK = String.raw`\[English\]\([^)]*\)`
+const RU_LINK = String.raw`\[Русский\]\([^)]*\)`
 const LANGUAGE_SWITCHER = new RegExp(
-  `^(?:English \\| ${ZH_LINK}|${EN_LINK} \\| 中文|${EN_LINK} \\| (?:${ZH_LINK} \\| )?Русский)$`,
+  `^(?:English \\| ${ZH_LINK}(?: \\| ${RU_LINK})?|${EN_LINK} \\| 中文(?: \\| ${RU_LINK})?|${EN_LINK} \\| (?:${ZH_LINK} \\| )?Русский)$`,
 )
 
 /** The repository badge a canonical page carries for its GitHub reader. */

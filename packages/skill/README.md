@@ -1,6 +1,6 @@
 # skill/ — skill capability family
 
-English | [中文](README.zh.md)
+English | [中文](README.zh.md) | [Русский](README.ru.md)
 
 This family discovers reusable agent instructions and exposes them to the model through a provider-neutral catalog and loader.
 

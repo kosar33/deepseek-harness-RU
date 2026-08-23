@@ -1,6 +1,6 @@
 # jobs/ — background-job capability family
 
-English | [中文](README.zh.md)
+English | [中文](README.zh.md) | [Русский](README.ru.md)
 
 This family gives long-running tools one owner-isolated background-job protocol for observation, cancellation, waiting, and completion notices.
 

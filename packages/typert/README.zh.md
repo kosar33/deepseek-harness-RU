@@ -1,6 +1,6 @@
 # Typert
 
-[English](README.md) | 中文
+[English](README.md) | 中文 | [Русский](README.ru.md)
 
 Typert 将源代码分析、运行时存储和 Loader 发现机制分离。
 

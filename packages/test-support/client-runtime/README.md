@@ -1,6 +1,6 @@
 # @deepseek-ai/dsh-client-test-runtime
 
-English | [中文](README.zh.md)
+English | [中文](README.zh.md) | [Русский](README.ru.md)
 
 jsdom slot test runtime for client feature specs: a real Cordis `Context`, the production `SlotRegistry` and UI renderer, assembled around typed session/workspace doubles. Feature suites exercise declaration, registration, scope, store, inject, rendering, updates, and disposal without hand-building the machinery per suite — and without a second implementation of any production logic.
 

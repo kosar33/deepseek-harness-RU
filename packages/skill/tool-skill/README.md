@@ -1,6 +1,6 @@
 # @deepseek-ai/dsh-tool-skill
 
-English | [中文](README.zh.md)
+English | [中文](README.zh.md) | [Русский](README.ru.md)
 
 The model-facing skill catalog and `skill` tool.
 

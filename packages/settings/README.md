@@ -1,6 +1,6 @@
 # settings/ — user-settings capability family
 
-English | [中文](README.zh.md)
+English | [中文](README.zh.md) | [Русский](README.ru.md)
 
 This family resolves user-editable configuration through registered namespaces and swappable storage providers.
 

@@ -1,6 +1,6 @@
 # credentials/ — credentials and authorization
 
-English | [中文](README.zh.md)
+English | [中文](README.zh.md) | [Русский](README.ru.md)
 
 The credential capability family separates reference resolution from its provider, and separates both from obtaining a credential that has to be asked for:
 

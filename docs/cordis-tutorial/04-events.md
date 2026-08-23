@@ -1,6 +1,6 @@
 # 4. Events
 
-English | [中文](04-events.zh.md)
+English | [中文](04-events.zh.md) | [Русский](04-events.ru.md)
 
 Services support direct calls; **events** let a plugin announce something without knowing which plugins listen. The harness uses events for interactions such as tool results, model requests, and approval decisions.
 

@@ -1,6 +1,6 @@
 # storage/ — non-session storage family
 
-English | [中文](README.zh.md)
+English | [中文](README.zh.md) | [Русский](README.ru.md)
 
 This family persists application data other than session event logs through named backends and typed data forms.
 

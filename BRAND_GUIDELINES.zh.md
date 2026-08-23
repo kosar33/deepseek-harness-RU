@@ -1,6 +1,6 @@
 # DeepSeek Harness 品牌素材使用规范
 
-[English](BRAND_GUIDELINES.md) | 中文
+[English](BRAND_GUIDELINES.md) | 中文 | [Русский](BRAND_GUIDELINES.ru.md)
 
 为了维护 DeepSeek Harness 生态的长期健康发展，避免用户混淆，方便用户对相关资源进行检索和识别，我们特别制定本规范，希望大家共同遵守：
 

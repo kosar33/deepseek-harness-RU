@@ -1,6 +1,6 @@
 # dsh-credentials-local
 
-[English](README.md) | 中文
+[English](README.md) | 中文 | [Русский](README.ru.md)
 
 文件型[凭据](../credentials/README.zh.md)提供方：四层来源，一套明确的优先级。
 

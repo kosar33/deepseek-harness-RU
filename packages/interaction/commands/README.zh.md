@@ -1,6 +1,6 @@
 # @deepseek-ai/dsh-commands
 
-[English](README.md) | 中文
+[English](README.md) | 中文 | [Русский](README.ru.md)
 
 由插件负责、供交互式 UI 适配器使用的面向用户命令注册表。[插件命令注册 Agent Note](../../../.agents/notes/implemented/feature/2026-07-19-plugin-command-registration.zh.md)定义了其边界与分发约定。
 

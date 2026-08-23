@@ -1,6 +1,6 @@
 # dsh-home-paths
 
-[English](README.md) | 中文
+[English](README.md) | 中文 | [Русский](README.ru.md)
 
 DeepSeek Harness 用户数据的共享文件系统路径辅助工具。
 

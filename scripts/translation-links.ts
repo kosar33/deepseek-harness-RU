@@ -60,6 +60,16 @@ interface Replacement {
 
 type LinkNode = Extract<Nodes, { type: 'link' | 'definition' }>
 
+/**
+ * Switcher paragraph forms accepted immediately after the H1. The trailing
+ * `[Русский]` segment is the additive third-locale link; the canonical
+ * counterpart link stays first and keeps its strict validation.
+ */
+const LANGUAGE_SWITCHER_LINE = new RegExp(
+  '^(?:English \\| \\[中文\\]\\([^\\n]+\\)(?: \\| \\[Русский\\]\\([^\\n]+\\))?'
+  + '|\\[English\\]\\([^\\n]+\\) \\| 中文(?: \\| \\[Русский\\]\\([^\\n]+\\))?)$',
+)
+
 /** Offset of the one top-level switcher link immediately following the H1. */
 export function languageSwitcherLinkOffset(
   tree: Nodes,
@@ -77,11 +87,11 @@ export function languageSwitcherLinkOffset(
     const end = node.position.end.offset
     if (start === undefined || end === undefined) continue
     const authored = markdown.slice(start, end)
-    if (!/^(?:English \| \[中文\]\([^\n]+\)|\[English\]\([^\n]+\) \| 中文)$/.test(authored)) continue
+    if (!LANGUAGE_SWITCHER_LINE.test(authored)) continue
     const links = node.children.filter((child): child is Extract<Nodes, { type: 'link' }> => child.type === 'link')
-    if (links.length === 1 && accepted.has(links[0]?.url ?? '')) {
-      return links[0]?.position?.start.offset
-    }
+    const primary = links.find(link => accepted.has(link.url))
+    const offset = primary?.position?.start.offset
+    if (offset !== undefined) return offset
   }
   return undefined
 }

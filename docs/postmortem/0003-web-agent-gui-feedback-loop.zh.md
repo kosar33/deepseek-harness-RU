@@ -1,6 +1,6 @@
 # 事故复盘（postmortem） 0003：Web agent（智能体）验收了替代服务器，而非其当前 GUI
 
-[English](0003-web-agent-gui-feedback-loop.md) | 中文
+[English](0003-web-agent-gui-feedback-loop.md) | 中文 | [Русский](0003-web-agent-gui-feedback-loop.ru.md)
 
 状态：已解决
 

@@ -1,6 +1,6 @@
 # `@deepseek-ai/dsh-file-reference`
 
-English | [中文](README.zh.md)
+English | [中文](README.zh.md) | [Русский](README.ru.md)
 
 File-reference discovery seam and browser-safe `@file` grammar shared by host-backed user interfaces. `ctx.fileReferences.list(agent, query, signal)` returns path-only file or directory candidates for the addressed agent; concrete providers own namespace access, ranking, caching, and invalidation. The same contract is remotely callable as the unary `fileReferences/list` Remote method (`@Remote` on the Service Definition, cancelled through the reserved trailing signal), so browser consumers call `ctx.remote.fileReferences.list` without an API Proxy route.
 

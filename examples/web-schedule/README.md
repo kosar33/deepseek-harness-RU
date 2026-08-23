@@ -1,6 +1,6 @@
 # Session-local Schedule
 
-English | [中文](README.zh.md)
+English | [中文](README.zh.md) | [Русский](README.ru.md)
 
 This overlay opts one `dsh web` process into Schedule reminders without changing the shipped default Web composition:
 

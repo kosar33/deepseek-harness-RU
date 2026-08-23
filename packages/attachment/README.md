@@ -1,6 +1,6 @@
 # attachment/ - durable attachment capability family
 
-English | [中文](README.zh.md)
+English | [中文](README.zh.md) | [Русский](README.ru.md)
 
 The durable binary attachment seam and its local filesystem implementation. Both are product packages.
 

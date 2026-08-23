@@ -1,6 +1,6 @@
 # MCP — Model Context Protocol
 
-English | [中文](README.zh.md)
+English | [中文](README.zh.md) | [Русский](README.ru.md)
 
 Packages bridging the harness to the MCP ecosystem.
 

@@ -1,6 +1,6 @@
 # @deepseek-ai/dsh-skill-filesystem
 
-English | [中文](README.zh.md)
+English | [中文](README.zh.md) | [Русский](README.ru.md)
 
 Local filesystem provider for the `ctx.skills` registry.
 

@@ -1,6 +1,6 @@
 # 开发一个工具
 
-[English](tool.md) | 中文
+[English](tool.md) | 中文 | [Русский](tool.ru.md)
 
 本教程会在 Web UI 中添加一个 `greet` 工具。请先完成[第一个插件](./index.zh.md)，并保留其中的 `scratch-plugin` 目录。
 

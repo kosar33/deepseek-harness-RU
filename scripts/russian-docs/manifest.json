@@ -2,73 +2,73 @@
   "pairs": {
     "BRAND_GUIDELINES.ru.md": {
       "source": "BRAND_GUIDELINES.md",
-      "sourceBlob": "900cf7bcec70ff78c6f55ed535897239cd4648df",
-      "ruBlob": "7425c2986138b1b1c139cd2b627d04c217abd5b2"
+      "sourceBlob": "ede2631ee01be0bb61ebe17623f490969a8bcc4d",
+      "ruBlob": "1c472496587e84fb9c47c0ad95084c770be3fe32"
     },
     "CONTRIBUTING.ru.md": {
       "source": "CONTRIBUTING.md",
-      "sourceBlob": "9f30e23a6d9567db7d6097cb82e481b16dda299e",
-      "ruBlob": "f8a950d21527b04fc6d447d8dfe7e93d23b19b5f"
+      "sourceBlob": "722bd8f16fe3733a33eaeb628ea110e538e4d9dd",
+      "ruBlob": "30e93be5f1a8fd3e02efb8890721d8a67d9c7a99"
     },
     "docs/user/develop/basic/config.ru.md": {
       "source": "docs/user/develop/basic/config.md",
-      "sourceBlob": "d935fc3f3b5b42c5b3fbd8d3b0d398a2608aead3",
-      "ruBlob": "14dc22d56cc6317fc98166ff18e75df781f0a2f0"
+      "sourceBlob": "7aab92bfd1d3ccbf91888d10bc647a933e20df42",
+      "ruBlob": "ece26ca85191df3291bc656267a70ee14f2b8868"
     },
     "docs/user/develop/basic/index.ru.md": {
       "source": "docs/user/develop/basic/index.md",
-      "sourceBlob": "08199624e638aaf4a36b04446c39c228b2af6025",
-      "ruBlob": "b7600cb27c5714ce06117cf48903a40d4c59d28a"
+      "sourceBlob": "d25087cf2dc7435ba00d2ba495e8938fe34df39f",
+      "ruBlob": "7ec9ef4d92bed488056bdd829b0ba855606e76a2"
     },
     "docs/user/develop/basic/publish.ru.md": {
       "source": "docs/user/develop/basic/publish.md",
-      "sourceBlob": "17f83e5448d5cfc65cd128c3fe1abbaa88925f77",
-      "ruBlob": "bc095f1e7c7ab155282ceeff6f42fd66a7c84ffd"
+      "sourceBlob": "09408ca7b67ba98ede11cd96ffda382925ae4c35",
+      "ruBlob": "2794809b69f91fab45de587b2ad9b99a6cf23c4f"
     },
     "docs/user/develop/basic/tool.ru.md": {
       "source": "docs/user/develop/basic/tool.md",
-      "sourceBlob": "24a82d277e626ba78760a0afb1c41e2a157eb8ee",
-      "ruBlob": "f7ea9e3e49f4ea63490961ba98c79075a691554d"
+      "sourceBlob": "0fc5f9318f38a6c40da55ca999fcfd02d162fc29",
+      "ruBlob": "06b5baaa5c9045a6403cc87487c9055dd6416080"
     },
     "docs/user/develop/framework/events.ru.md": {
       "source": "docs/user/develop/framework/events.md",
-      "sourceBlob": "17ce5f6c4a70e406b5e3d9e5dd26182f62dc9868",
-      "ruBlob": "f9c7fa6cfe48443d1a9b000e1d9c76700f0caefa"
+      "sourceBlob": "b89b86595c1e2bda06b6cd25f5d68ce73972b91e",
+      "ruBlob": "d64befe72722a40dcb6b9e8a626b73086e09fcef"
     },
     "docs/user/develop/framework/index.ru.md": {
       "source": "docs/user/develop/framework/index.md",
-      "sourceBlob": "8cc673148d7fec4f7d9b994907e17293bc3a6a97",
-      "ruBlob": "b7b41ad6320ecac3a65745d56b44eccb883bd6cc"
+      "sourceBlob": "e8fcf46f8baa39f6f898e141602c3620f862a002",
+      "ruBlob": "be86979dfdc525c2de04ada81a5458c88e101881"
     },
     "docs/user/develop/framework/service.ru.md": {
       "source": "docs/user/develop/framework/service.md",
-      "sourceBlob": "1bcfe2e7690d9f93b871500660e0fbe1e3439b3f",
-      "ruBlob": "a0fc09bf5e3d2dfe5277fa1e8df2f9e66546289e"
+      "sourceBlob": "e742729b57bed6ebe0b69922f5a86c691aef52ea",
+      "ruBlob": "0b18b5c8615fae02d3947a041840c7e5a0d4e43d"
     },
     "docs/user/develop/practice/index.ru.md": {
       "source": "docs/user/develop/practice/index.md",
-      "sourceBlob": "f7e10e14b78da0b2eb922ca0cafd3151d412efd1",
-      "ruBlob": "df169a6dc7e4bc7ee81db219304a5801fad86a53"
+      "sourceBlob": "c246d0a26a0a07092df85a9470118699070e856f",
+      "ruBlob": "726be7019b1d651fd2eac114244f430e098a26b6"
     },
     "docs/user/develop/practice/llm-adapter.ru.md": {
       "source": "docs/user/develop/practice/llm-adapter.md",
-      "sourceBlob": "882e82d880ac622cf886c6c24e75a1987e1c6702",
-      "ruBlob": "01f0f17a052ccdeae093700abcf8908e98983b17"
+      "sourceBlob": "12e73faccc649ff1dd52631a083476ab870a34b1",
+      "ruBlob": "0acde3ea310bd2ccd762cf7f52441f12f2caaad3"
     },
     "docs/user/guide/index.ru.md": {
       "source": "docs/user/guide/index.md",
-      "sourceBlob": "fb97f8cec837ecebc427f94ea5210b940d6fee75",
-      "ruBlob": "e10f011771196980720606ad90bf23a83ad50cc4"
+      "sourceBlob": "5ac986258641664d5a9e4acb0cd75fb77eea9d4f",
+      "ruBlob": "92d02bcd02091a602900def3c2a819c6e75c3625"
     },
     "docs/user/guide/providers.ru.md": {
       "source": "docs/user/guide/providers.md",
-      "sourceBlob": "59682d38c71893c16118639cb2b24f63497a3c13",
-      "ruBlob": "1ce4597df9452f8dee09ec90db093e3b234b2b63"
+      "sourceBlob": "4e9c98375636c3492fe41ea2652701a7ee6174fb",
+      "ruBlob": "9738fd96e36b44f4b24f8405e152b1def1ae6588"
     },
     "docs/user/guide/python-sdk.ru.md": {
       "source": "docs/user/guide/python-sdk.md",
-      "sourceBlob": "71c588ce8c22a8de7ea6c8ed79989b310dcf812a",
-      "ruBlob": "3be93d5c492219e96cdf3d8296edcb2c13830e11"
+      "sourceBlob": "944b1e09ed530c4bf63761b3e4b89bb69bdbc54b",
+      "ruBlob": "43f730b86c9ce0b5d1aaf4e2e32ceeff4547a393"
     },
     "docs/user/index.ru.md": {
       "source": "docs/user/index.md",
@@ -77,13 +77,13 @@
     },
     "README.ru.md": {
       "source": "README.md",
-      "sourceBlob": "9ccd27b8934449bd0d2311317dc38aee5a5c0cdc",
-      "ruBlob": "dcf0c992ce699881936ecbcdbbf29cf9e0db7f88"
+      "sourceBlob": "00e1166468f6be1c84ded8e0bed2a7a6b059a4f8",
+      "ruBlob": "5afeb76bda4948f5ac2180dd1d57e803a68e08db"
     },
     "docs/architecture.ru.md": {
       "source": "docs/architecture.md",
-      "sourceBlob": "622d074c3d873181d764cfe53f64485a2c2e0372",
-      "ruBlob": "a201e98751ebf5013027ee982ddba8748262dbc7"
+      "sourceBlob": "e924c0d8704c7b36b156d77fa1d4c7ea5c457c8b",
+      "ruBlob": "1c532ba9b5f8a211d4ed2b24b07332519bcdef5b"
     },
     "docs/cordis-primer.ru.md": {
       "source": "docs/cordis-primer.md",
@@ -97,23 +97,23 @@
     },
     "docs/glossary.ru.md": {
       "source": "docs/glossary.md",
-      "sourceBlob": "9bff818d5a9f7688e8d2a2425b6e6a9555be3847",
-      "ruBlob": "2f28f6a619e8e17129855a65aef648ce0672039a"
+      "sourceBlob": "ad3e7fec3496305d4f16cac1c1b58c5d721a7bde",
+      "ruBlob": "da35985cd10982d25ca9d98a94ae9296fa062df6"
     },
     "docs/web-styling.ru.md": {
       "source": "docs/web-styling.md",
-      "sourceBlob": "5296cc7f83f712532262eadda6da098ae9f63ec7",
-      "ruBlob": "a7828ad5370ee8d20ca9d1afb0a64492db1b7391"
+      "sourceBlob": "2a438d782a42bfbf3c506b9322ab9e24f729f261",
+      "ruBlob": "eaadf6365eefae8c7605ecd1f1ec3149fdeccac5"
     },
     "docs/rescope.ru.md": {
       "source": "docs/rescope.md",
-      "sourceBlob": "3dde39875021e7a4161e1ae66550e9dedf5eb4fa",
-      "ruBlob": "bdd7b7bea56c3d6004f497c8ef96c7a8b663f0e4"
+      "sourceBlob": "bf0d07851e8bec3def5f61bc88039442b0a4e151",
+      "ruBlob": "ec1c08d52bd890af8836a25e7f57670ece96f22b"
     },
     "docs/api-gateway.ru.md": {
       "source": "docs/api-gateway.md",
-      "sourceBlob": "cd3103a172d75a4ab325a2368e37af354f09051b",
-      "ruBlob": "c0c1703a3821b77a4054a619cf8a25fec774542c"
+      "sourceBlob": "45dce7301fc0b383059a2d882c56a5885683fd5c",
+      "ruBlob": "c667c738ae94aa894b2637a86aab5cf5707e8584"
     },
     "docs/cookbook/adding-a-conversation-node.ru.md": {
       "source": "docs/cookbook/adding-a-conversation-node.md",
@@ -162,23 +162,23 @@
     },
     "docs/testing.ru.md": {
       "source": "docs/testing.md",
-      "sourceBlob": "e2179effa6365a58584cb9f1dc7e4c40c5533741",
-      "ruBlob": "5076d72e261b19f95ec49f25ca16cbe77d7153ec"
+      "sourceBlob": "a1a2ac778b5334b480bba3decb0da338731980ad",
+      "ruBlob": "75521878e61e9203439d58fad656f52a4d3f2973"
     },
     "docs/development.ru.md": {
       "source": "docs/development.md",
-      "sourceBlob": "904245f93546122e4e3a54e020b302a3bcd39d1a",
-      "ruBlob": "3ed1709b5a8782db574afe08c35623cbcfabb90a"
+      "sourceBlob": "077cd43955d65ca57d860e10b896ec1b5e21007f",
+      "ruBlob": "ae80c79e32f1a3c1833002707c7d97a33ba10de7"
     },
     "docs/tool-execution-pipeline.ru.md": {
       "source": "docs/tool-execution-pipeline.md",
       "sourceBlob": "d04d2e4e5093fee92f8921f0eb0112c960a81bb8",
-      "ruBlob": "5bf06083ad405f78d17c5d4cd795de690a959574"
+      "ruBlob": "979bf93d03f7585766d4c80c9c8a60f03f34b073"
     },
     "docs/agent-lifecycle.ru.md": {
       "source": "docs/agent-lifecycle.md",
       "sourceBlob": "30509e17ce24ff2d078f86b6cc2a24b77ae3e4fa",
-      "ruBlob": "ffad510f5f1d03225494988bd91e5b49ecbe2576"
+      "ruBlob": "adc91e5f402fe5552cd64d0149356fad18724e46"
     },
     "docs/subsystems/core.ru.md": {
       "source": "docs/subsystems/core.md",
@@ -267,8 +267,8 @@
     },
     "docs/subsystems/session.ru.md": {
       "source": "docs/subsystems/session.md",
-      "sourceBlob": "96520c72b83bf713b7fe09563f7d6e44c0386bcf",
-      "ruBlob": "6332701b144158bb16e57b83988a1891a613738c"
+      "sourceBlob": "202605690174e8dbacd2708fd0edbff7c7ada166",
+      "ruBlob": "715a5b46c5718fcbfe40622002b67858dd6cc218"
     },
     "docs/subsystems/sandbox.ru.md": {
       "source": "docs/subsystems/sandbox.md",
@@ -287,8 +287,8 @@
     },
     "docs/subsystems/subagent.ru.md": {
       "source": "docs/subsystems/subagent.md",
-      "sourceBlob": "e08c2bd1caa021504be66f70d8b7006c923e4d6f",
-      "ruBlob": "31a495496008635dbaaca2d7d018464ea3bfd26c"
+      "sourceBlob": "847d51a939ecbe901313104b5901f6f415bddddd",
+      "ruBlob": "07cb16aba68f38f793344dae4707f8c00186ef7c"
     },
     "docs/subsystems/system-prompt.ru.md": {
       "source": "docs/subsystems/system-prompt.md",
@@ -1927,33 +1927,33 @@
     },
     "docs/cordis-tutorial/index.ru.md": {
       "source": "docs/cordis-tutorial/index.md",
-      "sourceBlob": "c51965e186ce8d78b577c1005c1c3e1831b91be1",
-      "ruBlob": "170f4a986d9366ad619bcab8572d0374a458ef4f"
+      "sourceBlob": "29346d21cdeba970d45a3696b79f9e6521dbb39d",
+      "ruBlob": "cb6745a0a4b3f14c7228e5ed65be748a75fe22a2"
     },
     "docs/cordis-tutorial/01-first-plugin.ru.md": {
       "source": "docs/cordis-tutorial/01-first-plugin.md",
-      "sourceBlob": "79df2f42df1f34a7ef32cc81607e1b926a1854ae",
-      "ruBlob": "5f1f1235449a962df988bd6400f2f6ec0607305e"
+      "sourceBlob": "39da81100c24cc0be4634b9638b9e827e8fd4d01",
+      "ruBlob": "16d7139f044d16908da46d2bee65a362375b5fd9"
     },
     "docs/cordis-tutorial/02-lifecycle-and-effects.ru.md": {
       "source": "docs/cordis-tutorial/02-lifecycle-and-effects.md",
-      "sourceBlob": "8e75708eb0cba1aceb7fa3dae5ae334995eb113f",
-      "ruBlob": "d320fbbb452fa43885ab1fe9654f9fd6d81c32a7"
+      "sourceBlob": "fee998796be13f993ca5b3eb9f0f13423a2bd147",
+      "ruBlob": "68693c5be831e5401a48730abbf65a74bfdf18a1"
     },
     "docs/cordis-tutorial/03-services.ru.md": {
       "source": "docs/cordis-tutorial/03-services.md",
-      "sourceBlob": "ebfc400dbbc701a3c164c7d30c371dec879d7d73",
-      "ruBlob": "8013ee1bd63b847f287760d011926ca6ac0bba2b"
+      "sourceBlob": "6b4b88f927637a70f70d0b4630450ddc79865d37",
+      "ruBlob": "0f6ed6bcdc393ec153c1a51c92bda9ac148f8275"
     },
     "docs/cordis-tutorial/04-events.ru.md": {
       "source": "docs/cordis-tutorial/04-events.md",
-      "sourceBlob": "db911b9a06d7304d73030a2020de3d465fde2f9c",
-      "ruBlob": "c60994ca4f9adca4e36be76254e65b705e771c66"
+      "sourceBlob": "b2d8d850b6967250ed418245c60f2ace7bd0f474",
+      "ruBlob": "0731f1d267d93cbe09c359a34624d0c7e2c520cd"
     },
     "docs/cordis-tutorial/05-config.ru.md": {
       "source": "docs/cordis-tutorial/05-config.md",
-      "sourceBlob": "17cccce2ec43be65477ce527800ee6a636ee5d96",
-      "ruBlob": "7ee424dc7c9d99498b2f4061e58755f3d41e5c0f"
+      "sourceBlob": "41a658630ce4d7df6138be4d7c18a97d1e3f4c86",
+      "ruBlob": "fe44c1b094156518e1561514c8d62911097d5ee7"
     },
     "examples/README.ru.md": {
       "source": "examples/README.md",
@@ -2012,8 +2012,8 @@
     },
     "docs/cordis-tutorial/06-composition-and-hmr.ru.md": {
       "source": "docs/cordis-tutorial/06-composition-and-hmr.md",
-      "sourceBlob": "2b53aa28be99851e77a71de76337f2beb4003e8d",
-      "ruBlob": "560fb5494bfb885e2ca7c4d8a3367b8e9877b763"
+      "sourceBlob": "bfd50ef1f9c9a4915416dc2f507f2bfb6f55e102",
+      "ruBlob": "a5d485358c36fcbd5b36db7d3c79424288f8b556"
     },
     "docs/cordis-tutorial/07-into-the-harness.ru.md": {
       "source": "docs/cordis-tutorial/07-into-the-harness.md",

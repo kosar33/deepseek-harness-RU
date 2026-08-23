@@ -31,7 +31,7 @@ import {
   accessEn, accessRu, accessZh, en, ru, zh,
 } from './locales.ts'
 import {
-  displayPermissionPreset, FULL_ACCESS_PRESET,
+  displayPermissionPreset, FULL_ACCESS_PRESET, presetModeKey,
 } from './presentation.ts'
 import { PermissionPresetSettingsController } from './settings-store.ts'
 
@@ -54,23 +54,28 @@ function selectOf(session: SessionFace | undefined): PermissionSelect | undefine
 function optionsOf(value: PermissionSelect, t: (key: string) => string): SelectOption[] {
   return value.options
     .filter(option => option.value !== 'custom')
-    .map(option => ({
-      id: option.value,
-      label: displayPermissionPreset(option.value, option.name),
-      ...(option.description !== undefined ? { detail: option.description } : {}),
-      ...(option.value === value.currentValue ? { active: true } : {}),
-      ...(option.value === FULL_ACCESS_PRESET
-        ? {
-          confirmation: {
-            title: t('confirm.title'),
-            description: t('confirm.description'),
-            acknowledgeLabel: t('confirm.acknowledge'),
-            cancelLabel: t('confirm.cancel'),
-            confirmLabel: t('confirm.enable'),
-          },
-        }
-        : {}),
-    }))
+    .map((option) => {
+      const modeKey = presetModeKey(option.value)
+      return {
+        id: option.value,
+        label: modeKey !== undefined
+          ? t(modeKey)
+          : displayPermissionPreset(option.value, option.name),
+        ...(option.description !== undefined ? { detail: option.description } : {}),
+        ...(option.value === value.currentValue ? { active: true } : {}),
+        ...(option.value === FULL_ACCESS_PRESET
+          ? {
+            confirmation: {
+              title: t('confirm.title'),
+              description: t('confirm.description'),
+              acknowledgeLabel: t('confirm.acknowledge'),
+              cancelLabel: t('confirm.cancel'),
+              confirmLabel: t('confirm.enable'),
+            },
+          }
+          : {}),
+      }
+    })
 }
 
 /**
@@ -87,6 +92,9 @@ export function apply(ctx: ClientContext): void {
   ctx.effect(() => {
     const disposers = [
       ctx.locale.register(ACCESS_NS, 'zh', {
+        'mode.read-only': accessZh['mode.read-only'],
+        'mode.workspace-write': accessZh['mode.workspace-write'],
+        'mode.full-access': accessZh['mode.full-access'],
         'confirm.title': accessZh['confirm.title'],
         'confirm.description': accessZh['confirm.description'],
         'confirm.acknowledge': accessZh['confirm.acknowledge'],
@@ -94,6 +102,9 @@ export function apply(ctx: ClientContext): void {
         'confirm.enable': accessZh['confirm.enable'],
       }),
       ctx.locale.register(ACCESS_NS, 'en', {
+        'mode.read-only': accessEn['mode.read-only'],
+        'mode.workspace-write': accessEn['mode.workspace-write'],
+        'mode.full-access': accessEn['mode.full-access'],
         'confirm.title': accessEn['confirm.title'],
         'confirm.description': accessEn['confirm.description'],
         'confirm.acknowledge': accessEn['confirm.acknowledge'],
@@ -101,6 +112,9 @@ export function apply(ctx: ClientContext): void {
         'confirm.enable': accessEn['confirm.enable'],
       }),
       ctx.locale.register(ACCESS_NS, 'ru', {
+        'mode.read-only': accessRu['mode.read-only'],
+        'mode.workspace-write': accessRu['mode.workspace-write'],
+        'mode.full-access': accessRu['mode.full-access'],
         'confirm.title': accessRu['confirm.title'],
         'confirm.description': accessRu['confirm.description'],
         'confirm.acknowledge': accessRu['confirm.acknowledge'],

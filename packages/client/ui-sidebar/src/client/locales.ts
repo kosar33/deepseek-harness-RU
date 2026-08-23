@@ -2,6 +2,7 @@
 
 /** Simplified Chinese dictionary (the key-set source of truth). */
 export const zh = {
+  'brand.localBuild': 'DSH 本地构建',
   'session.new': '新会话',
   'session.new.label': '新建会话',
   'toggle.open': '打开侧边栏',
@@ -13,6 +14,7 @@ export type SidebarKey = keyof typeof zh
 
 /** English dictionary, checked complete against the zh key set. */
 export const en = {
+  'brand.localBuild': 'DSH Local Build',
   'session.new': 'New Session',
   'session.new.label': 'New session',
   'toggle.open': 'Open sidebar',
@@ -21,6 +23,7 @@ export const en = {
 
 /** Russian dictionary, checked complete against the zh key set. */
 export const ru = {
+  'brand.localBuild': 'DSH — локальная сборка',
   'session.new': 'Новая сессия',
   'session.new.label': 'Новая сессия',
   'toggle.open': 'Открыть боковую панель',

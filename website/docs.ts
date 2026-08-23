@@ -159,34 +159,34 @@ const homeAndGuide = pairedPages([
   {
     source: 'docs/user/index.md',
     route: 'index.md',
-    label: { root: 'DeepSeek Harness', en: 'DeepSeek Harness' },
+    label: { root: 'DeepSeek Harness', en: 'DeepSeek Harness', ru: 'DeepSeek Harness' },
     sidebar: { root: null, en: null },
-    section: { root: '首页', en: 'Home' },
+    section: { root: '首页', en: 'Home', ru: 'Главная' },
     order: 0,
   },
   {
     source: 'docs/user/guide/index.md',
     route: 'guide/quickstart.md',
-    label: { root: '使用 Web UI', en: 'Use the Web UI' },
+    label: { root: '使用 Web UI', en: 'Use the Web UI', ru: 'Использование веб-интерфейса' },
     sidebar: { root: 'zh-guide', en: 'en-guide' },
-    section: { root: '入门', en: 'Guide' },
+    section: { root: '入门', en: 'Guide', ru: 'Руководство' },
     order: 1,
     sourceAliases: ['docs/user/guide'],
   },
   {
     source: 'docs/user/guide/providers.md',
     route: 'guide/providers.md',
-    label: { root: '配置模型', en: 'Configure models' },
+    label: { root: '配置模型', en: 'Configure models', ru: 'Настройка моделей' },
     sidebar: { root: 'zh-guide', en: 'en-guide' },
-    section: { root: '入门', en: 'Guide' },
+    section: { root: '入门', en: 'Guide', ru: 'Руководство' },
     order: 2,
   },
   {
     source: 'docs/user/guide/python-sdk.md',
     route: 'guide/python-sdk.md',
-    label: { root: 'Python', en: 'Python' },
+    label: { root: 'Python', en: 'Python', ru: 'Python' },
     sidebar: { root: 'zh-guide', en: 'en-guide' },
-    section: { root: 'SDK', en: 'SDK' },
+    section: { root: 'SDK', en: 'SDK', ru: 'SDK' },
     order: 1,
   },
 ])
@@ -195,95 +195,95 @@ const develop = pairedPages([
   {
     source: 'docs/user/develop/basic/index.md',
     route: 'develop/basic/index.md',
-    label: { root: '第一个 Harness 插件', en: 'Your first Harness plugin' },
+    label: { root: '第一个 Harness 插件', en: 'Your first Harness plugin', ru: 'Ваш первый плагин Harness' },
     sidebar: { root: 'zh-develop', en: 'en-develop' },
-    section: { root: '基础', en: 'Basics' },
+    section: { root: '基础', en: 'Basics', ru: 'Основы' },
     order: 1,
     sourceAliases: ['docs/user/develop/basic'],
   },
   {
     source: 'docs/user/develop/basic/tool.md',
     route: 'develop/basic/tool.md',
-    label: { root: '开发一个 Tool', en: 'Build a tool' },
+    label: { root: '开发一个 Tool', en: 'Build a tool', ru: 'Создание инструмента' },
     sidebar: { root: 'zh-develop', en: 'en-develop' },
-    section: { root: '基础', en: 'Basics' },
+    section: { root: '基础', en: 'Basics', ru: 'Основы' },
     order: 2,
   },
   {
     source: 'docs/user/develop/basic/config.md',
     route: 'develop/basic/config.md',
-    label: { root: '插件配置', en: 'Plugin configuration' },
+    label: { root: '插件配置', en: 'Plugin configuration', ru: 'Конфигурация плагина' },
     sidebar: { root: 'zh-develop', en: 'en-develop' },
-    section: { root: '基础', en: 'Basics' },
+    section: { root: '基础', en: 'Basics', ru: 'Основы' },
     order: 3,
   },
   {
     source: 'docs/user/develop/basic/publish.md',
     route: 'develop/basic/publish.md',
-    label: { root: '打包与安装插件', en: 'Package and install' },
+    label: { root: '打包与安装插件', en: 'Package and install', ru: 'Сборка и установка' },
     sidebar: { root: 'zh-develop', en: 'en-develop' },
-    section: { root: '基础', en: 'Basics' },
+    section: { root: '基础', en: 'Basics', ru: 'Основы' },
     order: 4,
   },
   {
     source: 'docs/user/develop/framework/index.md',
     route: 'develop/framework/index.md',
-    label: { root: '插件与生命周期', en: 'Plugin lifecycle' },
+    label: { root: '插件与生命周期', en: 'Plugin lifecycle', ru: 'Жизненный цикл плагина' },
     sidebar: { root: 'zh-develop', en: 'en-develop' },
-    section: { root: '框架能力', en: 'Framework' },
+    section: { root: '框架能力', en: 'Framework', ru: 'Фреймворк' },
     order: 1,
     sourceAliases: ['docs/user/develop/framework'],
   },
   {
     source: 'docs/user/develop/framework/service.md',
     route: 'develop/framework/service.md',
-    label: { root: '服务与依赖', en: 'Services and dependencies' },
+    label: { root: '服务与依赖', en: 'Services and dependencies', ru: 'Сервисы и зависимости' },
     sidebar: { root: 'zh-develop', en: 'en-develop' },
-    section: { root: '框架能力', en: 'Framework' },
+    section: { root: '框架能力', en: 'Framework', ru: 'Фреймворк' },
     order: 2,
   },
   {
     source: 'docs/user/develop/framework/events.md',
     route: 'develop/framework/events.md',
-    label: { root: '事件系统', en: 'Event system' },
+    label: { root: '事件系统', en: 'Event system', ru: 'Событийная система' },
     sidebar: { root: 'zh-develop', en: 'en-develop' },
-    section: { root: '框架能力', en: 'Framework' },
+    section: { root: '框架能力', en: 'Framework', ru: 'Фреймворк' },
     order: 3,
   },
   {
     source: 'docs/user/develop/practice/index.md',
     route: 'develop/practice/index.md',
-    label: { root: '能力的三层拆分', en: 'Capability layering' },
+    label: { root: '能力的三层拆分', en: 'Capability layering', ru: 'Слои возможности' },
     sidebar: { root: 'zh-develop', en: 'en-develop' },
-    section: { root: '实战', en: 'Practice' },
+    section: { root: '实战', en: 'Practice', ru: 'Практика' },
     order: 1,
     sourceAliases: ['docs/user/develop/practice'],
   },
   {
     source: 'docs/user/develop/practice/llm-adapter.md',
     route: 'develop/practice/llm-adapter.md',
-    label: { root: 'LLM 适配器', en: 'LLM adapter' },
+    label: { root: 'LLM 适配器', en: 'LLM adapter', ru: 'LLM-адаптер' },
     sidebar: { root: 'zh-develop', en: 'en-develop' },
-    section: { root: '实战', en: 'Practice' },
+    section: { root: '实战', en: 'Practice', ru: 'Практика' },
     order: 2,
   },
 ])
 
 const cordisTutorial = pairedPages(([
-  ['index.md', '总览', 'Overview'],
-  ['01-first-plugin.md', '1. 第一个插件', '1. Your first plugin'],
-  ['02-lifecycle-and-effects.md', '2. 生命周期与副作用', '2. Lifecycle and effects'],
-  ['03-services.md', '3. 服务', '3. Services'],
-  ['04-events.md', '4. 事件', '4. Events'],
-  ['05-config.md', '5. 配置', '5. Configuration'],
-  ['06-composition-and-hmr.md', '6. 组合与热重载', '6. Composition and HMR'],
-  ['07-into-the-harness.md', '7. 进入 Harness', '7. Into the harness'],
-] as const).map(([file, rootLabel, enLabel], order): PairedPage => ({
+  ['index.md', '总览', 'Overview', 'Обзор'],
+  ['01-first-plugin.md', '1. 第一个插件', '1. Your first plugin', '1. Ваш первый плагин'],
+  ['02-lifecycle-and-effects.md', '2. 生命周期与副作用', '2. Lifecycle and effects', '2. Жизненный цикл и эффекты'],
+  ['03-services.md', '3. 服务', '3. Services', '3. Сервисы'],
+  ['04-events.md', '4. 事件', '4. Events', '4. События'],
+  ['05-config.md', '5. 配置', '5. Configuration', '5. Конфигурация'],
+  ['06-composition-and-hmr.md', '6. 组合与热重载', '6. Composition and HMR', '6. Композиция и HMR'],
+  ['07-into-the-harness.md', '7. 进入 Harness', '7. Into the harness', '7. Внутрь Harness'],
+] as const).map(([file, rootLabel, enLabel, ruLabel], order): PairedPage => ({
   source: `docs/cordis-tutorial/${file}`,
   route: `develop/cordis-tutorial/${file}`,
-  label: { root: rootLabel, en: enLabel },
+  label: { root: rootLabel, en: enLabel, ru: ruLabel },
   sidebar: { root: 'zh-develop', en: 'en-develop' },
-  section: { root: 'Cordis 框架教程', en: 'Cordis framework tutorial' },
+  section: { root: 'Cordis 框架教程', en: 'Cordis framework tutorial', ru: 'Туториал по фреймворку Cordis' },
   order,
   ...(file === 'index.md' ? { sourceAliases: ['docs/cordis-tutorial'] } : {}),
 })))
@@ -292,9 +292,9 @@ const cordisPrimerReference = pairedPages([
   {
     source: 'docs/cordis-primer.md',
     route: 'reference/cordis-primer.md',
-    label: { root: 'Cordis 入门', en: 'Cordis primer' },
+    label: { root: 'Cordis 入门', en: 'Cordis primer', ru: 'Primer по Cordis' },
     sidebar: { root: 'zh-reference', en: 'en-reference' },
-    section: { root: '概念', en: 'Concepts' },
+    section: { root: '概念', en: 'Concepts', ru: 'Концепции' },
     order: 1,
   },
 ])
@@ -305,72 +305,72 @@ const cordisPrimerReference = pairedPages([
  * the reference sidebar below the fold.
  */
 const subsystemGroups = [
-  ['总览', 'Overview', [
-    ['README.md', '子系统', 'Subsystems'],
+  ['总览', 'Overview', 'Обзор', [
+    ['README.md', '子系统', 'Subsystems', 'Подсистемы'],
   ]],
-  ['内核与作用域', 'Core and scopes', [
-    ['core.md', '核心', 'Core'],
-    ['scope.md', '作用域', 'Scopes'],
-    ['invariants.md', '运行时不变式', 'Runtime invariants'],
+  ['内核与作用域', 'Core and scopes', 'Ядро и скоупы', [
+    ['core.md', '核心', 'Core', 'Ядро'],
+    ['scope.md', '作用域', 'Scopes', 'Скоупы'],
+    ['invariants.md', '运行时不变式', 'Runtime invariants', 'Инварианты рантайма'],
   ]],
-  ['会话与持久化', 'Sessions and persistence', [
-    ['session.md', '会话', 'Sessions'],
-    ['session-query.md', '会话查询', 'Session query'],
-    ['session-reference.md', '会话引用', 'Session references'],
-    ['session-title.md', '会话标题', 'Session titles'],
-    ['session-projection.md', '会话投影', 'Session projections'],
-    ['persistence.md', '会话持久化', 'Session persistence'],
-    ['spill.md', 'Spill 存储', 'Spill storage'],
-    ['session-telemetry.md', '遥测', 'SessionTelemetryBackend'],
+  ['会话与持久化', 'Sessions and persistence', 'Сессии и персистентность', [
+    ['session.md', '会话', 'Sessions', 'Сессии'],
+    ['session-query.md', '会话查询', 'Session query', 'Запросы к сессиям'],
+    ['session-reference.md', '会话引用', 'Session references', 'Ссылки на сессии'],
+    ['session-title.md', '会话标题', 'Session titles', 'Заголовки сессий'],
+    ['session-projection.md', '会话投影', 'Session projections', 'Проекции сессий'],
+    ['persistence.md', '会话持久化', 'Session persistence', 'Персистентность сессий'],
+    ['spill.md', 'Spill 存储', 'Spill storage', 'Хранилище Spill'],
+    ['session-telemetry.md', '遥测', 'SessionTelemetryBackend', 'SessionTelemetryBackend'],
   ]],
-  ['模型与上下文', 'Model and context', [
-    ['llm-streaming.md', 'LLM 流式响应', 'LLM streaming'],
-    ['token-meter.md', 'Token 计量', 'Token metering'],
-    ['system-prompt.md', '系统提示词', 'System prompts'],
-    ['compaction.md', '上下文压缩', 'Compaction'],
+  ['模型与上下文', 'Model and context', 'Модель и контекст', [
+    ['llm-streaming.md', 'LLM 流式响应', 'LLM streaming', 'Потоковая передача LLM'],
+    ['token-meter.md', 'Token 计量', 'Token metering', 'Учёт токенов'],
+    ['system-prompt.md', '系统提示词', 'System prompts', 'Системные промпты'],
+    ['compaction.md', '上下文压缩', 'Compaction', 'Компакция'],
   ]],
-  ['执行与工具', 'Execution and tools', [
-    ['tools.md', '工具', 'Tools'],
-    ['shell.md', 'Bash 执行', 'Bash execution'],
-    ['subprocess.md', '子进程', 'Subprocesses'],
-    ['terminal.md', 'PTY 会话', 'PTY sessions'],
-    ['jobs.md', '后台任务', 'Background jobs'],
-    ['filesystem.md', '文件系统', 'Filesystem'],
-    ['lsp.md', 'LSP 导航', 'LSP navigation'],
-    ['code-runtime.md', '代码运行时', 'Code runtime'],
-    ['web.md', 'Web 访问', 'Web access'],
-    ['skills.md', '技能', 'Skills'],
-    ['workflow.md', '工作流', 'Workflows'],
-    ['subagent.md', '子代理', 'Subagents'],
+  ['执行与工具', 'Execution and tools', 'Исполнение и инструменты', [
+    ['tools.md', '工具', 'Tools', 'Инструменты'],
+    ['shell.md', 'Bash 执行', 'Bash execution', 'Исполнение Bash'],
+    ['subprocess.md', '子进程', 'Subprocesses', 'Субпроцессы'],
+    ['terminal.md', 'PTY 会话', 'PTY sessions', 'PTY-сессии'],
+    ['jobs.md', '后台任务', 'Background jobs', 'Фоновые задания'],
+    ['filesystem.md', '文件系统', 'Filesystem', 'Файловая система'],
+    ['lsp.md', 'LSP 导航', 'LSP navigation', 'Навигация LSP'],
+    ['code-runtime.md', '代码运行时', 'Code runtime', 'Рантайм кода'],
+    ['web.md', 'Web 访问', 'Web access', 'Веб-доступ'],
+    ['skills.md', '技能', 'Skills', 'Навыки'],
+    ['workflow.md', '工作流', 'Workflows', 'Workflows'],
+    ['subagent.md', '子代理', 'Subagents', 'Субагенты'],
   ]],
-  ['策略与交互', 'Policy and interaction', [
-    ['approval.md', '审批', 'Approvals'],
-    ['permission-presets.md', '权限预设', 'Permission presets'],
-    ['sandbox.md', '沙箱', 'Sandboxing'],
-    ['plan.md', '计划模式', 'Plan mode'],
-    ['user-questions.md', '用户交互', 'User interaction'],
-    ['commands.md', '命令', 'Human commands'],
-    ['goal.md', '目标', 'Goals'],
-    ['schedule.md', '定时提醒', 'Scheduled reminders'],
+  ['策略与交互', 'Policy and interaction', 'Политики и взаимодействие', [
+    ['approval.md', '审批', 'Approvals', 'Одобрения'],
+    ['permission-presets.md', '权限预设', 'Permission presets', 'Пресеты разрешений'],
+    ['sandbox.md', '沙箱', 'Sandboxing', 'Песочница'],
+    ['plan.md', '计划模式', 'Plan mode', 'Режим плана'],
+    ['user-questions.md', '用户交互', 'User interaction', 'Взаимодействие с пользователем'],
+    ['commands.md', '命令', 'Human commands', 'Команды пользователя'],
+    ['goal.md', '目标', 'Goals', 'Цели'],
+    ['schedule.md', '定时提醒', 'Scheduled reminders', 'Напоминания по расписанию'],
   ]],
-  ['平台与接入', 'Platform and access', [
-    ['web-server.md', 'HTTP 服务器', 'HTTP server'],
-    ['typert.md', 'Typert', 'Typert'],
-    ['client-modules.md', '客户端模块', 'Client modules'],
-    ['storage.md', '存储', 'Storage'],
-    ['workspace.md', '工作区', 'Workspaces'],
-    ['settings.md', '用户设置', 'User settings'],
-    ['credentials.md', '用户凭据', 'User credentials'],
+  ['平台与接入', 'Platform and access', 'Платформа и доступ', [
+    ['web-server.md', 'HTTP 服务器', 'HTTP server', 'HTTP-сервер'],
+    ['typert.md', 'Typert', 'Typert', 'Typert'],
+    ['client-modules.md', '客户端模块', 'Client modules', 'Клиентские модули'],
+    ['storage.md', '存储', 'Storage', 'Хранилище'],
+    ['workspace.md', '工作区', 'Workspaces', 'Рабочие области'],
+    ['settings.md', '用户设置', 'User settings', 'Пользовательские настройки'],
+    ['credentials.md', '用户凭据', 'User credentials', 'Учётные данные пользователя'],
   ]],
 ] as const
 
-const subsystemsReference = subsystemGroups.flatMap(([rootSection, enSection, files]) => pairedPages(
-  files.map(([file, rootLabel, enLabel], order): PairedPage => ({
+const subsystemsReference = subsystemGroups.flatMap(([rootSection, enSection, ruSection, files]) => pairedPages(
+  files.map(([file, rootLabel, enLabel, ruLabel], order): PairedPage => ({
     source: `docs/subsystems/${file}`,
     route: file === 'README.md' ? 'reference/subsystems/index.md' : `reference/subsystems/${file}`,
-    label: { root: rootLabel, en: enLabel },
+    label: { root: rootLabel, en: enLabel, ru: ruLabel },
     sidebar: { root: 'zh-reference', en: 'en-reference' },
-    section: { root: rootSection, en: enSection },
+    section: { root: rootSection, en: enSection, ru: ruSection },
     order,
     // Subsystem pages carry long third-level sections a two-level outline reaches.
     outline: [2, 3],
@@ -380,85 +380,85 @@ const subsystemsReference = subsystemGroups.flatMap(([rootSection, enSection, fi
 
 const reference = [
   ...pairedPages(([
-    ['docs/architecture.md', 'reference/index.md', '架构', 'Architecture', 0],
-  ] as const).map(([source, route, rootLabel, enLabel, order]): PairedPage => ({
+    ['docs/architecture.md', 'reference/index.md', '架构', 'Architecture', 'Архитектура', 0],
+  ] as const).map(([source, route, rootLabel, enLabel, ruLabel, order]): PairedPage => ({
     source,
     route,
-    label: { root: rootLabel, en: enLabel },
+    label: { root: rootLabel, en: enLabel, ru: ruLabel },
     sidebar: { root: 'zh-reference', en: 'en-reference' },
-    section: { root: '概念', en: 'Concepts' },
+    section: { root: '概念', en: 'Concepts', ru: 'Концепции' },
     order,
   }))),
   ...pairedPages(([
-    ['docs/capability-seams.md', 'reference/capability-seams.md', '能力服务', 'Capability services', 2],
-    ['docs/agent-lifecycle.md', 'reference/agent-lifecycle.md', 'Agent 生命周期', 'Agent lifecycle', 3],
-    ['docs/tool-execution-pipeline.md', 'reference/tool-execution-pipeline.md', 'Tool 执行', 'Tool execution', 4],
-  ] as const).map(([source, route, rootLabel, enLabel, order]): PairedPage => ({
+    ['docs/capability-seams.md', 'reference/capability-seams.md', '能力服务', 'Capability services', 'Сервисы возможностей', 2],
+    ['docs/agent-lifecycle.md', 'reference/agent-lifecycle.md', 'Agent 生命周期', 'Agent lifecycle', 'Жизненный цикл агента', 3],
+    ['docs/tool-execution-pipeline.md', 'reference/tool-execution-pipeline.md', 'Tool 执行', 'Tool execution', 'Исполнение инструментов', 4],
+  ] as const).map(([source, route, rootLabel, enLabel, ruLabel, order]): PairedPage => ({
     source,
     route,
-    label: { root: rootLabel, en: enLabel },
+    label: { root: rootLabel, en: enLabel, ru: ruLabel },
     sidebar: { root: 'zh-reference', en: 'en-reference' },
-    section: { root: '概念', en: 'Concepts' },
+    section: { root: '概念', en: 'Concepts', ru: 'Концепции' },
     order,
   }))),
   ...pairedPages(([
-    ['docs/config-catalog.md', 'reference/config-catalog.md', '插件配置', 'Plugin configuration'],
-    ['docs/tool-catalog.md', 'reference/tool-catalog.md', 'Tool Schema', 'Tool schemas'],
-    ['docs/persistence-catalog.md', 'reference/persistence-catalog.md', '持久化事件', 'Persistence events', 'deep'],
-  ] as const).map(([source, route, rootLabel, enLabel, outline], order): PairedPage => ({
+    ['docs/config-catalog.md', 'reference/config-catalog.md', '插件配置', 'Plugin configuration', 'Конфигурация плагинов'],
+    ['docs/tool-catalog.md', 'reference/tool-catalog.md', 'Tool Schema', 'Tool schemas', 'Схемы инструментов'],
+    ['docs/persistence-catalog.md', 'reference/persistence-catalog.md', '持久化事件', 'Persistence events', 'События персистентности', 'deep'],
+  ] as const).map(([source, route, rootLabel, enLabel, ruLabel, outline], order): PairedPage => ({
     source,
     route,
-    label: { root: rootLabel, en: enLabel },
+    label: { root: rootLabel, en: enLabel, ru: ruLabel },
     sidebar: { root: 'zh-reference', en: 'en-reference' },
-    section: { root: '生成参考', en: 'Generated reference' },
+    section: { root: '生成参考', en: 'Generated reference', ru: 'Сгенерированный справочник' },
     order,
     ...(outline === undefined ? {} : { outline }),
   }))),
   ...pairedPages(([
-    ['context.md', 'Context', 'Context'],
-    ['events.md', 'Events', 'Events'],
-    ['fiber.md', 'Fiber', 'Fiber'],
-    ['registry.md', 'Plugin Registry', 'Plugin Registry'],
-    ['service.md', 'Service', 'Service'],
-  ] as const).map(([file, rootLabel, enLabel], order): PairedPage => ({
+    ['context.md', 'Context', 'Context', 'Context'],
+    ['events.md', 'Events', 'Events', 'Events'],
+    ['fiber.md', 'Fiber', 'Fiber', 'Fiber'],
+    ['registry.md', 'Plugin Registry', 'Plugin Registry', 'Plugin Registry'],
+    ['service.md', 'Service', 'Service', 'Service'],
+  ] as const).map(([file, rootLabel, enLabel, ruLabel], order): PairedPage => ({
     source: `docs/cordis-api/${file}`,
     route: `reference/cordis-api/${file}`,
-    label: { root: rootLabel, en: enLabel },
+    label: { root: rootLabel, en: enLabel, ru: ruLabel },
     sidebar: { root: 'zh-reference', en: 'en-reference' },
-    section: { root: 'Cordis API', en: 'Cordis Core API' },
+    section: { root: 'Cordis API', en: 'Cordis Core API', ru: 'Core API Cordis' },
     order,
   }))),
   ...mirroredPages(([
-    ['inherited.md', '继承接口面', 'Inherited surface'],
-  ] as const).map(([file, rootLabel, enLabel], order): MirroredPage => ({
+    ['inherited.md', '继承接口面', 'Inherited surface', 'Inherited surface'],
+  ] as const).map(([file, rootLabel, enLabel, ruLabel], order): MirroredPage => ({
     source: `docs/cordis-api/${file}`,
     route: `reference/cordis-api/${file}`,
     contentLocale: 'en-US',
-    label: { root: rootLabel, en: enLabel },
+    label: { root: rootLabel, en: enLabel, ru: ruLabel },
     sidebar: { root: 'zh-reference', en: 'en-reference' },
-    section: { root: 'Cordis API', en: 'Cordis Core API' },
+    section: { root: 'Cordis API', en: 'Cordis Core API', ru: 'Core API Cordis' },
     order: order + 5,
   }))),
   ...pairedPages(([
-    ['adding-a-package.md', '新增 Package', 'Adding a package'],
-    ['adding-a-tool.md', '新增 Tool', 'Adding a tool'],
-    ['adding-an-llm-adapter.md', '新增 LLM Adapter', 'Adding an LLM adapter'],
-    ['adding-a-settings-card.md', '新增设置卡片', 'Adding a settings card'],
-    ['extension-cookbook.md', '扩展模式', 'Extension patterns'],
-  ] as const).map(([file, rootLabel, enLabel], order): PairedPage => ({
+    ['adding-a-package.md', '新增 Package', 'Adding a package', 'Добавление пакета'],
+    ['adding-a-tool.md', '新增 Tool', 'Adding a tool', 'Добавление инструмента'],
+    ['adding-an-llm-adapter.md', '新增 LLM Adapter', 'Adding an LLM adapter', 'Добавление LLM-адаптера'],
+    ['adding-a-settings-card.md', '新增设置卡片', 'Adding a settings card', 'Добавление карточки настроек'],
+    ['extension-cookbook.md', '扩展模式', 'Extension patterns', 'Шаблоны расширений'],
+  ] as const).map(([file, rootLabel, enLabel, ruLabel], order): PairedPage => ({
     source: `docs/cookbook/${file}`,
     route: `reference/cookbook/${file}`,
-    label: { root: rootLabel, en: enLabel },
+    label: { root: rootLabel, en: enLabel, ru: ruLabel },
     sidebar: { root: 'zh-reference', en: 'en-reference' },
-    section: { root: '开发手册', en: 'Cookbook' },
+    section: { root: '开发手册', en: 'Cookbook', ru: 'Cookbook' },
     order,
   }))),
   ...pairedPages([{
     source: 'docs/cookbook/adding-a-conversation-node.md',
     route: 'reference/cookbook/adding-a-conversation-node.md',
-    label: { root: '新增 Conversation Node', en: 'Adding a Conversation Node' },
+    label: { root: '新增 Conversation Node', en: 'Adding a Conversation Node', ru: 'Добавление Conversation Node' },
     sidebar: { root: 'zh-reference', en: 'en-reference' },
-    section: { root: '开发手册', en: 'Cookbook' },
+    section: { root: '开发手册', en: 'Cookbook', ru: 'Cookbook' },
     order: 5,
   }]),
 ]
@@ -487,8 +487,8 @@ export interface DocsSection {
  *
  * The subsystem groups collapse because together they outnumber the rest of the
  * reference sidebar; expanded, they push every other group below the fold.
- * The Russian tree starts on the English group labels: its pages fall back to
- * English sources anyway, and translated labels replace them per label.
+ * The Russian group labels mirror the `ru` overrides authored on each page's
+ * `section`; `sectionSpec` rejects a page whose section has no placement.
  */
 const enSections: readonly DocsSection[] = [
   { label: 'Guide' }, { label: 'SDK' },
@@ -501,6 +501,19 @@ const enSections: readonly DocsSection[] = [
   { label: 'Execution and tools', collapsed: true },
   { label: 'Policy and interaction', collapsed: true },
   { label: 'Platform and access', collapsed: true },
+]
+
+const ruSections: readonly DocsSection[] = [
+  { label: 'Руководство' }, { label: 'SDK' },
+  { label: 'Основы' }, { label: 'Фреймворк' }, { label: 'Практика' }, { label: 'Туториал по фреймворку Cordis' },
+  { label: 'Концепции' }, { label: 'Сгенерированный справочник' }, { label: 'Core API Cordis' }, { label: 'Cookbook' },
+  { label: 'Обзор' },
+  { label: 'Ядро и скоупы', collapsed: true },
+  { label: 'Сессии и персистентность', collapsed: true },
+  { label: 'Модель и контекст', collapsed: true },
+  { label: 'Исполнение и инструменты', collapsed: true },
+  { label: 'Политики и взаимодействие', collapsed: true },
+  { label: 'Платформа и доступ', collapsed: true },
 ]
 
 const sections: Record<DocsLocale, readonly DocsSection[]> = {
@@ -517,7 +530,7 @@ const sections: Record<DocsLocale, readonly DocsSection[]> = {
     { label: '平台与接入', collapsed: true },
   ],
   en: enSections,
-  ru: enSections,
+  ru: ruSections,
 }
 
 /**

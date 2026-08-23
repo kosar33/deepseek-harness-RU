@@ -20,3 +20,21 @@ export function displayPresetName(name: string): string {
 export function displayPermissionPreset(value: string, name: string): string {
   return value === FULL_ACCESS_PRESET ? 'Full access' : displayPresetName(name)
 }
+
+/** Locale keys for the three conventional presets, keyed by machine value. */
+export const PRESET_MODE_KEYS = {
+  'read-only': 'mode.read-only',
+  'workspace-write': 'mode.workspace-write',
+  [FULL_ACCESS_PRESET]: 'mode.full-access',
+} as const
+
+/**
+ * Localized label for a preset when it is one of the three conventional
+ * values; `undefined` for host-configured names, which keep their authored
+ * label or the title-cased machine name.
+ * @param value - preset machine value.
+ * @returns the locale key for a conventional preset, else undefined.
+ */
+export function presetModeKey(value: string): 'mode.read-only' | 'mode.workspace-write' | 'mode.full-access' | undefined {
+  return (PRESET_MODE_KEYS as Record<string, 'mode.read-only' | 'mode.workspace-write' | 'mode.full-access'>)[value]
+}

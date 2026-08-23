@@ -125,6 +125,7 @@ describe('apply', () => {
     expect(presentation.dictionaries).toEqual([{
       namespace: 'skill', dictionaries: {
         zh: {
+          'row.title': 'Skill',
           'row.running': '正在加载 skill',
           'row.failed': 'skill 加载失败',
           'row.stopped': 'skill 加载已中止',
@@ -132,11 +133,20 @@ describe('apply', () => {
           'menu.userOnly': '仅用户',
         },
         en: {
+          'row.title': 'Skill',
           'row.running': 'Loading skill',
           'row.failed': 'Skill load failed',
           'row.stopped': 'Skill load stopped',
           'row.instructions': 'Instructions',
           'menu.userOnly': 'user-only',
+        },
+        ru: {
+          'row.title': 'Навык',
+          'row.running': 'Загрузка skill',
+          'row.failed': 'Не удалось загрузить skill',
+          'row.stopped': 'Загрузка skill прервана',
+          'row.instructions': 'Инструкции',
+          'menu.userOnly': 'только для пользователя',
         },
       },
     }])

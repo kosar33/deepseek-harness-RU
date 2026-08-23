@@ -1,7 +1,8 @@
 /**
- * Separate byte-identical Chinese Markdown code blocks from the primary checks
- * performed on their unsuffixed English siblings. The bilingual pairing gate
- * owns cross-language identity; source-oriented gates consume one copy.
+ * Separate byte-identical Chinese and Russian Markdown code blocks from the
+ * primary checks performed on their unsuffixed English siblings. The bilingual
+ * pairing gate owns cross-language identity; source-oriented gates consume one
+ * copy.
  */
 
 /** The result of separating canonical blocks from paired Chinese derivatives. */
@@ -12,9 +13,12 @@ export interface MarkdownDerivativePartition<T> {
   derivatives: T[]
 }
 
-/** Return the unsuffixed sibling of a Chinese Markdown path. */
+const LANGUAGE_SUFFIXES = ['.zh.md', '.ru.md']
+
+/** Return the unsuffixed sibling of a Chinese or Russian Markdown path. */
 function unsuffixedSibling(doc: string): string | null {
-  return doc.endsWith('.zh.md') ? `${doc.slice(0, -'.zh.md'.length)}.md` : null
+  const suffix = LANGUAGE_SUFFIXES.find(candidate => doc.endsWith(candidate))
+  return suffix === undefined ? null : doc.slice(0, -suffix.length) + '.md'
 }
 
 /**

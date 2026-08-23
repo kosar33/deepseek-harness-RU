@@ -2,13 +2,18 @@
  * Canonical publication manifest for the documentation website.
  *
  * Markdown stays in its owning repository tier. This manifest maps each
- * canonical source into matching route trees for both site locales; when a
- * translation is absent, both routes intentionally project the available
- * source instead of copying Markdown.
+ * canonical source into matching route trees for every site locale; when a
+ * translation is absent, the locale's route intentionally projects the
+ * available source instead of copying Markdown.
  */
 
+import { existsSync } from 'node:fs'
+import { resolve } from 'node:path'
+
+const repositoryRoot = resolve(import.meta.dirname, '..')
+
 /** Locale key used by the VitePress site. */
-export type DocsLocale = 'root' | 'en'
+export type DocsLocale = 'root' | 'en' | 'ru'
 
 /** Sidebar collection rendered for one locale and top-level module. */
 export type DocsSidebar =
@@ -18,13 +23,23 @@ export type DocsSidebar =
   | 'en-guide'
   | 'en-develop'
   | 'en-reference'
+  | 'ru-guide'
+  | 'ru-develop'
+  | 'ru-reference'
+
+/**
+ * Per-locale values authored for the two upstream locales, with an optional
+ * Russian override. A missing `ru` value falls back to the English one, so
+ * Russian navigation labels can arrive incrementally.
+ */
+type AuthoredLabels<T> = Record<'root' | 'en', T> & { ru?: T }
 
 /** A page projected into the VitePress source tree. */
 export interface DocsPage {
   /** VitePress locale whose route tree owns this projection. */
   locale: DocsLocale
   /** Language of the canonical source currently projected at this route. */
-  contentLocale: 'zh-CN' | 'en-US'
+  contentLocale: 'zh-CN' | 'en-US' | 'ru-RU'
   /** Repository-relative canonical Markdown source. */
   source: string
   /** VitePress route, including the `.md` suffix. */
@@ -47,9 +62,9 @@ interface MirroredPage {
   source: string | Record<DocsLocale, string>
   route: string
   contentLocale: DocsPage['contentLocale'] | Record<DocsLocale, DocsPage['contentLocale']>
-  label: Record<DocsLocale, string>
-  sidebar: Record<DocsLocale, DocsSidebar | null>
-  section: Record<DocsLocale, string>
+  label: AuthoredLabels<string>
+  sidebar: AuthoredLabels<DocsSidebar | null>
+  section: AuthoredLabels<string>
   order: number
   outline?: DocsPage['outline']
   sourceAliases?: string[] | Partial<Record<DocsLocale, string[]>>
@@ -62,25 +77,48 @@ type PairedPage = Omit<MirroredPage, 'source' | 'contentLocale' | 'sourceAliases
   sourceAliases?: string[]
 }
 
+/** Every route-tree locale, in manifest order. */
+const LOCALES = ['root', 'en', 'ru'] as const satisfies readonly DocsLocale[]
+
 function localized<T>(value: T | Record<DocsLocale, T>, locale: DocsLocale): T {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-    ? (value as Record<DocsLocale, T>)[locale]
-    : value
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return value
+  const record = value as Record<DocsLocale, T>
+  return record[locale] ?? record.en
+}
+
+/** The Russian sidebar collection matching an English one; `null` stays `null`. */
+function russianSidebar(sidebar: DocsSidebar | null): DocsSidebar | null {
+  return sidebar === null ? null : (sidebar.replace(/^en-/, 'ru-') as DocsSidebar)
 }
 
 function mirroredPages(pages: MirroredPage[]): DocsPage[] {
-  return pages.flatMap(page => (['root', 'en'] as const).map((locale) => {
+  return pages.flatMap(page => LOCALES.map((locale) => {
+    // Russian overrides apply to the Russian tree alone; the upstream trees
+    // keep their authored values untouched.
+    const label = locale === 'root'
+      ? page.label.root
+      : locale === 'ru' ? (page.label.ru ?? page.label.en) : page.label.en
+    const sidebar = locale === 'root'
+      ? page.sidebar.root
+      : locale === 'ru'
+        ? (page.sidebar.ru ?? russianSidebar(page.sidebar.en))
+        : page.sidebar.en
+    const section = locale === 'root'
+      ? page.section.root
+      : locale === 'ru' ? (page.section.ru ?? page.section.en) : page.section.en
     const aliases = page.sourceAliases === undefined
       ? undefined
-      : Array.isArray(page.sourceAliases) ? page.sourceAliases : page.sourceAliases[locale]
+      : Array.isArray(page.sourceAliases)
+        ? page.sourceAliases
+        : (page.sourceAliases[locale] ?? page.sourceAliases.en)
     return {
       locale,
       contentLocale: localized(page.contentLocale, locale),
       source: localized(page.source, locale),
-      route: locale === 'root' ? page.route : `en/${page.route}`,
-      label: page.label[locale],
-      sidebar: page.sidebar[locale],
-      section: page.section[locale],
+      route: locale === 'root' ? page.route : `${locale}/${page.route}`,
+      label,
+      sidebar,
+      section,
       order: page.order,
       ...(page.outline === undefined ? {} : { outline: page.outline }),
       ...(aliases === undefined ? {} : { sourceAliases: aliases }),
@@ -88,17 +126,30 @@ function mirroredPages(pages: MirroredPage[]): DocsPage[] {
   }))
 }
 
+/**
+ * The Russian side of a pair projects the `.ru.md` sibling when it exists and
+ * falls back to the English source while the translation is outstanding.
+ */
+function russianPairSource(englishSource: string): { source: string; contentLocale: DocsPage['contentLocale'] } {
+  const candidate = englishSource.replace(/\.md$/, '.ru.md')
+  return existsSync(resolve(repositoryRoot, candidate))
+    ? { source: candidate, contentLocale: 'ru-RU' }
+    : { source: englishSource, contentLocale: 'en-US' }
+}
+
 function pairedPages(pages: PairedPage[]): DocsPage[] {
   return mirroredPages(pages.map((page) => {
     const chineseSource = page.source.replace(/\.md$/, '.zh.md')
+    const russian = russianPairSource(page.source)
     const sharedAliases = page.sourceAliases ?? []
     return {
       ...page,
-      source: { root: chineseSource, en: page.source },
-      contentLocale: { root: 'zh-CN', en: 'en-US' },
+      source: { root: chineseSource, en: page.source, ru: russian.source },
+      contentLocale: { root: 'zh-CN', en: 'en-US', ru: russian.contentLocale },
       sourceAliases: {
         root: [...sharedAliases, page.source],
         en: [...sharedAliases, chineseSource],
+        ru: [...sharedAliases, chineseSource],
       },
     }
   }))
@@ -420,6 +471,7 @@ const reference = [
 export const localeCollections = {
   root: ['zh-guide', 'zh-develop', 'zh-reference'],
   en: ['en-guide', 'en-develop', 'en-reference'],
+  ru: ['ru-guide', 'ru-develop', 'ru-reference'],
 } as const satisfies Record<DocsLocale, readonly DocsSidebar[]>
 
 /** A sidebar group, matched to pages by `label`. */
@@ -435,7 +487,22 @@ export interface DocsSection {
  *
  * The subsystem groups collapse because together they outnumber the rest of the
  * reference sidebar; expanded, they push every other group below the fold.
+ * The Russian tree starts on the English group labels: its pages fall back to
+ * English sources anyway, and translated labels replace them per label.
  */
+const enSections: readonly DocsSection[] = [
+  { label: 'Guide' }, { label: 'SDK' },
+  { label: 'Basics' }, { label: 'Framework' }, { label: 'Practice' }, { label: 'Cordis framework tutorial' },
+  { label: 'Concepts' }, { label: 'Generated reference' }, { label: 'Cordis Core API' }, { label: 'Cookbook' },
+  { label: 'Overview' },
+  { label: 'Core and scopes', collapsed: true },
+  { label: 'Sessions and persistence', collapsed: true },
+  { label: 'Model and context', collapsed: true },
+  { label: 'Execution and tools', collapsed: true },
+  { label: 'Policy and interaction', collapsed: true },
+  { label: 'Platform and access', collapsed: true },
+]
+
 const sections: Record<DocsLocale, readonly DocsSection[]> = {
   root: [
     { label: '入门' }, { label: 'SDK' },
@@ -449,18 +516,8 @@ const sections: Record<DocsLocale, readonly DocsSection[]> = {
     { label: '策略与交互', collapsed: true },
     { label: '平台与接入', collapsed: true },
   ],
-  en: [
-    { label: 'Guide' }, { label: 'SDK' },
-    { label: 'Basics' }, { label: 'Framework' }, { label: 'Practice' }, { label: 'Cordis framework tutorial' },
-    { label: 'Concepts' }, { label: 'Generated reference' }, { label: 'Cordis Core API' }, { label: 'Cookbook' },
-    { label: 'Overview' },
-    { label: 'Core and scopes', collapsed: true },
-    { label: 'Sessions and persistence', collapsed: true },
-    { label: 'Model and context', collapsed: true },
-    { label: 'Execution and tools', collapsed: true },
-    { label: 'Policy and interaction', collapsed: true },
-    { label: 'Platform and access', collapsed: true },
-  ],
+  en: enSections,
+  ru: enSections,
 }
 
 /**

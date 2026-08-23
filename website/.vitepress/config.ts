@@ -45,7 +45,7 @@ interface GuideModuleLink {
  */
 interface GuideModules {
   /** Guide sidebar collection for the locale. */
-  guide: 'zh-guide' | 'en-guide'
+  guide: 'zh-guide' | 'en-guide' | 'ru-guide'
   /** Development module link. */
   develop: GuideModuleLink
   /** Reference module link. */
@@ -66,6 +66,11 @@ const guideModules = {
     guide: localeCollections.en[0],
     develop: { label: 'Development', collection: localeCollections.en[1] },
     reference: { label: 'Reference', collection: localeCollections.en[2] },
+  },
+  ru: {
+    guide: localeCollections.ru[0],
+    develop: { label: 'Разработка', collection: localeCollections.ru[1] },
+    reference: { label: 'Справочник', collection: localeCollections.ru[2] },
   },
 } satisfies Record<DocsLocale, GuideModules>
 
@@ -95,7 +100,7 @@ function guideSidebar(locale: DocsLocale): DefaultTheme.SidebarItem[] {
  */
 function moduleNav(locale: DocsLocale): DefaultTheme.NavItem[] {
   const { develop, reference } = guideModules[locale]
-  const routePrefix = locale === 'root' ? '' : '/en'
+  const routePrefix = locale === 'root' ? '' : `/${locale}`
   return [
     { text: develop.label, link: landingLink(locale, develop.collection), activeMatch: `^${routePrefix}/develop/` },
     { text: reference.label, link: landingLink(locale, reference.collection), activeMatch: `^${routePrefix}/reference/` },
@@ -179,6 +184,29 @@ const sharedTheme: Pick<DefaultTheme.Config, 'search' | 'socialLinks' | 'editLin
                 navigateDownKeyAriaLabel: '下方向键',
                 closeText: '关闭',
                 closeKeyAriaLabel: 'Esc 键',
+              },
+            },
+          },
+        },
+        ru: {
+          translations: {
+            button: {
+              buttonText: 'Поиск документации',
+              buttonAriaLabel: 'Поиск документации',
+            },
+            modal: {
+              displayDetails: 'Показать подробный список',
+              resetButtonTitle: 'Очистить поиск',
+              backButtonTitle: 'Закрыть поиск',
+              noResultsText: 'Ничего не найдено',
+              footer: {
+                selectText: 'Выбрать',
+                selectKeyAriaLabel: 'Enter',
+                navigateText: 'Переключиться',
+                navigateUpKeyAriaLabel: 'Стрелка вверх',
+                navigateDownKeyAriaLabel: 'Стрелка вниз',
+                closeText: 'Закрыть',
+                closeKeyAriaLabel: 'Esc',
               },
             },
           },
@@ -363,6 +391,41 @@ export default withMermaid({
         },
         outline: { label: 'On this page' },
         docFooter: { prev: 'Previous', next: 'Next' },
+      },
+    },
+    ru: {
+      label: 'Русский',
+      lang: 'ru-RU',
+      link: '/ru/',
+      themeConfig: {
+        siteTitle: siteTitle('Превью'),
+        nav: [
+          { text: 'Руководство', link: landingLink('ru', guideModules.ru.guide), activeMatch: '^/ru/guide/' },
+          ...moduleNav('ru'),
+        ],
+        sidebar: {
+          '/ru/guide/': guideSidebar('ru'),
+          '/ru/develop/': sidebar('ru', 'ru-develop'),
+          '/ru/reference/': sidebar('ru', 'ru-reference'),
+        },
+        editLink: {
+          pattern: ({ frontmatter }: PageData) => {
+            const data: unknown = frontmatter
+            const editSource: unknown = typeof data === 'object' && data !== null ? Reflect.get(data, 'editSource') : undefined
+            if (typeof editSource !== 'string') throw new Error('Projected documentation page has no editSource frontmatter.')
+            return `https://github.com/deepseek-ai/deepseek-harness/edit/master/${editSource}`
+          },
+          text: 'Редактировать эту страницу на GitHub',
+        },
+        outline: { label: 'На этой странице' },
+        docFooter: { prev: 'Предыдущая', next: 'Следующая' },
+        darkModeSwitchLabel: 'Тема',
+        lightModeSwitchTitle: 'Переключить на светлую тему',
+        darkModeSwitchTitle: 'Переключить на тёмную тему',
+        sidebarMenuLabel: 'Меню',
+        returnToTopLabel: 'Наверх',
+        langMenuLabel: 'Сменить язык',
+        skipToContentLabel: 'Перейти к содержимому',
       },
     },
   },

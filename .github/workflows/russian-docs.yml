@@ -1,0 +1,51 @@
+# Russian documentation layer status.
+#
+# This repository carries `*.ru.md` translations beside the upstream
+# English/Chinese pairing corpus. The upstream doc-sync gates do not know the
+# Russian locale, so this workflow owns its freshness contract: on every push,
+# pull request, and a weekly schedule it validates existing pairs (structure +
+# recorded hashes) and reports the remaining translation queue.
+#
+# Exit semantics of scripts/russian-docs/check.mjs:
+#   0 — no violations; missing translations are the expected backlog.
+#   1 — --strict and outdated/unconfirmed pairs exist (PR gate).
+#   2 — structural violation or orphaned pair (always an error).
+#
+# Manual flow after translating or updating a file:
+#   node scripts/russian-docs/check.mjs --write <path/to/file.ru.md>
+#
+# Runs on a Windows runner per the repository's GitHub Actions convention;
+ # walking the tree under Windows also keeps the tracker's path-separator
+# normalization exercised in CI.
+name: russian-docs
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  schedule:
+    # Weekly, Mondays 03:00 UTC: flags English sources changed upstream.
+    - cron: '0 3 * * 1'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  status:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate pairs and report status
+        shell: pwsh
+        run: node scripts/russian-docs/check.mjs --report
+
+      - name: PR gate — every existing pair must be confirmed and current
+        if: github.event_name == 'pull_request'
+        shell: pwsh
+        run: node scripts/russian-docs/check.mjs --report --strict

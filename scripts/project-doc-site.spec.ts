@@ -279,9 +279,9 @@ describe('rewriteMarkdown', () => {
 })
 
 describe('docsPages locale routes', () => {
-  it('redirects both locale roots to their locale-relative quick-start page', () => {
+  it('redirects every locale root to its locale-relative quick-start page', () => {
     const homes = docsPages.filter(page => page.sidebar === null)
-    expect(homes.map(page => page.route).sort()).toEqual(['en/index.md', 'index.md'])
+    expect(homes.map(page => page.route).sort()).toEqual(['en/index.md', 'index.md', 'ru/index.md'])
     for (const page of homes) {
       const source = readFileSync(resolve(repositoryRoot, page.source), 'utf8')
       const projected = projectedPageContent(source, page)
@@ -349,7 +349,7 @@ describe('docsPages locale routes', () => {
   it('indexes every subsystem page in both sides of the folder README', () => {
     const pages = globSync(join(repositoryRoot, 'docs/subsystems/*.md'))
       .map(page => basename(page))
-      .filter(page => !page.endsWith('.zh.md') && page !== 'README.md')
+      .filter(page => !/\.(?:zh|ru)\.md$/.test(page) && page !== 'README.md')
       .sort()
     expect(pages.length).toBeGreaterThan(0)
     for (const readme of ['README.md', 'README.zh.md']) {
@@ -396,21 +396,22 @@ describe('docsPages locale routes', () => {
     }
   })
 
-  it('keeps Cordis inherited on the English fallback in both locales', () => {
+  it('keeps Cordis inherited on the English fallback in every locale', () => {
     const pages = docsPages.filter(page => page.route.endsWith('reference/cordis-api/inherited.md'))
-    expect(pages).toHaveLength(2)
+    expect(pages).toHaveLength(3)
     expect(pages.every(page => page.source === 'docs/cordis-api/inherited.md')).toBe(true)
     expect(pages.every(page => page.contentLocale === 'en-US')).toBe(true)
   })
 
-  it('includes persistence event headings in both locale outlines', () => {
+  it('includes persistence event headings in every locale outline', () => {
     const pages = docsPages.filter(page => page.route.endsWith('reference/persistence-catalog.md'))
-    expect(pages).toHaveLength(2)
+    expect(pages).toHaveLength(3)
     expect(pages.map(page => page.source).sort()).toEqual([
+      'docs/persistence-catalog.md',
       'docs/persistence-catalog.md',
       'docs/persistence-catalog.zh.md',
     ])
-    expect(pages.map(page => page.outline)).toEqual(['deep', 'deep'])
+    expect(pages.map(page => page.outline)).toEqual(['deep', 'deep', 'deep'])
   })
 
   it('projects reviewed generated counterparts into root locale routes', () => {

@@ -79,5 +79,43 @@ export const en: Record<SubagentKey, string> = {
   'readonly.body': 'The parent session is offline; reopen it to continue sending messages.',
 }
 
+/** Russian dictionary, checked complete against the zh key set. */
+export const ru = {
+  'diagnostic.corrupt': 'Запись сессии повреждена',
+  'diagnostic.unsupported': 'Версия записи субагента не поддерживается',
+  'diagnostic.unavailable': 'Запись сессии временно недоступна',
+  'duration.seconds': '{seconds} с',
+  'duration.minutes': '{minutes} мин {seconds} с',
+  'duration.hours': '{hours} ч {minutes} мин {seconds} с',
+  'duration.days': '{days} д',
+  'duration.daysHours': '{days} д {hours} ч',
+  'duration.months': '~{months} мес',
+  'duration.monthsDays': '~{months} мес {days} д',
+  'duration.years': '~{years} г',
+  'duration.yearsMonths': '~{years} г {months} мес',
+  'duration.exactDays': '{days} д {hours} ч {minutes} мин {seconds} с',
+  'duration.exactTitle': 'Общее время активной работы: {duration}',
+  'loading.label': 'Загрузка субагентов…',
+  'loading.aria': 'Загрузка субагентов',
+  'load.error': 'Не удалось загрузить субагентов',
+  'retry': 'Повторить',
+  'mode.oneShot': 'одноразовый',
+  'mode.continuable': 'многоразовый',
+  'activity.running': 'выполняется',
+  'activity.inactive': 'не выполняется',
+  'branch.collapse': 'Свернуть дочерние субагенты {label}',
+  'branch.expand': 'Развернуть дочерние субагенты {label}',
+  'count.total.one': '{count} субагент',
+  'count.total.other': '{count} субагентов',
+  'count.running.one': '{count} субагент выполняется',
+  'count.running.other': '{count} субагентов выполняется',
+  'switcher.aria': 'Переключить субагента: {title}',
+  'tree.aria': 'Сессии субагентов',
+  'readonly.oneShot.title': 'Одноразовая запись субагента',
+  'readonly.title': 'Этот субагент пока доступен только для чтения',
+  'readonly.oneShot.body': 'Одноразовые задачи не принимают продолжений; здесь можно просмотреть полную запись выполнения.',
+  'readonly.body': 'Родительская сессия сейчас офлайн; откройте её снова, чтобы продолжить отправку сообщений.',
+} satisfies Record<SubagentKey, string>
+
 /** Key domain of the `subagent` namespace (zh is the source of truth). */
 export type SubagentKey = keyof typeof zh

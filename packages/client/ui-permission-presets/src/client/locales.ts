@@ -29,6 +29,19 @@ export const en = {
   'confirm.enable': 'Enable Full access',
 } satisfies Record<PermissionSettingsKey, string>
 
+/** Russian dictionary, checked complete against the zh key set. */
+export const ru = {
+  'title': 'Разрешения',
+  'description': 'Выберите режим разрешений по умолчанию для новых сессий',
+  'loading': 'Загрузка',
+  'unavailable': 'Недоступно',
+  'confirm.title': 'Включить Full access?',
+  'confirm.description': 'Full access позволяет новым сессиям сократить число шагов подтверждения и напрямую выполнять больше действий, включая чувствительные операции, изменение файлов и внешние команды. Используйте его, только если доверяете последующим задачам.',
+  'confirm.acknowledge': 'Я понимаю риски и хочу продолжить',
+  'confirm.cancel': 'Отмена',
+  'confirm.enable': 'Включить Full access',
+} satisfies Record<PermissionSettingsKey, string>
+
 /** Simplified Chinese dictionary for the current-session popup gate. */
 export const accessZh = {
   'confirm.title': '确认启用 Full access？',
@@ -48,4 +61,13 @@ export const accessEn = {
   'confirm.acknowledge': 'I understand the risks and want to continue',
   'confirm.cancel': 'Cancel',
   'confirm.enable': 'Enable Full access',
+} satisfies Record<PermissionAccessKey, string>
+
+/** Russian dictionary for the current-session popup gate. */
+export const accessRu = {
+  'confirm.title': 'Включить Full access?',
+  'confirm.description': 'Full access сокращает число шагов подтверждения и позволяет агенту напрямую выполнять больше действий, включая чувствительные операции, изменение файлов и внешние команды. Используйте его, только если доверяете текущей задаче.',
+  'confirm.acknowledge': 'Я понимаю риски и хочу продолжить',
+  'confirm.cancel': 'Отмена',
+  'confirm.enable': 'Включить Full access',
 } satisfies Record<PermissionAccessKey, string>

@@ -166,8 +166,11 @@ export function rewriteMarkdown(source: string, options: RewriteMarkdownOptions)
     const { absPath, line } = resolveRepositoryTarget(sourceAbs, path, options.repoRoot)
     const targetPath = repoPath(absPath, options.repoRoot)
     const isLanguageSwitcher = targetPath === counterpartSource(options.sourcePath)
+      || (options.sourcePath.endsWith('.ru.md') && targetPath === options.sourcePath.replace(/\.ru\.md$/, '.md'))
+    // A switcher link crosses locales: the link target names the side — a
+    // `.zh.md` counterpart belongs to the root tree, everything else to `en`.
     const targetLocale: DocsLocale = isLanguageSwitcher
-      ? options.locale === 'root' ? 'en' : 'root'
+      ? targetPath.endsWith('.zh.md') ? 'root' : 'en'
       : options.locale
     const page = published.get(targetPath)?.get(targetLocale)
     const nextUrl = page !== undefined
@@ -218,7 +221,11 @@ export function addProjectionFrontmatter(markdown: string, page: Pick<DocsPage, 
 }
 
 /** The switcher line a canonical page carries so its GitHub reader can reach the other language. */
-const LANGUAGE_SWITCHER = /^(?:English \| \[中文\]\([^)]*\)|\[English\]\([^)]*\) \| 中文)$/
+const ZH_LINK = String.raw`\[中文\]\([^)]*\)`
+const EN_LINK = String.raw`\[English\]\([^)]*\)`
+const LANGUAGE_SWITCHER = new RegExp(
+  `^(?:English \\| ${ZH_LINK}|${EN_LINK} \\| 中文|${EN_LINK} \\| (?:${ZH_LINK} \\| )?Русский)$`,
+)
 
 /** The repository badge a canonical page carries for its GitHub reader. */
 const REPOSITORY_BADGE = /^\[!\[[^\]]*\]\(https:\/\/img\.shields\.io\/[^)]*\)\]\([^)]*\)$/
@@ -543,6 +550,7 @@ export interface LlmsTxtSite {
 const llmsTxtLocales: readonly { heading: string; locale: DocsLocale }[] = [
   { heading: '简体中文', locale: 'root' },
   { heading: 'English', locale: 'en' },
+  { heading: 'Русский', locale: 'ru' },
 ]
 
 /**

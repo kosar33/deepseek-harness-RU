@@ -23,7 +23,7 @@
     "docs/user/develop/basic/publish.ru.md": {
       "source": "docs/user/develop/basic/publish.md",
       "sourceBlob": "09408ca7b67ba98ede11cd96ffda382925ae4c35",
-      "ruBlob": "2794809b69f91fab45de587b2ad9b99a6cf23c4f"
+      "ruBlob": "07f667523e9760f3ffb4e33d3350c1355c63e1a6"
     },
     "docs/user/develop/basic/tool.ru.md": {
       "source": "docs/user/develop/basic/tool.md",
@@ -53,7 +53,7 @@
     "docs/user/develop/practice/llm-adapter.ru.md": {
       "source": "docs/user/develop/practice/llm-adapter.md",
       "sourceBlob": "12e73faccc649ff1dd52631a083476ab870a34b1",
-      "ruBlob": "0acde3ea310bd2ccd762cf7f52441f12f2caaad3"
+      "ruBlob": "29b1d7b4a0e5966bd739312cfc5fdb3b323975b6"
     },
     "docs/user/guide/index.ru.md": {
       "source": "docs/user/guide/index.md",
@@ -77,8 +77,8 @@
     },
     "README.ru.md": {
       "source": "README.md",
-      "sourceBlob": "00e1166468f6be1c84ded8e0bed2a7a6b059a4f8",
-      "ruBlob": "5afeb76bda4948f5ac2180dd1d57e803a68e08db"
+      "sourceBlob": "8ba8bda0bc0fd5fb74f76f7fe0fd392407f24e30",
+      "ruBlob": "a0c8abf8619ed10387f5a8e4088a64d2ff3793d5"
     },
     "docs/architecture.ru.md": {
       "source": "docs/architecture.md",
@@ -87,8 +87,8 @@
     },
     "docs/cordis-primer.ru.md": {
       "source": "docs/cordis-primer.md",
-      "sourceBlob": "2a3afe180623d89b006dfa3e73aba5567c15bbe9",
-      "ruBlob": "fdb35a6897cd00f09a74ebaad03ea1b1c5890e7a"
+      "sourceBlob": "1935fc263cc508e6e703c7aef1b71d3da76ecde0",
+      "ruBlob": "61a82874555822ea81e4d5c405af2caae3d34902"
     },
     "docs/defensive-patterns.ru.md": {
       "source": "docs/defensive-patterns.md",
@@ -117,33 +117,33 @@
     },
     "docs/cookbook/adding-a-conversation-node.ru.md": {
       "source": "docs/cookbook/adding-a-conversation-node.md",
-      "sourceBlob": "c1965dc8a3081eebb8c1026ac53d2f7b8964edb7",
-      "ruBlob": "dec60f4b3b36c78485084028b94784a7841f902c"
+      "sourceBlob": "4e2c626d85139f80b5cfc3fc0b2249446cf81f1a",
+      "ruBlob": "a25f781c57c90de7011618fd550d27eeb0c34f81"
     },
     "docs/cookbook/adding-a-settings-card.ru.md": {
       "source": "docs/cookbook/adding-a-settings-card.md",
-      "sourceBlob": "56ec3be578bbc489bbb979a50bcaed063a35ace5",
-      "ruBlob": "3bda7377a247caadbd77b5fea81ee7a995c53840"
+      "sourceBlob": "3f4ee3adcf680ff1d9539b1ed86be8c6056ab4a4",
+      "ruBlob": "6dafb495b8381fec443442c4025ae73371cbac85"
     },
     "docs/cookbook/maintaining-dsh-code-review.ru.md": {
       "source": "docs/cookbook/maintaining-dsh-code-review.md",
-      "sourceBlob": "a8c2a66c065aaec5c03f0ab6965377d1d1eb14bd",
-      "ruBlob": "cce0b4f3c15e8da0bc223cc845bf010643bcb5e6"
+      "sourceBlob": "60564bd3dfe86c8b9a79aab244d9675846b1b64a",
+      "ruBlob": "574023dfc03a94b2fff552fae4cdb6dbca162121"
     },
     "docs/cookbook/responding-to-pr-review-on-a-stack.ru.md": {
       "source": "docs/cookbook/responding-to-pr-review-on-a-stack.md",
-      "sourceBlob": "6bb7be3daf8613666f02f21e96bf7b1ac8cb3606",
-      "ruBlob": "7b5f71d02b649b8165b089a3276b0db6923d2986"
+      "sourceBlob": "698b27ff7ccc717c3851340be10afa75614782b9",
+      "ruBlob": "dba2fd1068c758804074d4db5ae7c82896a4975e"
     },
     "docs/cookbook/adding-a-package.ru.md": {
       "source": "docs/cookbook/adding-a-package.md",
-      "sourceBlob": "a78695735957395c5c900c3294b6778904557f85",
-      "ruBlob": "a08d7bf036841464f8dc5de4c9b633cff50f9bd2"
+      "sourceBlob": "4e704e9ce53fc401daf2fb131fad7d079b516d3e",
+      "ruBlob": "8f5608c43d890cb86fd99d4ab3f8b836c04e0a37"
     },
     "docs/cookbook/adding-a-tool.ru.md": {
       "source": "docs/cookbook/adding-a-tool.md",
-      "sourceBlob": "37516521de4d00de964003fd6f877831774fdcd3",
-      "ruBlob": "222703000a80dbe4d77ed2182013a02b1686709d"
+      "sourceBlob": "1a29ce0dee2a7d56961a69a03bd6f35616a8d6c9",
+      "ruBlob": "19fd010d7e2c4577957339593c12cd40aae04d27"
     },
     "docs/cookbook/adding-an-llm-adapter.ru.md": {
       "source": "docs/cookbook/adding-an-llm-adapter.md",
@@ -152,13 +152,13 @@
     },
     "docs/cookbook/adding-a-vendored-package.ru.md": {
       "source": "docs/cookbook/adding-a-vendored-package.md",
-      "sourceBlob": "239ac27565204332559038014fabae83fc2d1057",
-      "ruBlob": "9ac968c6f7d29be0bf92bf5e252c3a5dd57e0d75"
+      "sourceBlob": "d4daf97f86117ce3fcce9c343dec331acc86ddd0",
+      "ruBlob": "27fad10e987abb6d8cd9e5af86edc3f7bcde32bb"
     },
     "docs/cookbook/extension-cookbook.ru.md": {
       "source": "docs/cookbook/extension-cookbook.md",
-      "sourceBlob": "9618a3522c5566636fe3e49f7eca93d1e113d51a",
-      "ruBlob": "12f5ee0093f2678e87996ab335cf9f5e717c00df"
+      "sourceBlob": "bf206f9e7f4bf214863a2879c0df6d1144d167ec",
+      "ruBlob": "8a2ea5e8c2f63918af3ba89cda77f50b12550295"
     },
     "docs/testing.ru.md": {
       "source": "docs/testing.md",
@@ -207,8 +207,8 @@
     },
     "docs/subsystems/tools.ru.md": {
       "source": "docs/subsystems/tools.md",
-      "sourceBlob": "dd89d40c1401732dd5e6d8dfb5ccb08a89c58405",
-      "ruBlob": "e66a8525808fbe993ea390db592689c3cbc936fe"
+      "sourceBlob": "3df01a396a8d5883c9ba13c9596c4c78fb25d8b9",
+      "ruBlob": "cce1050d3420ebaf3d21274ed9134669869abaff"
     },
     "docs/subsystems/shell.ru.md": {
       "source": "docs/subsystems/shell.md",
@@ -247,8 +247,8 @@
     },
     "docs/subsystems/filesystem.ru.md": {
       "source": "docs/subsystems/filesystem.md",
-      "sourceBlob": "c95c430c39f15f9cea7435b5d18c0caf9ddb964e",
-      "ruBlob": "a7f6131af36ebe0b9c6982f449f05d0c0698a4db"
+      "sourceBlob": "e4ef82f88108a4d926c8bdcfa361415d2c54e1be",
+      "ruBlob": "1aa9de97a5bfac1a8ef2b39771acc393be77471a"
     },
     "docs/subsystems/terminal.ru.md": {
       "source": "docs/subsystems/terminal.md",
@@ -268,7 +268,7 @@
     "docs/subsystems/session.ru.md": {
       "source": "docs/subsystems/session.md",
       "sourceBlob": "202605690174e8dbacd2708fd0edbff7c7ada166",
-      "ruBlob": "715a5b46c5718fcbfe40622002b67858dd6cc218"
+      "ruBlob": "7e0b70bd228fd12133f0b5a13841f2a8ef2099dd"
     },
     "docs/subsystems/sandbox.ru.md": {
       "source": "docs/subsystems/sandbox.md",
@@ -297,13 +297,13 @@
     },
     "docs/subsystems/compaction.ru.md": {
       "source": "docs/subsystems/compaction.md",
-      "sourceBlob": "4b6e9dee81cb30d42bb6194776457e354102b529",
-      "ruBlob": "2c4483f6816c20832788c9c9d2405f8111659d87"
+      "sourceBlob": "47108430b6d26f98a27d62413e9500dd3ffa8f3c",
+      "ruBlob": "660fb9a9d0b05bebf5066e2ff7a0fed1e2d8be2a"
     },
     "docs/subsystems/llm-streaming.ru.md": {
       "source": "docs/subsystems/llm-streaming.md",
-      "sourceBlob": "1b2356983be4045666f7a9d40d8d191bdb4910a2",
-      "ruBlob": "739f3266b515893719a499736967690701c445bc"
+      "sourceBlob": "34365b2731d494e2df315bba9e4efdc836ed4351",
+      "ruBlob": "5d1ae79b239878f8cdfd07b40d209ddb670d2e39"
     },
     "docs/subsystems/agent-team.ru.md": {
       "source": "docs/subsystems/agent-team.md",
@@ -332,12 +332,12 @@
     },
     "docs/subsystems/credentials.ru.md": {
       "source": "docs/subsystems/credentials.md",
-      "sourceBlob": "9955f3ae6c6991ba5abbbec593ca5ccd12ef8773",
-      "ruBlob": "73945095e8246c937dfac6df7b7ff17ce9075068"
+      "sourceBlob": "d16e404e7de2b0e7ace06f32e48a6f1ad720d95a",
+      "ruBlob": "24564272ee4d85d4c0fc36a2103bc251fe11e942"
     },
     "docs/subsystems/extensions.ru.md": {
       "source": "docs/subsystems/extensions.md",
-      "sourceBlob": "0418afc7f1b6b6cd892deb618a4f346f6cde720d",
+      "sourceBlob": "587c2d7adb15df25875219b57ee3678c09cc5191",
       "ruBlob": "c529d0dfc13c9355bbf399f32f90f84d74a2eb84"
     },
     "docs/subsystems/feedback.ru.md": {
@@ -347,18 +347,18 @@
     },
     "docs/subsystems/jobs.ru.md": {
       "source": "docs/subsystems/jobs.md",
-      "sourceBlob": "65e92a122b4870c7de295e33d115243b4da8f4d8",
-      "ruBlob": "5e0ac6393a371b10e4529fccacaf1c0bb8e5e249"
+      "sourceBlob": "b37daf59d7fc2904ade7b394f10bea35ae8d9f93",
+      "ruBlob": "5b41f040fd5c93235e168ba9d72f29e682916642"
     },
     "docs/subsystems/settings.ru.md": {
       "source": "docs/subsystems/settings.md",
-      "sourceBlob": "e408f32f67d71e49f5376d6c693be432344d3e07",
-      "ruBlob": "8f559d78eb188253bdbb95bda411e325452b1fc2"
+      "sourceBlob": "eaeefe37f2fdf5baac4507285878c2dc3522f58b",
+      "ruBlob": "4b8582f1dac6cf5011cee470c186fc8ce1e0eca1"
     },
     "docs/subsystems/skills.ru.md": {
       "source": "docs/subsystems/skills.md",
-      "sourceBlob": "5abfa84356dc947f8b3359ad5f0fc5c42a99553a",
-      "ruBlob": "2e4e65eecbb2f2f057c53f314d436d8c12377176"
+      "sourceBlob": "380a34490e08b8f0d2fd326b5cc04a180917381c",
+      "ruBlob": "e32f229b97f6ea81efd3b3fcf33e9d3b13dab372"
     },
     "docs/subsystems/session-projection.ru.md": {
       "source": "docs/subsystems/session-projection.md",
@@ -367,8 +367,8 @@
     },
     "docs/subsystems/session-query.ru.md": {
       "source": "docs/subsystems/session-query.md",
-      "sourceBlob": "40dbd63cb8f0b6922130cb855cc313ebee73150a",
-      "ruBlob": "1b4886a05c63310a247d551d72ae11ef9a83a7e0"
+      "sourceBlob": "4c0eb8f114e651c592c4c1075885f375f12027f2",
+      "ruBlob": "0ab0f9cd3b7064188139d8400ba2a3859ba8fd15"
     },
     "docs/subsystems/session-telemetry.ru.md": {
       "source": "docs/subsystems/session-telemetry.md",
@@ -377,8 +377,8 @@
     },
     "docs/subsystems/persistence.ru.md": {
       "source": "docs/subsystems/persistence.md",
-      "sourceBlob": "1480780b343e2d55544e441362abde58ffdffb2b",
-      "ruBlob": "e3c2f8356e6a0a249cad504612ba6dbdad820122"
+      "sourceBlob": "b512e61a37409bcf27fe4814f70b25ca3f44f4a9",
+      "ruBlob": "c211572694b665e21b43592eec75e28adf271fac"
     },
     "docs/subsystems/schedule.ru.md": {
       "source": "docs/subsystems/schedule.md",
@@ -462,8 +462,8 @@
     },
     "packages/subagent/subagent/README.ru.md": {
       "source": "packages/subagent/subagent/README.md",
-      "sourceBlob": "e84a6b486253e81ccf7e7df12c4149e6df4ed9f2",
-      "ruBlob": "25369668d048803c817f18b0894801bbb9464100"
+      "sourceBlob": "afbcf5cf85bd744241cf1623a90235712e638d78",
+      "ruBlob": "8f2430b5ea16e03eae66ed28c2545321485b5604"
     },
     "packages/host/apiproxy/README.ru.md": {
       "source": "packages/host/apiproxy/README.md",
@@ -477,8 +477,8 @@
     },
     "packages/llm/llm-pi-ai/README.ru.md": {
       "source": "packages/llm/llm-pi-ai/README.md",
-      "sourceBlob": "43472de90803481deebb9bc91586a4b85e443db5",
-      "ruBlob": "e203ecc673839cdac9c7dfeab676517f91a10e00"
+      "sourceBlob": "eca980321367087e904cfc571bb4fef5e48a258b",
+      "ruBlob": "83c7f490a6d05c544ceccd4a5575aabd2ded5580"
     },
     "packages/host/directory-picker-browse/README.ru.md": {
       "source": "packages/host/directory-picker-browse/README.md",
@@ -487,8 +487,8 @@
     },
     "packages/core/tools/README.ru.md": {
       "source": "packages/core/tools/README.md",
-      "sourceBlob": "dd20b1b8fdc4ff57ff9850683d6070fdb219e25a",
-      "ruBlob": "2efe37d1a9b5cf4e452286812d96f67eed14aaa1"
+      "sourceBlob": "b46d77b41722e9c8f93f550436e59b48cfa2c2b9",
+      "ruBlob": "695bda8278c407c4dee6f1efa7c1e9d4bdb096f8"
     },
     "packages/extensions/cordis-host-runner/README.ru.md": {
       "source": "packages/extensions/cordis-host-runner/README.md",
@@ -1888,17 +1888,17 @@
     "docs/cordis-api/context.ru.md": {
       "source": "docs/cordis-api/context.md",
       "sourceBlob": "320b23de1c8d19e2dacdf0ec9f2361037bcf8048",
-      "ruBlob": "2bb16feb24f0d7961470b37afc975e7cc85a3a7a"
+      "ruBlob": "c3382a6590d33a1e6e28306d4a285ccdfbe47f5c"
     },
     "docs/cordis-api/events.ru.md": {
       "source": "docs/cordis-api/events.md",
       "sourceBlob": "8b8eb2358e10a250f581aecc725ba32360d338d3",
-      "ruBlob": "c502bfd007626f6330ed926cf7abb6854c11e251"
+      "ruBlob": "c756311c95e11839d32b7a00211a935195aff858"
     },
     "docs/cordis-api/fiber.ru.md": {
       "source": "docs/cordis-api/fiber.md",
       "sourceBlob": "182b77390b29b8a90504437d0ccc2dfeba23921a",
-      "ruBlob": "0d20b32090b2b17f96fefeb21e5b9373a68c6894"
+      "ruBlob": "15de86975d872c4e89fb56f3dee38350fa8a31c7"
     },
     "docs/cordis-api/registry.ru.md": {
       "source": "docs/cordis-api/registry.md",
@@ -1908,7 +1908,7 @@
     "docs/cordis-api/service.ru.md": {
       "source": "docs/cordis-api/service.md",
       "sourceBlob": "d4b0f06da16decf31e0d348a88e0360b46ee9d35",
-      "ruBlob": "a0e513d91b4ec2bd1f5a2df98fac95c56ac9912e"
+      "ruBlob": "41a1f40d0b557cb94dfeba58287e783b3b03482d"
     },
     "native/landlock-run/docs/architecture.ru.md": {
       "source": "native/landlock-run/docs/architecture.md",

@@ -12,7 +12,7 @@
 
 Каждая операция сначала разрешает переданный пользователем путь в непрозрачную цель бэкенда. Потребители могут показывать `displayPath`, но не должны разбирать `targetKey` (брендированный непрозрачный идентификатор) или считать его локальным абсолютным путём.
 
-Потребители, разделяющие с файловой системой исполнительный мир, получают координаты для других возможностей через провайдера, а не интерпретируют эту идентичность сами: `processPath(target)` возвращает канонический абсолютный путь, который способен открыть дочерний процесс, `fileUrl(target)` возвращает его `file:`-URI платформы провайдера, а `contains(parent, child)` проверяет каноническую идентичность либо вхождение потомка.
+Потребители, разделяющие с файловой системой мир исполнения, получают координаты для других возможностей через провайдера, а не интерпретируют эту идентичность сами: `processPath(target)` возвращает канонический абсолютный путь, который способен открыть дочерний процесс, `fileUrl(target)` возвращает его `file:`-URI платформы провайдера, а `contains(parent, child)` проверяет каноническую идентичность либо вхождение потомка.
 
 ```ts type-equiv
 /**
@@ -52,7 +52,7 @@ type FsTargetKey = Branded<'FsTargetKey'>
 type FsVersion = Branded<'FsVersion'>
 ```
 
-`stat` возвращает метаданные (никогда не содержимое) либо `undefined`, когда цель отсутствует. Поле `type` позволяет потребителям отвергать каталоги и специальные файлы до чтения, а `size` позволяет текстовым потребителям выбирать между `readText` и `streamText` без выяснения размера пробным отказом. Текстовый потребитель применяет собственный потолок удержания, потребляя `streamText`. Потребители сырых байтов используют `readBytes(target, signal, maxBytes)`; обязательный предел полного содержимого превращает известное или обнаруженное переполнение в отказ `FS_TOO_LARGE` вместо усечения или ничем не ограниченной буферизации.
+`stat` возвращает метаданные (никогда не содержимое) либо `undefined`, когда цель отсутствует. Поле `type` позволяет потребителям отвергать каталоги и специальные файлы до чтения, а `size` позволяет текстовым потребителям выбирать между `readText` и `streamText`, не прибегая к пробным отказам. Текстовый потребитель применяет собственный лимит удержания, потребляя `streamText`. Потребители сырых байтов используют `readBytes(target, signal, maxBytes)`; обязательный предел полного содержимого превращает известное или обнаруженное переполнение в отказ `FS_TOO_LARGE` вместо усечения или ничем не ограниченной буферизации.
 
 ```ts type-equiv
 /**
@@ -90,7 +90,7 @@ interface FsPathInfo {
 }
 ```
 
-`listDir` возвращает прямых потомков в устойчивом порядке имён. Каждая запись несёт базовое имя потомка, тип, разрешённую цель и, если бэкенд способен сообщить их недорого, метаданные. Перечислению запрещено читать содержимое файлов, поэтому `size` есть только у обычных файлов, а `version` выводится из метаданных. Сломавшиеся или исчезнувшие потомки могут возвращаться как `other` без метаданных; отказ доступа или отказ ввода-вывода бэкенда при перечислении либо разрешении метаданных потомков приводит к отказу всего перечисления с `FS_PERMISSION_DENIED` или `FS_IO_ERROR`.
+`listDir` возвращает прямых потомков в устойчивом порядке имён. Каждая запись несёт базовое имя потомка, тип, разрешённую цель и, если бэкенд способен сообщить их недорого, метаданные. Перечислению запрещено читать содержимое файлов, поэтому `size` есть только у обычных файлов, а `version` выводится из метаданных. Битые или исчезнувшие потомки могут возвращаться как `other` без метаданных; ошибка прав доступа либо ввода-вывода бэкенда при перечислении или разрешении метаданных потомков приводит к отказу всего перечисления с `FS_PERMISSION_DENIED` или `FS_IO_ERROR`.
 
 ```ts type-equiv
 /**
@@ -182,7 +182,7 @@ interface FsEditOutcome {
 
 `dsh-fs` владеет тремя событиями, которые диспетчеризует инструмент и слушает плагин политики, поэтому эмиттер (`dsh-tool-fs`) и слушатель (`dsh-fs-observation-policy`) говорят на общем словаре `dsh-fs`, не порождая зависимости эмиттера от плагина политики. События несут только словарь `dsh-fs` плюс непрозрачного актора `object` — ни обращённых к модели понятий, ни структуры владельца агент/сессия.
 
-`fs/write-intent` и `fs/edit-intent` — **решающие каскады с одним slot'ом**: инструмент диспетчеризует каждый из них с thunk'ом по умолчанию, возвращающим `undefined` (голый провайдер), а слушатель решает всё целиком, не вызывая `next()`. Slot достаётся первому по порядку регистрации — владение плагина политики здесь соглашение развёртывания, а не принуждаемый инвариант. `fs/observed` — событие записи fire-and-forget, несущее `FsObservation`: либо present с версией, либо подтверждённое absent. Оно диспетчеризуется обычным `ctx.emit`; его слушатель **ДОЛЖЕН** быть синхронным и сводиться к побочным эффектам, потому что инструмент **НЕ** страхует emit — слушатель, бросающий исключение, способен подменить собой ошибку чтения или проявиться как результат `isError` инструмента после уже свершившейся мутации. Точные сигнатуры показывает расположенный ниже сгенерированный [cordis surface](#cordis-surface).
+`fs/write-intent` и `fs/edit-intent` — **решающие каскады с одним slot'ом**: инструмент диспетчеризует каждый из них с thunk'ом по умолчанию, возвращающим `undefined` (голый провайдер), а слушатель решает всё целиком, не вызывая `next()`. Slot достаётся первому по порядку регистрации — то, что им владеет плагин политики, является соглашением развёртывания, а не принудительно соблюдаемым инвариантом. `fs/observed` — регистрирующее fire-and-forget-событие, несущее `FsObservation`: либо present с версией, либо подтверждённое absent. Оно диспетчеризуется обычным `ctx.emit`; его слушатель **ДОЛЖЕН** быть синхронным и сводиться к побочным эффектам, потому что инструмент **НЕ** защищает emit — слушатель, бросающий исключение, способен подменить собой ошибку чтения или проявиться как результат `isError` инструмента после уже свершившейся мутации. Точные сигнатуры показывает расположенный ниже сгенерированный [cordis surface](#cordis-surface).
 
 ```ts type-equiv
 /**
@@ -221,7 +221,7 @@ interface FsObservationActor {
 
 ## Исход чтения (потребитель / рендеринг чтения)
 
-Текстовое чтение ограничено окном строк, байтовым пределом и лимитами бэкенда. После исчерпания байтового предела сканирование продолжается без удержания новых строк, так что `totalLines` остаётся точным. Результат, который рендерит обращённый к модели инструмент `read`, чисто презентационный; представлений `full`/`partial` нет — авторизация основана на актуальности (инструмент испускает наблюдение `fs/observed` вида present прямо с версией из stat), поэтому любое оконное чтение способно авторизовать последующую запись/правку, пока файл не изменился. Промах по метаданным испускает наблюдение вида absent до того, как инструмент вернёт `FS_NOT_FOUND`, что позволяет последующей записи под guard'ом воссоздать внешне удалённую цель, не авторизуя правку. Чтение разбивает на окна и собирает этот результат `dsh-tool-fs` — исполнитель, владеющий чтением; плагин политики этого не делает.
+Текстовое чтение ограничено окном строк, байтовым пределом и лимитами бэкенда. После исчерпания байтового предела сканирование продолжается без удержания новых строк, так что `totalLines` остаётся точным. Результат, который рендерит обращённый к модели инструмент `read`, чисто презентационный; представлений `full`/`partial` нет — авторизация основана на актуальности (инструмент испускает наблюдение `fs/observed` вида present прямо с версией из stat), поэтому любое оконное чтение способно авторизовать последующую запись/правку, пока файл не изменился. Промах по метаданным испускает наблюдение вида absent до того, как инструмент вернёт `FS_NOT_FOUND`, что позволяет последующей записи под guard'ом воссоздать внешне удалённую цель, не авторизуя правку. Оконную нарезку чтения и сборку этого результата выполняет `dsh-tool-fs` — исполнитель, владеющий чтением; плагин политики этого не делает.
 
 ```ts type-equiv
 /** Outcome of a bounded text read — what {@link formatReadOutput} renders. */
@@ -239,11 +239,11 @@ interface FileReadOutcome {
 
 ## Состояние наблюдаемых файлов (плагин политики)
 
-Состояние наблюдений — это `WeakMap<owner, Map<targetKey, FsObservation>>` внутри плагина `dsh-fs-observation-policy`. Нет записи в карте — состояние unseen; `{ kind: 'absent' }` — промах по метаданным подтвердил отсутствие: при `read` либо `view`, `str_replace` или `insert` инструмента `str_replace_editor`; `{ kind: 'present', version }` — чтение, запись или правка наблюдали эту версию. Решение о записи отображает unseen и absent в `createIfAbsent`, а present — в `replaceIfVersion`; решение о правке отображает unseen в `FS_NOT_OBSERVED`, absent — в `FS_NOT_FOUND`, а present — в его guard версии. Владелец выводится из актора события (обычно `exec.agent.session`), трактуется как непрозрачный и никогда не читается. Освобождение ресурсов отбрасывает всё (безопасность при HMR), и политика не выполняет файлового ввода-вывода.
+Состояние наблюдений — это `WeakMap<owner, Map<targetKey, FsObservation>>` внутри плагина `dsh-fs-observation-policy`. Нет записи в карте — состояние unseen; `{ kind: 'absent' }` — отсутствие подтвердил промах по метаданным при `read` либо при `view`, `str_replace` или `insert` инструмента `str_replace_editor`; `{ kind: 'present', version }` — чтение, запись или правка наблюдали эту версию. Решение о записи отображает unseen и absent в `createIfAbsent`, а present — в `replaceIfVersion`; решение о правке отображает unseen в `FS_NOT_OBSERVED`, absent — в `FS_NOT_FOUND`, а present — в его guard версии. Владелец выводится из актора события (обычно `exec.agent.session`), трактуется как непрозрачный и никогда не читается. Освобождение ресурсов отбрасывает всё (безопасность при HMR), и политика не выполняет файлового ввода-вывода.
 
 ## Таксономия ошибок (контракт провайдера)
 
-Отказы файловой системы несут стабильные строки `FsErrorCode` в составе `FsError` (`HarnessError`). Реестр инструментов сохраняет `{ name, code }` в результатах с ошибкой, поэтому слои повтора, разрешений и UI способны ветвить без разбора текста.
+Отказы файловой системы несут стабильные строки `FsErrorCode` в составе `FsError` (`HarnessError`). Реестр инструментов сохраняет `{ name, code }` в результатах с ошибкой, поэтому слои повтора, разрешений и UI могут выбирать нужную ветку, не разбирая текст.
 
 ```ts type-equiv
 /**
@@ -267,27 +267,27 @@ type FsErrorCode =
   | 'FS_ABORTED'
 ```
 
-Перечисление каталогов использует `FS_NOT_DIRECTORY`, `FS_PERMISSION_DENIED` и `FS_IO_ERROR`, чтобы различить существующую цель-не-каталог, отклонённое перечисление и неожиданный отказ ввода-вывода бэкенда. `FS_SANDBOX_DENIED` — отказ на уровне ПОЛИТИКИ от принуждающего песочницу бэкенда (`dsh-fs-sandbox`): барьер режима отклонил запись/правку; он отличим от `FS_PERMISSION_DENIED` (отказа ядра хоста). `FS_NOT_OBSERVED` означает, что у плагина политики нет записи о предшествующем наблюдении для этого владельца (либо `createIfAbsent` наткнулся на существующий файл). `FS_NOT_FOUND` обозначает также правку, отклонённую из-за подтверждённого отсутствия. `FS_STALE_VERSION` означает, что версия бэкенда больше не совпадает с наблюдавшейся (либо сам провайдер получил правку для отсутствующей цели). У авторизации по актуальности нет деления на частичное/полное, поэтому `FS_PARTIAL_OBSERVATION` не существует.
+Перечисление каталогов использует `FS_NOT_DIRECTORY`, `FS_PERMISSION_DENIED` и `FS_IO_ERROR`, чтобы различить существующую цель-не-каталог, отклонённое перечисление и неожиданный отказ ввода-вывода бэкенда. `FS_SANDBOX_DENIED` — отказ уровня ПОЛИТИКИ со стороны бэкенда, принуждающего песочницу (`dsh-fs-sandbox`): режимное ограничение отклонило запись/правку; он отличим от `FS_PERMISSION_DENIED` (отказа со стороны ядра хоста). `FS_NOT_OBSERVED` означает, что у плагина политики нет записи о предшествующем наблюдении для этого владельца (либо `createIfAbsent` наткнулся на существующий файл). `FS_NOT_FOUND` обозначает также правку, отклонённую из-за подтверждённого отсутствия. `FS_STALE_VERSION` означает, что версия бэкенда больше не совпадает с наблюдавшейся (либо сам провайдер получил правку для отсутствующей цели). У авторизации по актуальности нет деления на частичное/полное, поэтому `FS_PARTIAL_OBSERVATION` не существует.
 
 ## Файловый ввод-вывод без таймаутов
 
-`read`/`write`/`edit` не принимают **никакого** `timeoutMs`, и контракт провайдера не взводит дедлайна — в отличие от bash и web (они потребляют [`@deepseek-ai/dsh-timeout`](../../packages/util/timeout/README.md)) и работающих поверх дочерних процессов `glob`/`grep` (чьё объявленное `timeoutMs` принуждает `@deepseek-ai/dsh-tool-call-timeout-policy`): те опираются на процессы, где дедлайн действительно способен убить работу. Локальный syscall в лучшем случае допускает прерывание по возможности (best-effort): таймаут не может заставить выполняющийся `fsync`/`rename` остановиться, так что `timeoutMs` здесь был бы дедлайном, который seam не в силах обеспечить, и неявным умолчанием ровно там, где принцип «явное > неявное» его запрещает. Отмена по-прежнему распространяется через сигнал исполнения инструмента ради прерывания по возможности на границах syscall.
+`read`/`write`/`edit` не принимают **никакого** `timeoutMs`, и контракт провайдера не задаёт дедлайна — в отличие от bash и web (они потребляют [`@deepseek-ai/dsh-timeout`](../../packages/util/timeout/README.md)) и работающих поверх дочерних процессов `glob`/`grep` (чей объявленный `timeoutMs` принудительно применяет `@deepseek-ai/dsh-tool-call-timeout-policy`): те работают поверх процессов, где дедлайн действительно способен убить работу. Локальный syscall в лучшем случае допускает прерывание по возможности (best-effort): таймаут не может заставить выполняющийся `fsync`/`rename` остановиться, так что `timeoutMs` здесь был бы дедлайном, который seam не в силах обеспечить, и неявным умолчанием ровно там, где принцип «явное > неявное» его запрещает. Отмена по-прежнему распространяется через сигнал исполнения инструмента ради прерывания по возможности на границах syscall.
 
 ## Сервис и плагин
 
-`FileSystem` (`ctx.fs`, абстрактный) владеет примитивами провайдера: `resolve`, `processPath`, `fileUrl`, `contains`, `stat`, `lstat`, `readText`, `streamText`, `readBytes`, `listDir`, `writeText` и `editText`. `dsh-fs-observation-policy` **не регистрирует сервиса** — это плагин, добавляющий политику через события `fs/*`: он принимает решения в каскадах намерений записи/правки, исходя из состояния unseen/absent/present, и записывает значения `FsObservation`. Исполнитель — `dsh-tool-fs`: он читает, пишет и правит через `ctx.fs`, диспетчеризует каскады и испускает событие записи. Точные сигнатуры показывает расположенный ниже сгенерированный раздел [`ctx.fs`](#ctxfs--filesystem-abstract-seam).
+`FileSystem` (`ctx.fs`, абстрактный) владеет примитивами провайдера: `resolve`, `processPath`, `fileUrl`, `contains`, `stat`, `lstat`, `readText`, `streamText`, `readBytes`, `listDir`, `writeText` и `editText`. `dsh-fs-observation-policy` **не регистрирует сервиса** — это плагин, добавляющий политику через гейт событий `fs/*`: он принимает решения в каскадах намерений записи/правки, исходя из состояния unseen/absent/present, и записывает значения `FsObservation`. Исполнитель — `dsh-tool-fs`: он читает, пишет и правит через `ctx.fs`, диспетчеризует каскады и испускает событие записи. Точные сигнатуры показывает расположенный ниже сгенерированный раздел [`ctx.fs`](#ctxfs--filesystem-abstract-seam).
 
-<!-- BEGIN GENERATED cordis-surface (gen-cordis-catalog.ts) вЂ” do not edit between markers -->
+<!-- BEGIN GENERATED cordis-surface (gen-cordis-catalog.ts) — do not edit between markers -->
 
 <a id="cordis-surface"></a>
 
 ## Cordis API
 
-Generated from source by `scripts/gen-cordis-catalog.ts` (verified fresh by `pnpm run verify-cordis-catalog` in doc-sync; regenerate with `pnpm run gen-cordis-catalog`) вЂ” the language sides differ only in locale-specific paired document paths. Signature blocks use a `ts cordis-catalog` fence and keep the original source JSDoc; dispatch modes are defined in the [primer](../cordis-primer.md#dispatch-modes), and the framework-inherited `ctx` API lives in [cordis-api/inherited.md](../cordis-api/inherited.md).
+Generated from source by `scripts/gen-cordis-catalog.ts` (verified fresh by `pnpm run verify-cordis-catalog` in doc-sync; regenerate with `pnpm run gen-cordis-catalog`) — the language sides differ only in locale-specific paired document paths. Signature blocks use a `ts cordis-catalog` fence and keep the original source JSDoc; dispatch modes are defined in the [primer](../cordis-primer.md#dispatch-modes), and the framework-inherited `ctx` API lives in [cordis-api/inherited.md](../cordis-api/inherited.md).
 
 <a id="ctxfs--filesystem-abstract-seam"></a>
 
-### `ctx.fs` вЂ” `FileSystem` (abstract seam)
+### `ctx.fs` — `FileSystem` (abstract seam)
 
 Abstract filesystem provider. Targets must preserve identity across aliases; reads expose regular UTF-8 text or typed errors, listings are stable and content-free, and mutations are atomic. Optional guards add stale protection without changing the unguarded provider contract.
 
@@ -435,7 +435,7 @@ Source: [`packages/fs/fs/src/index.ts`](../../packages/fs/fs/src/index.ts)
 
 <a id="fsedit-intent--waterfall"></a>
 
-#### `fs/edit-intent` вЂ” waterfall
+#### `fs/edit-intent` — waterfall
 
 Single-slot decision for the next FileSystem.editText. Calling `next()` yields an unconditional edit; the first returned guard wins.
 
@@ -454,7 +454,7 @@ Source: [`packages/fs/fs/src/index.ts`](../../packages/fs/fs/src/index.ts)
 
 <a id="fsobserved--emit"></a>
 
-#### `fs/observed` вЂ” emit
+#### `fs/observed` — emit
 
 Record an authoritative positive or negative observation. Listeners must be synchronous recorders: throws fail the tool call and returned promises are not awaited.
 
@@ -475,7 +475,7 @@ Source: [`packages/fs/fs/src/index.ts`](../../packages/fs/fs/src/index.ts)
 
 <a id="fswrite-intent--waterfall"></a>
 
-#### `fs/write-intent` вЂ” waterfall
+#### `fs/write-intent` — waterfall
 
 Single-slot decision for the next FileSystem.writeText. Calling `next()` yields the bare provider's unconditional write; the first listener that returns an intent owns the decision rather than composing with peers.
 

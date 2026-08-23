@@ -5,7 +5,7 @@
 
 [English](service.md) | [中文](service.zh.md) | Русский
 
-Базовый класс сервисов контекста. Подкласс, загруженный как плагин, регистрирует себя как `ctx.<имя>`.
+Базовый класс сервисов контекста. Подкласс, загруженный как плагин, регистрирует себя как `ctx.<name>`.
 
 Базовый класс для сервисов, выставляющих именованный API на `ctx`.
 
@@ -33,7 +33,7 @@ public name!: string
 static readonly init: unique symbol
 ```
 
-Ключ-symbol метода экземпляра, запускаемого после конструирования (классовые плагины).
+Ключ-symbol метода экземпляра, запускаемого после конструирования (плагины-классы).
 
 [Исходник](../../vendor/cordis/src/service.ts#L13)
 
@@ -55,7 +55,7 @@ static readonly check: unique symbol
 static readonly config: unique symbol
 ```
 
-Ключ-symbol фантомного тип-параметра конфигурации intercept.
+Ключ-symbol фантомного типового параметра конфигурации intercept.
 
 [Исходник](../../vendor/cordis/src/service.ts#L17)
 
@@ -99,6 +99,6 @@ static readonly tracker: unique symbol
 static readonly resolveConfig: unique symbol
 ```
 
-Ключ-symbol хелпера разрешения конфигурации intercept, описанного ниже.
+Ключ-symbol хелпера разрешения конфигурации intercept (см. ниже).
 
 [Исходник](../../vendor/cordis/src/service.ts#L25)

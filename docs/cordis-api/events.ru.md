@@ -5,7 +5,7 @@
 
 [English](events.md) | [中文](events.zh.md) | Русский
 
-API диспатча событий, подмешанный в каждый контекст. Декларации событий harness и их режимы диспатча генерируются на каждой владеющей ими [странице подсистемы](../subsystems/core.ru.md).
+API диспатча событий, подмешанный в каждый контекст. Декларации событий harness и их режимы диспатча генерируются на странице каждой владеющей [подсистемы](../subsystems/core.ru.md).
 
 ### ctx.parallel(name, ...args)
 
@@ -138,13 +138,13 @@ waterfall<K extends keyof Events>(thisArg: NoInfer<ThisType<Events[K]>>, name: K
 on<K extends keyof Events>(name: K, listener: Events[K], options?: boolean | EventOptions): () => boolean
 ```
 
-Регистрирует слушателя события во владении текущего fiber.
+Регистрирует слушателя события, принадлежащего текущему fiber.
 
 - `name` — имя события, которое слушаем.
 - `listener` — вызывается с аргументами диспатча.
 - `options` — опции слушателя; булево значение — краткая форма `prepend`.
 
-**Возвращает** disposer, удаляющего слушателя; `true`, если тот ещё был зарегистрирован.
+**Возвращает** disposer, удаляющий слушателя; `true`, если тот ещё был зарегистрирован.
 
 [Исходник](../../vendor/cordis/src/events.ts#L97)
 
@@ -168,7 +168,7 @@ once<K extends keyof Events>(name: K, listener: Events[K], options?: boolean | E
 - `listener` — вызывается не более одного раза с аргументами диспатча.
 - `options` — опции слушателя; булево значение — краткая форма `prepend`.
 
-**Возвращает** disposer, удаляющего слушателя; `true`, если тот ещё был зарегистрирован.
+**Возвращает** disposer, удаляющий слушателя; `true`, если тот ещё был зарегистрирован.
 
 [Исходник](../../vendor/cordis/src/events.ts#L106)
 

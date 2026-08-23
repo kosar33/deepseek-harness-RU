@@ -5,14 +5,19 @@
  */
 import { afterEach, describe, expect, it } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
+import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import {
   formatElapsedSeconds,
   TrajectoryCell,
   type TrajectoryCellKind,
 } from '../src/client/TrajectoryCell.tsx'
 import { formatDurationMillis } from '../src/client/trajectory-record.ts'
+import { zh } from '../src/client/locales.ts'
 
 afterEach(cleanup)
+
+/** Specs resolve UI copy through the real zh dictionary, like the injected seat. */
+const t = makeTranslate(zh)
 
 describe('formatDurationMillis', () => {
   it('formats exact millisecond labels with thousands separators', () => {
@@ -49,10 +54,11 @@ describe('TrajectoryCell', () => {
         kind="tool"
         text="bash · Read src/index.ts"
         timeSeconds={5}
+        t={t}
       />,
     )
     expect(screen.getByText('#6')).toBeTruthy()
-    expect(screen.getByText('Tool')).toBeTruthy()
+    expect(screen.getByText('工具')).toBeTruthy()
     expect(screen.getByText('bash · Read src/index.ts')).toBeTruthy()
     expect(screen.getByText('5,000 ms')).toBeTruthy()
   })
@@ -67,9 +73,10 @@ describe('TrajectoryCell', () => {
         input={136}
         output={381}
         think={155}
+        t={t}
       />,
     )
-    expect(screen.getByText('Message')).toBeTruthy()
+    expect(screen.getByText('消息')).toBeTruthy()
     expect(screen.getByText('136')).toBeTruthy()
     expect(screen.getByText('381')).toBeTruthy()
     expect(screen.getByText('155')).toBeTruthy()
@@ -82,17 +89,17 @@ describe('TrajectoryCell', () => {
 
   it('selected marks the row for the brand-primary inset ring', () => {
     const { container } = render(
-      <TrajectoryCell index={15} kind="message" text="pictur..." timeSeconds={123.6} selected />,
+      <TrajectoryCell index={15} kind="message" text="pictur..." timeSeconds={123.6} selected t={t} />,
     )
     expect(container.firstElementChild?.getAttribute('data-selected')).toBe('true')
   })
 
   it.each([
-    ['user', 'User'],
-    ['tool', 'Tool'],
+    ['user', '用户'],
+    ['tool', '工具'],
   ] as const)('kind %s shows the %s tag and no metric columns', (kind: TrajectoryCellKind, label: string) => {
     const { container } = render(
-      <TrajectoryCell index={1} kind={kind} text="summary" timeSeconds={kind === 'user' ? 0 : null} input={1} output={2} think={3} />,
+      <TrajectoryCell index={1} kind={kind} text="summary" timeSeconds={kind === 'user' ? 0 : null} input={1} output={2} think={3} t={t} />,
     )
     expect(screen.getByText(label)).toBeTruthy()
     expect(container.querySelector('[data-kind]')?.getAttribute('data-kind')).toBe(kind)

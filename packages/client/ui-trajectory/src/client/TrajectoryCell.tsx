@@ -1,11 +1,16 @@
 // Legacy standalone trajectory cell retained for direct consumers and specs.
 
+import type { TranslateNS } from '@deepseek-ai/dsh-client-ui-slots'
+import { NS, type TrajectoryKey } from './locales.ts'
 import {
   formatElapsedSeconds,
   type TrajectoryCellKind,
   type TrajectoryCellProps,
 } from './trajectory-record.ts'
 import css from './TrajectoryCell.module.css'
+
+/** The namespace-bound translate seat this component consumes. */
+type Translate = TranslateNS<typeof NS>
 
 export { formatElapsedSeconds }
 export type {
@@ -14,15 +19,15 @@ export type {
   TrajectoryCellProps,
 } from './trajectory-record.ts'
 
-/** Display label per kind (matches the design tags). */
-const KIND_LABEL: Record<TrajectoryCellKind, string> = {
-  system: 'System',
-  user: 'User',
-  context: 'Context',
-  compacted: 'Compacted',
-  message: 'Message',
-  tool: 'Tool',
-  subtool: 'Sub',
+/** Dictionary key per kind; the label renders through the bound translate. */
+const KIND_KEYS: Record<TrajectoryCellKind, TrajectoryKey> = {
+  system: 'cell.system',
+  user: 'cell.user',
+  context: 'cell.context',
+  compacted: 'cell.compacted',
+  message: 'cell.message',
+  tool: 'cell.tool',
+  subtool: 'cell.sub',
 }
 
 const TAG_CLASS: Record<TrajectoryCellKind, string | undefined> = {
@@ -37,7 +42,7 @@ const TAG_CLASS: Record<TrajectoryCellKind, string | undefined> = {
 
 /**
  * Render one trajectory step cell.
- * @param props - index, kind, text, time, and optional Message metrics.
+ * @param props - index, kind, text, time, optional Message metrics, and the bound translate.
  * @returns the cell element.
  */
 export function TrajectoryCell({
@@ -63,8 +68,9 @@ export function TrajectoryCell({
   think,
   selected = false,
   className,
+  t,
   ...rest
-}: TrajectoryCellProps) {
+}: TrajectoryCellProps & { t: Translate }) {
   const rootClass = [
     css.root,
     selected ? css.selected : undefined,
@@ -75,7 +81,7 @@ export function TrajectoryCell({
     <div className={rootClass} data-kind={kind} data-selected={selected || undefined} {...rest}>
       <span className={css.index}>#{index}</span>
       <span className={css.tagSlot}>
-        <span className={[css.tag, TAG_CLASS[kind]].filter((c): c is string => c !== undefined).join(' ')}>{KIND_LABEL[kind]}</span>
+        <span className={[css.tag, TAG_CLASS[kind]].filter((c): c is string => c !== undefined).join(' ')}>{t(KIND_KEYS[kind])}</span>
       </span>
       <span className={css.text}>{text}</span>
       <span className={css.trailing}>

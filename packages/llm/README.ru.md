@@ -7,8 +7,8 @@ Seam LLM и его адаптеры провайдеров. Пакет `llm` в�
 | Пакет | Роль | ctx-ключ |
 |---|---|---|
 | [`llm/`](llm/README.ru.md) | Сервис LLM и общий словарь потоковой передачи | `ctx.llm` |
-| [`token-meter/`](token-meter/README.ru.md) | Учитывающее воспроизведение измерение токенов | `ctx.tokenMeter` |
-| [`llm-retry/`](llm-retry/README.ru.md) | Политика повторов в области провайдера | слушает `agent/request-error` |
+| [`token-meter/`](token-meter/README.ru.md) | Измерение токенов с учётом воспроизведения | `ctx.tokenMeter` |
+| [`llm-retry/`](llm-retry/README.ru.md) | Политика повторов на уровне провайдера | слушает `agent/request-error` |
 | [`llm-deepseek/`](llm-deepseek/README.ru.md) | Прямой адаптер DeepSeek | регистрируется на `ctx.llm` |
 | [`llm-pi-ai/`](llm-pi-ai/README.ru.md) | Мультипровайдерный адаптер pi-ai | регистрируется на `ctx.llm` |
 

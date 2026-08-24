@@ -412,8 +412,10 @@ describe('PiAiAdapter provider routing', () => {
 
 describe('provider profile lifecycle', () => {
   it('keeps adapter helpers off the package root', () => {
+    // `resolveProfiles` and the two credential-seam adapters are deliberately
+    // root-exported as the reuse channel for sibling adapter families (see
+    // dsh-llm-key-rotation); every other helper stays internal.
     for (const helper of [
-      'resolveProfiles',
       'toPiContext',
       'toPiReplayState',
       'toPiAssistant',

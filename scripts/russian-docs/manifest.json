@@ -2148,6 +2148,31 @@
       "source": "docs/capability-seams.md",
       "sourceBlob": "9e99ebbdc0e3af22f9939c690ead479d4d20b00c",
       "ruBlob": "479f0f4ff1f11c066dc61eeb74e4487dca9b57b2"
+    },
+    "docs/event-producer-consumer.ru.md": {
+      "source": "docs/event-producer-consumer.md",
+      "sourceBlob": "1fb65d55f5a0d8121f4f171c956196fde746103f",
+      "ruBlob": "4d18b39f30559fcc20e8180538cabb4a23364239"
+    },
+    "docs/graph-atlas.ru.md": {
+      "source": "docs/graph-atlas.md",
+      "sourceBlob": "1da995e8ff6b47e0a83f0308342c5f45ccbd3835",
+      "ruBlob": "940b05359805474e8b1a2832a70e9cda594a5ac4"
+    },
+    "packages/llm/llm-key-rotation/README.ru.md": {
+      "source": "packages/llm/llm-key-rotation/README.md",
+      "sourceBlob": "e386024105655fe2becc732a5575572a07ca6038",
+      "ruBlob": "bee90d90113352290778ecc6fcbee0f654b33efd"
+    },
+    "docs/module-graph.ru.md": {
+      "source": "docs/module-graph.md",
+      "sourceBlob": "531def00118795d3d8c6812baa215e71ca499bc0",
+      "ruBlob": "fe2b202d24db1ba1ccd93a938becb4f88b040f94"
+    },
+    "docs/persistence-catalog.ru.md": {
+      "source": "docs/persistence-catalog.md",
+      "sourceBlob": "aaedabf93db497dc3e760ea5609497151569a3a4",
+      "ruBlob": "cbcd6a7b1ab752be7e12a177347f843529bce2cf"
     }
   }
 }

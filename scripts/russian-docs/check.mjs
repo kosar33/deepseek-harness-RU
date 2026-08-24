@@ -59,10 +59,6 @@ const SKIP_FILES = new Set([
   // as an ordinary outdated pair instead of silently dropping translations.
   'docs/tool-catalog.md',
   'docs/config-catalog.md',
-  'docs/persistence-catalog.md',
-  'docs/graph-atlas.md',
-  'docs/module-graph.md',
-  'docs/event-producer-consumer.md',
   // Meta-documentation of the translation process itself.
   'docs/i18n/README.md',
   'docs/i18n/translation-rules.md',

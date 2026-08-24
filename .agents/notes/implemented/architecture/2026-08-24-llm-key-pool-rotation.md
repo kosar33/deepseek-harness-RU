@@ -2,6 +2,8 @@
 
 Status: implemented
 
+English | [中文](2026-08-24-llm-key-pool-rotation.zh.md)
+
 Some providers meter requests per API key, and their daily windows do not clear by waiting within the day, so retrying a 429 against the same key spends budget on an attempt that cannot succeed until reset. [Bounded recovery](2026-06-21-bounded-llm-request-recovery.md) owns same-request retry timing but deliberately owns no credential identity: its policy decides *when* to re-attempt, never *with what* the attempt authenticates. This note adds the missing half — a plugin that chooses among several keys for one route and parks exhausted ones until their reset.
 
 ## Problem

@@ -48,7 +48,7 @@
     "docs/user/develop/practice/index.ru.md": {
       "source": "docs/user/develop/practice/index.md",
       "sourceBlob": "c246d0a26a0a07092df85a9470118699070e856f",
-      "ruBlob": "227e12770737b350c028236b4b972477db4d1ad7"
+      "ruBlob": "726be7019b1d651fd2eac114244f430e098a26b6"
     },
     "docs/user/develop/practice/llm-adapter.ru.md": {
       "source": "docs/user/develop/practice/llm-adapter.md",
@@ -63,7 +63,7 @@
     "docs/user/guide/providers.ru.md": {
       "source": "docs/user/guide/providers.md",
       "sourceBlob": "4e9c98375636c3492fe41ea2652701a7ee6174fb",
-      "ruBlob": "6829b83f1334c2f74c8c5256dcf1c20c2ffc6d42"
+      "ruBlob": "9738fd96e36b44f4b24f8405e152b1def1ae6588"
     },
     "docs/user/guide/python-sdk.ru.md": {
       "source": "docs/user/guide/python-sdk.md",
@@ -83,7 +83,7 @@
     "docs/architecture.ru.md": {
       "source": "docs/architecture.md",
       "sourceBlob": "e924c0d8704c7b36b156d77fa1d4c7ea5c457c8b",
-      "ruBlob": "1326eb37b2fce7b571a5d023d544d3ba5665cefd"
+      "ruBlob": "1c532ba9b5f8a211d4ed2b24b07332519bcdef5b"
     },
     "docs/cordis-primer.ru.md": {
       "source": "docs/cordis-primer.md",
@@ -113,17 +113,17 @@
     "docs/api-gateway.ru.md": {
       "source": "docs/api-gateway.md",
       "sourceBlob": "45dce7301fc0b383059a2d882c56a5885683fd5c",
-      "ruBlob": "384af125f7817d2925a4d7557f07d51a792a726f"
+      "ruBlob": "c667c738ae94aa894b2637a86aab5cf5707e8584"
     },
     "docs/cookbook/adding-a-conversation-node.ru.md": {
       "source": "docs/cookbook/adding-a-conversation-node.md",
       "sourceBlob": "4e2c626d85139f80b5cfc3fc0b2249446cf81f1a",
-      "ruBlob": "910e56d7a7562599b5aafe4d1a6e2f7eea5bbe9f"
+      "ruBlob": "a25f781c57c90de7011618fd550d27eeb0c34f81"
     },
     "docs/cookbook/adding-a-settings-card.ru.md": {
       "source": "docs/cookbook/adding-a-settings-card.md",
       "sourceBlob": "3f4ee3adcf680ff1d9539b1ed86be8c6056ab4a4",
-      "ruBlob": "3f9fbca6a295193cf02c3cb85dc8c7032e97c2a6"
+      "ruBlob": "6dafb495b8381fec443442c4025ae73371cbac85"
     },
     "docs/cookbook/maintaining-dsh-code-review.ru.md": {
       "source": "docs/cookbook/maintaining-dsh-code-review.md",
@@ -133,12 +133,12 @@
     "docs/cookbook/responding-to-pr-review-on-a-stack.ru.md": {
       "source": "docs/cookbook/responding-to-pr-review-on-a-stack.md",
       "sourceBlob": "698b27ff7ccc717c3851340be10afa75614782b9",
-      "ruBlob": "2a329fd23544a3e515b682655128538d20d3918e"
+      "ruBlob": "dba2fd1068c758804074d4db5ae7c82896a4975e"
     },
     "docs/cookbook/adding-a-package.ru.md": {
       "source": "docs/cookbook/adding-a-package.md",
       "sourceBlob": "4e704e9ce53fc401daf2fb131fad7d079b516d3e",
-      "ruBlob": "3f81a73790b31c0818b4d54c8dbe2ea120774308"
+      "ruBlob": "8f5608c43d890cb86fd99d4ab3f8b836c04e0a37"
     },
     "docs/cookbook/adding-a-tool.ru.md": {
       "source": "docs/cookbook/adding-a-tool.md",
@@ -162,8 +162,8 @@
     },
     "docs/testing.ru.md": {
       "source": "docs/testing.md",
-      "sourceBlob": "1ec4d4e65fa83dd390a75386945dcfb472822edc",
-      "ruBlob": "2f9ceefa87551c321bbdcb55f23b11327c5ee2c6"
+      "sourceBlob": "a1a2ac778b5334b480bba3decb0da338731980ad",
+      "ruBlob": "75521878e61e9203439d58fad656f52a4d3f2973"
     },
     "docs/development.ru.md": {
       "source": "docs/development.md",
@@ -182,107 +182,98 @@
     },
     "docs/subsystems/core.ru.md": {
       "source": "docs/subsystems/core.md",
-      "sourceBlob": "18057c9a9a308e439bb6a08f598f51f158243496",
-      "ruBlob": "3266211d6b096d5ae890a2a584e9579c71cb5d6b"
+      "sourceBlob": "fb33f59794e03c098d79268d2b11b543763bc713",
+      "ruBlob": "408dcaaf6f93c07c246a24c579c6d483a35f46bd"
     },
     "docs/subsystems/scope.ru.md": {
       "source": "docs/subsystems/scope.md",
-      "sourceBlob": "c425217de224839d719da213e33f58bd2e6bf002",
-      "ruBlob": "2ac6648ceced7af1fda2a1acb8ae178f8ddcc32d"
+      "sourceBlob": "e26bba835a05fa8917607b00eb7e8b14e6563f66",
+      "ruBlob": "9d527b6cce1553ea16f37a721bb292e50a04fe13"
     },
     "docs/subsystems/invariants.ru.md": {
       "source": "docs/subsystems/invariants.md",
-      "sourceBlob": "9d0de847a7b7170365e06431be79f7feb1e2ef4d",
-      "ruBlob": "2052a0f07ce9307422da7aec61d6d55c76e3e08a"
+      "sourceBlob": "ebf848ff0885e14c2f830f4b0e3ef94b59ed8365",
+      "ruBlob": "7051cbe964c15713666a5153fb8a94bf9119c314"
     },
     "docs/subsystems/spill.ru.md": {
       "source": "docs/subsystems/spill.md",
-      "sourceBlob": "8356fc45f8581c6776238f212592c4ea2841a96a",
-      "ruBlob": "fbb762086c8f6c33d0947e971d95398c1365354c"
+      "sourceBlob": "c84055664b95bc363f10e67b888c9cac668f9931",
+      "ruBlob": "7b8e4ac0fd520b10956245cb4bb7a773e635c2cb"
     },
     "docs/subsystems/token-meter.ru.md": {
       "source": "docs/subsystems/token-meter.md",
-      "sourceBlob": "b8b2add194cbafafc250c6fc15b23e246d87d9c1",
-      "ruBlob": "d4ac0b1108930c5d0342770eabf4caa8f7d9cebe"
+      "sourceBlob": "ca727e0853a40b4ddce9320803c2613ae7f535bc",
+      "ruBlob": "35a9594e5b97285731bfd04fe082e3330e5acc6b"
     },
     "docs/subsystems/tools.ru.md": {
       "source": "docs/subsystems/tools.md",
       "sourceBlob": "3df01a396a8d5883c9ba13c9596c4c78fb25d8b9",
-      "ruBlob": "f7a7c805cafd7cd037e905b7148c814d0db43400"
+      "ruBlob": "cce1050d3420ebaf3d21274ed9134669869abaff"
     },
     "docs/subsystems/shell.ru.md": {
       "source": "docs/subsystems/shell.md",
-      "sourceBlob": "8cfe731b3d83559b9543668f38934c75847184db",
-      "ruBlob": "05deed246906e9e3b0bc7439f8f02e246a85dcc4"
+      "sourceBlob": "554adcfb1b37a5e2fe787a78dbb61a1206f80cf9",
+      "ruBlob": "8b33ff4d8cdc2436d572f7cda66d70c6c7ad365e"
     },
     "docs/subsystems/commands.ru.md": {
       "source": "docs/subsystems/commands.md",
-      "sourceBlob": "f3760558b04253701915a240375f13e096bc0c51",
-      "ruBlob": "79c6ffbd4bf22d2a168ab2ef2d6cf9e07dfb92ba"
+      "sourceBlob": "ae4f043c14bfce549a6b8551d4cee8ac2e01ba00",
+      "ruBlob": "670ddaf829341d47ea6c67aab36604adc0fce2fb"
     },
     "docs/subsystems/goal.ru.md": {
       "source": "docs/subsystems/goal.md",
-      "sourceBlob": "858d0f073f570185ff101f0d64ac701693e5e866",
-      "ruBlob": "8b6c90e7dc4a6b82ce26d3c5e1848ab14b8850ec"
+      "sourceBlob": "95f03e64785a5050a17ed8b340c16148805dc8b0",
+      "ruBlob": "f5c29ec74a28daf650c1a14adb8f0de3ed76de2b"
     },
     "docs/subsystems/workflow.ru.md": {
       "source": "docs/subsystems/workflow.md",
-      "sourceBlob": "b608efab2300b20b06a3aa09041c3419fbc2145b",
-      "ruBlob": "d2a8d21801b3a7899f7b89f9a8567173134e74c4"
       "sourceBlob": "4c0cf48a39b12e1753c51af0420e0330599783c3",
-      "ruBlob": "d0dff7882a4ffd85d31bc2116b4a0ef4ac84f156"
+      "ruBlob": "710aacecaa82d630e07a07690dd378c8fc4409e3"
     },
     "docs/subsystems/session-reference.ru.md": {
       "source": "docs/subsystems/session-reference.md",
-      "sourceBlob": "17c0d14485bd5a0eea97781c8f5fe1c4b3bda886",
-      "ruBlob": "49991265a81af1d6549ceeabf232198eaf60f1d6"
+      "sourceBlob": "a8e64121987fe6b7417a3f119f05554135c77ec1",
+      "ruBlob": "58c0dc9577270a51c75bd91634ec907952328f18"
     },
     "docs/subsystems/session-title.ru.md": {
       "source": "docs/subsystems/session-title.md",
-      "sourceBlob": "13991f8e9d4e765fdc99ade077d928cb05d1ccaf",
-      "ruBlob": "50898f92ebc6f15d76835e790b276ec634321fd8"
-    },
-    "docs/subsystems/plan.ru.md": {
-      "source": "docs/subsystems/plan.md",
-      "sourceBlob": "a4332ba97667f125b0996f305e7e2a2a36005ddf",
-      "ruBlob": "45dd1ff9bfaa1ff45a6009aa8ee660f365f2a685"
       "sourceBlob": "34e8dc4f6765e798aa6b7fc519bc1c5cbcb36dc0",
-      "ruBlob": "3ac1451571a6ede23e104876c7fd915fc2bea5d6"
+      "ruBlob": "38e4366685274ff2d349f15d784251fe6fbc26ca"
     },
     "docs/subsystems/plan.ru.md": {
       "source": "docs/subsystems/plan.md",
       "sourceBlob": "f8ec859eca358e9cdca3d435fc35839ef9f1488d",
-      "ruBlob": "19342b5bede25d2ea8df8cd65be31259d21c5839"
+      "ruBlob": "7518aeebffee159d41d1886c718a92b6f6874397"
     },
     "docs/subsystems/filesystem.ru.md": {
       "source": "docs/subsystems/filesystem.md",
       "sourceBlob": "e4ef82f88108a4d926c8bdcfa361415d2c54e1be",
-      "ruBlob": "ab3d24186c2247b7aa96e02d30416f109877b0aa"
+      "ruBlob": "1aa9de97a5bfac1a8ef2b39771acc393be77471a"
     },
     "docs/subsystems/terminal.ru.md": {
       "source": "docs/subsystems/terminal.md",
-      "sourceBlob": "c1c78963e48f51014678e778bbdc5da530f453c6",
-      "ruBlob": "c3f5b5a998ce8feb2821d6de1d29bba7a23ece12"
+      "sourceBlob": "b6bdf9c943d51e047b792c2899af45b918cbc553",
+      "ruBlob": "c598948597b795b0e0f0def15bb6b1fc788d498d"
     },
     "docs/subsystems/lsp.ru.md": {
       "source": "docs/subsystems/lsp.md",
-      "sourceBlob": "8f0b12cdbc4d81a9317b8f360fb7b76a03fbeb2b",
-      "ruBlob": "39216a0745b2431000d3805e4e9e465deace2c2b"
+      "sourceBlob": "caf016c62fe15bcc34892f94dcdfa5d0f534984a",
+      "ruBlob": "8d2aa4b513adfedd01a4e3047f1a1b51ae8d0d06"
     },
     "docs/subsystems/web.ru.md": {
       "source": "docs/subsystems/web.md",
-      "sourceBlob": "4acab9273b3b2753409c680bd41e93fb3a627843",
-      "ruBlob": "3af114c6cf7b419452893b46ccbf9def098b14f3"
+      "sourceBlob": "37bfa80218f8f71e1d3d1f3503279b7bee92700a",
+      "ruBlob": "7c1ad27783cbf4d2e65b65ca849295fbaaf0a0d5"
     },
     "docs/subsystems/session.ru.md": {
       "source": "docs/subsystems/session.md",
       "sourceBlob": "202605690174e8dbacd2708fd0edbff7c7ada166",
-      "ruBlob": "aa00b94df7936267b2484886bfc849e003eadcb0"
+      "ruBlob": "7e0b70bd228fd12133f0b5a13841f2a8ef2099dd"
     },
     "docs/subsystems/sandbox.ru.md": {
       "source": "docs/subsystems/sandbox.md",
-      "sourceBlob": "765b33e2aca437735163a0203ec17bfe35b485d8",
-      "ruBlob": "cfb6d821af54b9bceb971595dc0175399d7c2484"
+      "sourceBlob": "ee5ca5b5da00fc91d6416dde8ef42ee4951a78b3",
+      "ruBlob": "cffc495ac12c90ab707f018afda195c448f2c8a2"
     },
     "docs/subsystems/subprocess.ru.md": {
       "source": "docs/subsystems/subprocess.md",
@@ -291,18 +282,18 @@
     },
     "docs/subsystems/user-questions.ru.md": {
       "source": "docs/subsystems/user-questions.md",
-      "sourceBlob": "f6a8fe611caf9f51c9a233a96be25d69a839e3f3",
-      "ruBlob": "14d77525708b7d82e3e0d9ce548797f3aae6fee1"
+      "sourceBlob": "d5976ae39314261cd92845d9966613b85bcec8b2",
+      "ruBlob": "b6e02e07ff005e54f6e97e311d4afed6220a297a"
     },
     "docs/subsystems/subagent.ru.md": {
       "source": "docs/subsystems/subagent.md",
       "sourceBlob": "847d51a939ecbe901313104b5901f6f415bddddd",
-      "ruBlob": "91f1e5adce4f7b724e95116ea45c348efab86263"
+      "ruBlob": "07cb16aba68f38f793344dae4707f8c00186ef7c"
     },
     "docs/subsystems/system-prompt.ru.md": {
       "source": "docs/subsystems/system-prompt.md",
-      "sourceBlob": "f4cdf40703ac4f4a6f87d525efb6010e45f4480b",
-      "ruBlob": "e5679971232cd8d83bdf897fe431c3caa02cb444"
+      "sourceBlob": "c05adf1d562769b63a1a0d24f145d3a846a01543",
+      "ruBlob": "a87c63a934eea7ce9b8f2d41ba67954924d10378"
     },
     "docs/subsystems/compaction.ru.md": {
       "source": "docs/subsystems/compaction.md",
@@ -312,36 +303,32 @@
     "docs/subsystems/llm-streaming.ru.md": {
       "source": "docs/subsystems/llm-streaming.md",
       "sourceBlob": "34365b2731d494e2df315bba9e4efdc836ed4351",
-      "ruBlob": "1ae4ccb25b7a9db76eecbe53f29dce8c001d18e3"
+      "ruBlob": "5d1ae79b239878f8cdfd07b40d209ddb670d2e39"
     },
     "docs/subsystems/agent-team.ru.md": {
       "source": "docs/subsystems/agent-team.md",
-      "sourceBlob": "d3cca68124bfa199c4a81d6c67c6305ce7f65b6c",
-      "ruBlob": "2efc1ad0c4934da588db374d091de6529b32275e"
       "sourceBlob": "6086d0fc3ef25bfece56b086ebde8c23b754f2c6",
-      "ruBlob": "524d2be651d42feab5f00a0db35e5868a7fc5421"
+      "ruBlob": "3bdc95569a039d2cbdc750cc16e534cb1a21065e"
     },
     "docs/subsystems/approval.ru.md": {
       "source": "docs/subsystems/approval.md",
-      "sourceBlob": "7d3d09314f8fbb151cc8a00dbbee5e2cc14e2c9a",
-      "ruBlob": "430246c48eba194e28497644db74996f3457f83b"
+      "sourceBlob": "05276454ba20c2b3646545bacbd552efa10675f6",
+      "ruBlob": "854d1180a71a846e62028e6ac8ac8c3971f13e67"
     },
     "docs/subsystems/attachment.ru.md": {
       "source": "docs/subsystems/attachment.md",
-      "sourceBlob": "e6d0a53db2827a38a1535380319b6220aa37f0a4",
-      "ruBlob": "91c28ffaaa8d31fc8cdeb3737c975d9cf52c56a4"
       "sourceBlob": "2483bffa6b8c0fb42d7ddea265c57760a67c269b",
-      "ruBlob": "38a613c096caa68d64162f364a352dd3e2d99d19"
+      "ruBlob": "4ecd59324c8cff55d8032ce7fc6f2b4ba6052dc4"
     },
     "docs/subsystems/client-modules.ru.md": {
       "source": "docs/subsystems/client-modules.md",
-      "sourceBlob": "ae767c6a098cb1b7188c06e61efd2798eb93ff66",
-      "ruBlob": "b40e1ab88015c538213310c2b9acc2c02351db0a"
+      "sourceBlob": "4a7599c83736cb4a9662049b3aa3f9e681318263",
+      "ruBlob": "6d0670f4cdff619d5f81026a84f49f4268947a9f"
     },
     "docs/subsystems/code-runtime.ru.md": {
       "source": "docs/subsystems/code-runtime.md",
-      "sourceBlob": "ae760487eff19f6a0b91620b92007d0a86eb1589",
-      "ruBlob": "0b4c1e7b8ddc9a471379c7e4cbe08ca02fa55f7c"
+      "sourceBlob": "4d92fa98f0ceeaf10a58efb5968c7ce505bc3271",
+      "ruBlob": "6766dece8efef328e91c7a1035754d8616b05ef5"
     },
     "docs/subsystems/credentials.ru.md": {
       "source": "docs/subsystems/credentials.md",
@@ -371,14 +358,12 @@
     "docs/subsystems/skills.ru.md": {
       "source": "docs/subsystems/skills.md",
       "sourceBlob": "380a34490e08b8f0d2fd326b5cc04a180917381c",
-      "ruBlob": "d402bb1356060b27dc5bcefba22c7b4b817bcea9"
+      "ruBlob": "e32f229b97f6ea81efd3b3fcf33e9d3b13dab372"
     },
     "docs/subsystems/session-projection.ru.md": {
       "source": "docs/subsystems/session-projection.md",
       "sourceBlob": "ccd4b0305c6253f7a00930ca0f0f2e5ffd5195b9",
       "ruBlob": "3235993c9d1d841a4656d7b182b67d05c99004ee"
-      "sourceBlob": "7511f55fbc2c828ccc5427de6ea5de866c6e5950",
-      "ruBlob": "046bd16b15c0457d2e88fbb64aafda31443f1593"
     },
     "docs/subsystems/session-query.ru.md": {
       "source": "docs/subsystems/session-query.md",
@@ -387,22 +372,18 @@
     },
     "docs/subsystems/session-telemetry.ru.md": {
       "source": "docs/subsystems/session-telemetry.md",
-      "sourceBlob": "1158171c30228389317f708a35114bf4495a4e34",
-      "ruBlob": "e5ab2f975263cf36986effbddda01b98c2ab1396"
       "sourceBlob": "4b2af98260653f2907b72ee528d2d68293e529ab",
-      "ruBlob": "8678ff6dd2297798a6c14ff9e1ed1331b6b8d065"
+      "ruBlob": "94ff22f916a87ffb87fef36c99076e6a1c34875c"
     },
     "docs/subsystems/persistence.ru.md": {
       "source": "docs/subsystems/persistence.md",
       "sourceBlob": "b512e61a37409bcf27fe4814f70b25ca3f44f4a9",
-      "ruBlob": "bbba9fe132a44b63a3bacd276344857d168582db"
+      "ruBlob": "c211572694b665e21b43592eec75e28adf271fac"
     },
     "docs/subsystems/schedule.ru.md": {
       "source": "docs/subsystems/schedule.md",
       "sourceBlob": "b5abbf4d82e9bdd38c5fd2a396888422c36e91f6",
       "ruBlob": "7752707f93619d6390efd48aef0f07429c4411da"
-      "sourceBlob": "381baa2e69405883a05b9456d8d941b3aa6c16d1",
-      "ruBlob": "9d0ab3e4704107151d8eeca554f6d42a47249618"
     },
     "docs/subsystems/storage.ru.md": {
       "source": "docs/subsystems/storage.md",
@@ -411,13 +392,13 @@
     },
     "docs/subsystems/typert.ru.md": {
       "source": "docs/subsystems/typert.md",
-      "sourceBlob": "46d9e7c7ef5e5366b165f4dc9217ca9fc02712ab",
-      "ruBlob": "b031c608f56d1a958c31fa9eaa85abf9b8b0ac91"
+      "sourceBlob": "5cb60267439fe849407bfb9b5a9d1df9f590749b",
+      "ruBlob": "6aedbb32cd79dd7d9c1d6d6f1b83215e591ba334"
     },
     "docs/subsystems/web-server.ru.md": {
       "source": "docs/subsystems/web-server.md",
-      "sourceBlob": "c23a48cd57aeb2127107c0487cb46c9202d11605",
-      "ruBlob": "9eec7bf60850a73d10406c4c3bcbef2e34fae2ee"
+      "sourceBlob": "3f5d8e06ff53ce69c8615e2613c1d5490dc29d4b",
+      "ruBlob": "9dda1828713a49f21a79fc1e848ec4dbba071b7b"
     },
     "docs/subsystems/workspace.ru.md": {
       "source": "docs/subsystems/workspace.md",
@@ -426,54 +407,48 @@
     },
     "docs/subsystems/README.ru.md": {
       "source": "docs/subsystems/README.md",
-      "sourceBlob": "d926abac718ba14b0d50f27d7c00b421c8460352",
-      "ruBlob": "4f4338427b45e5ed112462d9b3995c354456317b"
+      "sourceBlob": "55a77e6c1733821aa89477151a642503d25e9347",
+      "ruBlob": "238dd43dd3d3498eaa4ddd0b7bb6142b8cd4c052"
     },
     "docs/subsystems/permission-presets.ru.md": {
       "source": "docs/subsystems/permission-presets.md",
-      "sourceBlob": "4afa5063f2ab107415fd6429cf0cee6a4ecdfe4f",
-      "ruBlob": "1e27a31be20a7de8f009381922029663c2cd6c18"
       "sourceBlob": "2486f0f8cd4bd477a4afc5de338cefb3289c4665",
-      "ruBlob": "e7025e9210bfdcc505cec7f89e90524e82398758"
+      "ruBlob": "bb16904e5f755e8bc57a1fdf27508d37539db004"
     },
     "docs/postmortem/README.ru.md": {
       "source": "docs/postmortem/README.md",
-      "sourceBlob": "ffde0057304856b7c7718e3dd1f4743c48ee193f",
-      "ruBlob": "3a68034c5c3cad6fa9c3eac4943d94f80b2d527f"
+      "sourceBlob": "5105e45a0f78bbfbd344928387906411b2ad9cc2",
+      "ruBlob": "0290366816d407d1832da7fcfc930298e5c0afed"
     },
     "docs/postmortem/0001-acp-default-export-drops-inject.ru.md": {
       "source": "docs/postmortem/0001-acp-default-export-drops-inject.md",
-      "sourceBlob": "f8474bde0b81b24573f813d9a0fb017962751f49",
-      "ruBlob": "4732c268727a1876da683b3b394fe098a498332f"
+      "sourceBlob": "1640d277bc95307e013024b1aef09dbaabc8b9e8",
+      "ruBlob": "6e2b343ee44bb07a5ad37010465684811d85a2f1"
     },
     "docs/postmortem/0002-js-expression-disabled-filesystem-tools.ru.md": {
       "source": "docs/postmortem/0002-js-expression-disabled-filesystem-tools.md",
-      "sourceBlob": "93c62261f54e273ea5dbb2ca1a236daf9b2a6f15",
-      "ruBlob": "efd1c35f8a3e72bc6e4f97f4061c983b93193142"
       "sourceBlob": "1f9640a26b5706201a365f9ccf1cc9ccc798f04f",
-      "ruBlob": "9ff4a03c1b66ed56a2d97fa6b825e90ff5528cbe"
+      "ruBlob": "1a8caccb74099ef3762d898e4ff061304cd2d7db"
     },
     "docs/postmortem/0003-web-agent-gui-feedback-loop.ru.md": {
       "source": "docs/postmortem/0003-web-agent-gui-feedback-loop.md",
-      "sourceBlob": "45995a5dde03e4af0aa5b09bc16670c29129100d",
-      "ruBlob": "017d3724446c5ccf5bc747555492a84345e6b1b1"
+      "sourceBlob": "817b455d6471b3cef3119742136b0efa1a1d044c",
+      "ruBlob": "0e7e711870d5c24277a5bdf6fa37e00eec5bd980"
     },
     "docs/postmortem/0004-landlock-partial-notice-misclassified-child-failures.ru.md": {
       "source": "docs/postmortem/0004-landlock-partial-notice-misclassified-child-failures.md",
-      "sourceBlob": "a41a09ed06554da91aa62ced766776a7691c24b1",
-      "ruBlob": "837c9d368b6b061e9832f4953e5fe795ac3bb429"
+      "sourceBlob": "7b799bebf1b82a1aec54b9bee2588c3393bc1700",
+      "ruBlob": "a5bd8df46f0572fbaf82e10f8df0b986f30d278d"
     },
     "packages/client/ui-conversation/README.ru.md": {
       "source": "packages/client/ui-conversation/README.md",
-      "sourceBlob": "96f67677f690f12929cf691ab5901ded399504d3",
-      "ruBlob": "70d63585276e331190d28440e049c8172c8a1f55"
+      "sourceBlob": "d242d7da96131ce46b0094caedb20777a36bc6c0",
+      "ruBlob": "1fdd7afc9ea9a76a5d5e54d39f9d03ef85283656"
     },
     "packages/client/ui-settings-models/README.ru.md": {
       "source": "packages/client/ui-settings-models/README.md",
-      "sourceBlob": "781d7a8134c8118ddf4a78f3ee153a8043bae0a6",
-      "ruBlob": "ad6180c21fe11f7a48f004a99f7b404763662018"
-      "sourceBlob": "a373ab72c9a4c3ba2b00430905224c7d34415c14",
-      "ruBlob": "a1c37dfeb978c95c4cb737624b9a160325a782dd"
+      "sourceBlob": "8d253ddb47b764fc15030407040d5884fcd0529c",
+      "ruBlob": "d7d52eb55b59d4fcb59db355b7681c1108435ade"
     },
     "packages/mcp/README.ru.md": {
       "source": "packages/mcp/README.md",
@@ -482,42 +457,38 @@
     },
     "packages/client/ui-workspace/README.ru.md": {
       "source": "packages/client/ui-workspace/README.md",
-      "sourceBlob": "041c886ae3f38415ac01fbfc3546a1f32581257c",
-      "ruBlob": "16def77bbfec913fb43cc3dcdea3761239b1cc8e"
+      "sourceBlob": "d8a863554ef8a4a3ccc5e79332cb868387fbc837",
+      "ruBlob": "f82ab872ecf021a7ad81cff47d5bee9e6c773ef3"
     },
     "packages/subagent/subagent/README.ru.md": {
       "source": "packages/subagent/subagent/README.md",
       "sourceBlob": "afbcf5cf85bd744241cf1623a90235712e638d78",
-      "ruBlob": "bafb267b130942d191596e0ad20f6a4d86749256"
+      "ruBlob": "8f2430b5ea16e03eae66ed28c2545321485b5604"
     },
     "packages/host/apiproxy/README.ru.md": {
       "source": "packages/host/apiproxy/README.md",
-      "sourceBlob": "4cf11c7ffe55484fd2c27e597931f22f8f861a14",
-      "ruBlob": "a88ddf34172e6cf4e3dd139251c84fd2893b91d9"
+      "sourceBlob": "0efe7bc8b05897871352305b6db9910f4c2852ca",
+      "ruBlob": "7b23650ceb9e63955c1e26b39606758e3d68875a"
     },
     "packages/compaction/compaction/README.ru.md": {
       "source": "packages/compaction/compaction/README.md",
-      "sourceBlob": "89788990b3f3894954f4dfc24bb3230300ae8786",
-      "ruBlob": "92266ac1e37f02c0aaa62522acf6589782376e8d"
       "sourceBlob": "299749dc47e57f3a66a9d924336c23373f4b2f53",
-      "ruBlob": "bd63fc84e83109207242031b8387547433c89640"
+      "ruBlob": "16c692d0312e42a2c405e9779db38d067f6f6fde"
     },
     "packages/llm/llm-pi-ai/README.ru.md": {
       "source": "packages/llm/llm-pi-ai/README.md",
       "sourceBlob": "eca980321367087e904cfc571bb4fef5e48a258b",
-      "ruBlob": "1e0c5468523d9a1fc09024e5c1fef94a9a45ea13"
+      "ruBlob": "83c7f490a6d05c544ceccd4a5575aabd2ded5580"
     },
     "packages/host/directory-picker-browse/README.ru.md": {
       "source": "packages/host/directory-picker-browse/README.md",
-      "sourceBlob": "11ddece6f68a752f8afc0392029c752013389d4a",
-      "ruBlob": "a327c98a47a56d907bd9d92830d0a102fb8685ef"
       "sourceBlob": "1153fd03f035789ae1a0ea7ab9bb6016e2c5fc4e",
-      "ruBlob": "e993d5e8b165fecdf28354fc1e51041ba7d0c418"
+      "ruBlob": "fc4024aca73ffee42ba7fcdb18a8a2274108ecfb"
     },
     "packages/core/tools/README.ru.md": {
       "source": "packages/core/tools/README.md",
       "sourceBlob": "b46d77b41722e9c8f93f550436e59b48cfa2c2b9",
-      "ruBlob": "74cf9918cb78ea403656911c5776c7edd854475f"
+      "ruBlob": "695bda8278c407c4dee6f1efa7c1e9d4bdb096f8"
     },
     "packages/extensions/cordis-host-runner/README.ru.md": {
       "source": "packages/extensions/cordis-host-runner/README.md",
@@ -526,10 +497,8 @@
     },
     "packages/llm/llm/README.ru.md": {
       "source": "packages/llm/llm/README.md",
-      "sourceBlob": "59c5303bdae8d6391f3bb1595a527d677e2378bc",
-      "ruBlob": "753cb97103d94c67d41c87284f5efb547d08db7b"
       "sourceBlob": "62bb0f65681be199ed8916baf56fae7f38812fb3",
-      "ruBlob": "3bdf3f8d6c64323d8686d449d7c3d554dfd218e3"
+      "ruBlob": "2cac04fec4a9a5f075b75294c6832f452170d2a1"
     },
     "packages/client/runtime/README.ru.md": {
       "source": "packages/client/runtime/README.md",
@@ -548,99 +517,78 @@
     },
     "packages/core/agent-loop/README.ru.md": {
       "source": "packages/core/agent-loop/README.md",
-      "sourceBlob": "907bbe75fd687388be044916f4c4509e1c552177",
-      "ruBlob": "24025539544921eae2eb14c6406dbd2f97dd5ee6"
+      "sourceBlob": "e234412e8b225cd5439ed5c8c173fe0f53e93efd",
+      "ruBlob": "bc74c5b5df57aee64c6f6b06cd5a9e4e585e89f8"
     },
     "packages/api/gateway/README.ru.md": {
       "source": "packages/api/gateway/README.md",
-      "sourceBlob": "7caf707c376bd3e2654fad1f0c01ac83e6faa44c",
-      "ruBlob": "1fae89f38c84a0b67cce91a90fb2ba3feee3b2aa"
+      "sourceBlob": "addc3199b97016b45c1ea9b885e58d43252b8872",
+      "ruBlob": "fc4a1cc673163c281d2fb03652b540accdde5997"
     },
     "packages/core/agent/README.ru.md": {
       "source": "packages/core/agent/README.md",
-      "sourceBlob": "f6b698e93b254c97786155e7d2c7e81f07c0d981",
-      "ruBlob": "994803a396783c98201bce1b6b16f8200864e049"
-    },
-    "packages/core/session/README.ru.md": {
-      "source": "packages/core/session/README.md",
-      "sourceBlob": "c62668167f4e0dfda822c7b82add3b4d8eb3d635",
-      "ruBlob": "748a1ce81c1ef2345ac38175841defef74cc83c1"
-    },
-    "packages/fs/fs/README.ru.md": {
-      "source": "packages/fs/fs/README.md",
-      "sourceBlob": "7bde7d4d64005a6bdd0f0ac974bf45e5450e4207",
-      "ruBlob": "ebc35d948a225053915d745d316140e34f63e86a"
       "sourceBlob": "d9acecab61b1fec65f1e0c5a931745da5ce01c82",
-      "ruBlob": "d318b388c39fa683a1ad8ed1f68f0b97992a4c31"
+      "ruBlob": "15b28c26de4c3d471ced7f4a0170909d1f7f3100"
     },
     "packages/core/session/README.ru.md": {
       "source": "packages/core/session/README.md",
       "sourceBlob": "a70dea3965edd230a3e04982af88957650710372",
-      "ruBlob": "f93d04058ebf6ed1b7e842da8f8baeaa775120af"
+      "ruBlob": "3b4b30aa4e7a93218399f4896b8f626d976609ed"
     },
     "packages/fs/fs/README.ru.md": {
       "source": "packages/fs/fs/README.md",
       "sourceBlob": "074c9b480bacaf74173daff24bc8114a4541b147",
-      "ruBlob": "0c685a357741efcdc0acd2f3e365d60a85fc92ec"
+      "ruBlob": "9f4ca7270736754e9ffe19363c504d87da724bd8"
     },
     "packages/context/agent-instructions/README.ru.md": {
       "source": "packages/context/agent-instructions/README.md",
-      "sourceBlob": "6f9d3f4e6b93609d44be0000c75e1a257eeb29d4",
-      "ruBlob": "c4a38ec08398961ee3a2e4daac9a21c1df47c2ff"
+      "sourceBlob": "c1abf82c1bab80c1140f49d1c77abc04ecf3271f",
+      "ruBlob": "5479eb7cc65545fb33e5e115ebe7d036376756c2"
     },
     "packages/fs/tool-fs/README.ru.md": {
       "source": "packages/fs/tool-fs/README.md",
-      "sourceBlob": "763cb831233da5b1f14c73e353920e9d6a87ced9",
-      "ruBlob": "c8c302f0d454c0ca8f98e1cc4ef76ed500b2ec3f"
-    },
-    "packages/skill/tool-skill/README.ru.md": {
-      "source": "packages/skill/tool-skill/README.md",
-      "sourceBlob": "4cfd8f22b3cfaf22b6f9f6cdc48f0db994858906",
-      "ruBlob": "72b2f86a9f74dfac68c4a695def771924f00c340"
       "sourceBlob": "8f4a837ec891feb18b1ffac3b236711aac3a01ce",
-      "ruBlob": "6542ebdcbb1dea12e0b4143204791e7c32ae562a"
+      "ruBlob": "f5a04a70345055972d6ee9585452178cba2fd88f"
     },
     "packages/skill/tool-skill/README.ru.md": {
       "source": "packages/skill/tool-skill/README.md",
       "sourceBlob": "6e23232b38feb0264d9792ee3f482491811ecd46",
-      "ruBlob": "d309a79bfb1de2496aef9f399fac65c0198071ad"
+      "ruBlob": "971623729edca9b59fd925f1838b30fb2aeaccfe"
     },
     "packages/compaction/compaction-basic/README.ru.md": {
       "source": "packages/compaction/compaction-basic/README.md",
-      "sourceBlob": "82df7b7e399cef80d92611819e9e58f13babf175",
-      "ruBlob": "c430c90e3ca712ee078e36a5d535fa753b188977"
+      "sourceBlob": "8d699f1c94207209bee279bc1440e690eaeedb3b",
+      "ruBlob": "57e9eabaf25c9d85553708866cfc38a6a7aa3ee6"
     },
     "packages/extensions/tool-cordis/README.ru.md": {
       "source": "packages/extensions/tool-cordis/README.md",
       "sourceBlob": "396a844014328da8cfad57fa7728793b91a9aff7",
       "ruBlob": "89b30277368712aa5732104badae46afb7d0421d"
-      "sourceBlob": "ac59c2046c7fb9218067cefd40a3c188e61f26e7",
-      "ruBlob": "8ada4ff81f4b36d47163502f2ae11108dc4a9a22"
     },
     "packages/subagent/subagent-codex/README.ru.md": {
       "source": "packages/subagent/subagent-codex/README.md",
-      "sourceBlob": "975f353b9f1bc6fab61a4c0eb40ebaf50c436623",
-      "ruBlob": "219f9a028cb621b26d4c9c53df3fcdcf940adec8"
+      "sourceBlob": "a8c49dff174e048d17fdef3f0d75905c0f02194f",
+      "ruBlob": "f369e918eacc029b2539ef752a9ddcc10a2e21b3"
     },
     "packages/llm/llm-deepseek/README.ru.md": {
       "source": "packages/llm/llm-deepseek/README.md",
-      "sourceBlob": "8a62b7b587323de152ea3322ce310d48a41247cc",
-      "ruBlob": "5e11fd51ff6f8e5f20ba34a7a52d5d38c16b070f"
+      "sourceBlob": "f6612127ff9f6f3ec89ac69bfe8674914d94e1cf",
+      "ruBlob": "fdd6f29d0b20fe62d6cdc02af9f3f123cde73aec"
     },
     "packages/preset/agent-presets/README.ru.md": {
       "source": "packages/preset/agent-presets/README.md",
-      "sourceBlob": "2438d751f000297cc4ede7b2a34736a62cc39dda",
-      "ruBlob": "bebd51961b376e1d1ea319f8fc59e957647879ee"
+      "sourceBlob": "1fc95d709cc065becc20d16a678a6bece2ddfeab",
+      "ruBlob": "96193d8e2c444d01ada39d788d423b5c38f6d1f4"
     },
     "packages/session/session-persistence/README.ru.md": {
       "source": "packages/session/session-persistence/README.md",
-      "sourceBlob": "335f40e7439fc4a49fa49bb4541f101250468d1b",
-      "ruBlob": "038b942db1c7dd0ce84d30d83866f2b5276bfc8f"
+      "sourceBlob": "d323cb4d0838fc678cd512b0f593ed262b08d095",
+      "ruBlob": "365a2a40ef50340f11c607ed7a95287b87bd030a"
     },
     "packages/subagent/subagent-claude-code/README.ru.md": {
       "source": "packages/subagent/subagent-claude-code/README.md",
-      "sourceBlob": "0260d9c82dee82541e5b60ff7fe2c323cf9b7331",
-      "ruBlob": "b66ef07c6821cf3e2f42ba5624ec777aa146fa91"
+      "sourceBlob": "ada6c496771aa86b1ba4eac360f7f1d793663508",
+      "ruBlob": "78aa0f2b0a89b825f902b0bf2acba7747506f344"
     },
     "apps/cli/reference/README.ru.md": {
       "source": "apps/cli/reference/README.md",
@@ -649,8 +597,8 @@
     },
     "packages/boot/app-boot/README.ru.md": {
       "source": "packages/boot/app-boot/README.md",
-      "sourceBlob": "80f8e8a694b32eb8a1499f75a56de852f7106643",
-      "ruBlob": "aec2978a631857c7f21563a90f920531218b9431"
+      "sourceBlob": "a5c5f1fbca73e12b94cee193b5970c0a759fe8bc",
+      "ruBlob": "fe52f22268a6af7479805b2137575baad9aa5f41"
     },
     "packages/test-support/acp-snapshot/README.ru.md": {
       "source": "packages/test-support/acp-snapshot/README.md",
@@ -659,81 +607,63 @@
     },
     "packages/web/tool-web/README.ru.md": {
       "source": "packages/web/tool-web/README.md",
-      "sourceBlob": "787b70a5070f48a3bac6435d5d7e8b64c01e0341",
-      "ruBlob": "16db971c2d6aeae749f470e60829f64c3271d983"
       "sourceBlob": "f0406733af7f2659f38593b0c6b3ba38066ef85c",
-      "ruBlob": "0d9fffe5d544424a468d56b5c4c82cf8f3649927"
+      "ruBlob": "de41ad4b1f6a06afc51378681c44b9b5c99abf21"
     },
     "packages/examples/acp-demo/README.ru.md": {
       "source": "packages/examples/acp-demo/README.md",
-      "sourceBlob": "5472a763782f1dec5084ecd69f363aba020aec6c",
-      "ruBlob": "6aead1af0fb3ba851fff571e349bf4f8add53ec4"
+      "sourceBlob": "10ab91716a4e3c1395a41e2cb44cb46719d8e0f3",
+      "ruBlob": "db30c826ca9e44b02c1a5701048b3545da731268"
     },
     "packages/client/ui-primitives/README.ru.md": {
       "source": "packages/client/ui-primitives/README.md",
-      "sourceBlob": "7822a5d41e8125752b8bc28fea3db2232323fd81",
-      "ruBlob": "673e70693f6c2d90df54244b08b3abe6d50b6553"
+      "sourceBlob": "8b3f321c5183d420302df0b0df93407125ddf014",
+      "ruBlob": "d0eaa8a8391a12ea8106a1bd94ea3d1e65ad297b"
     },
     "packages/fs/tool-fs-search/README.ru.md": {
       "source": "packages/fs/tool-fs-search/README.md",
-      "sourceBlob": "84a3adc31f9c1580b90c038b0902e88b050f0340",
-      "ruBlob": "2204fc46b399d8c8cb1e70e4a39441291dd6ef15"
-    },
-    "packages/shell/tool-bash/README.ru.md": {
-      "source": "packages/shell/tool-bash/README.md",
-      "sourceBlob": "21749bf0a1cd3cdc46257fb2a02ba6b4ab1f5ee6",
-      "ruBlob": "1d5248a8a170ad95a3d2fb8400e83ea40f1f2654"
       "sourceBlob": "2cd83031cb96a373a5eaacc6d0f55fd2973f6bd3",
-      "ruBlob": "494716aad36367dd83065af69171893bfa6ef962"
+      "ruBlob": "e1b956201445b0bc4cbc4be3b6d2a31e0e02e1de"
     },
     "packages/shell/tool-bash/README.ru.md": {
       "source": "packages/shell/tool-bash/README.md",
       "sourceBlob": "feb805e1fe312c65b81f265c9fe92a0563288338",
-      "ruBlob": "f58d67ae2b76be14d62d704cffbd4f3fb602a8dc"
+      "ruBlob": "c095320ff1e5aeb253ed741caed500fcc9c23420"
     },
     "packages/client/ui-directory-picker-native/README.ru.md": {
       "source": "packages/client/ui-directory-picker-native/README.md",
-      "sourceBlob": "feb944b38a17086e0fcc6e4da52e1f16a4055166",
-      "ruBlob": "d7a060f7964ebd6c9313d38dd17299b65850b5e5"
+      "sourceBlob": "c5a9dda72c5e4e162146dd53c5e25cd3d1ee6250",
+      "ruBlob": "b06b038ccb3c9a66515b856902be59e922884cdb"
     },
     "packages/shell/tool-pwsh/README.ru.md": {
       "source": "packages/shell/tool-pwsh/README.md",
-      "sourceBlob": "e862fcf0ca85d0ecb0a5fe6cff3ee3c7a8153716",
-      "ruBlob": "8f2439fdb15c23955614ece924d5bba176bca8ea"
-    },
-    "packages/core/system-prompt/README.ru.md": {
-      "source": "packages/core/system-prompt/README.md",
-      "sourceBlob": "d750a507e628e7609af542227e4528d4d4934ce8",
-      "ruBlob": "789c373433a3a99a1e94012f146f1f7c3597c06c"
       "sourceBlob": "72eff3b3aa2aebbae62871f75f3040eb1ff32fc2",
-      "ruBlob": "53c40531bc926cfb972c316816fd5f8a56981d97"
+      "ruBlob": "0468b016404bdc43ea5b89bb92c3ce0af8aecfc2"
     },
     "packages/core/system-prompt/README.ru.md": {
       "source": "packages/core/system-prompt/README.md",
       "sourceBlob": "08d6ea972b33b002ce5d9c66aed72caff1969d83",
-      "ruBlob": "069a1ce3b7e2a72496bfd33f7bf7b8d8c2debcb3"
+      "ruBlob": "606659853f03eba0fbae414701ad949df2649975"
     },
     "packages/hooks/hooks-codex/README.ru.md": {
       "source": "packages/hooks/hooks-codex/README.md",
-      "sourceBlob": "0a4f918acd960ae63bd131d11f77e8ab52f9ca47",
-      "ruBlob": "fefecc35b9be0bb36a3528c4d2b148e1b8bed033"
+      "sourceBlob": "35fdc67501f9dadf2e6726689a385a4077f5b98b",
+      "ruBlob": "568e4a3a12f56bf693bdb1669bb9f62799e28b53"
     },
     "packages/session/session-persistence-jsonl/README.ru.md": {
       "source": "packages/session/session-persistence-jsonl/README.md",
-      "sourceBlob": "4cff3215cdb083d2fdb7c4a8f1b60e8c4028ba84",
-      "ruBlob": "f1c922cbda555ca5a41ec70f82cacaa90cfbac46"
+      "sourceBlob": "3458c03265a3a51192de6b28c46079f175abaf70",
+      "ruBlob": "4f2e97d7f60f87f12ad95e262ae7011759a8fa62"
     },
     "packages/hooks/hooks-claude-code/README.ru.md": {
       "source": "packages/hooks/hooks-claude-code/README.md",
-      "sourceBlob": "5e6924da1206ff26311c6b7edf4ea73c6476ed87",
-      "ruBlob": "9f68c9e0cb89aa15cc0e52acfa4f6607af4750f5"
+      "sourceBlob": "7fe5732fceff6469cb936d779481f2a32bb9f5f0",
+      "ruBlob": "6990cfa5121c4195ee60fdb4c267b4cd35278468"
     },
     "packages/schedule/schedule/README.ru.md": {
       "source": "packages/schedule/schedule/README.md",
       "sourceBlob": "f56c689198b7e17a85f43a1ecb6e5f1527da6a91",
       "ruBlob": "194d02eca80120e7bc0709f8f5b9e6396c2a70c5"
-      "sourceBlob": "bfdd9c388c27a8c9a028acdf8ae8663de8c15498",
-      "ruBlob": "a48cfde64c47e7bb89f1c93463b5b28425ece7e9"
     },
     "packages/extensions/cordis-client-runner/README.ru.md": {
       "source": "packages/extensions/cordis-client-runner/README.md",
@@ -742,15 +672,13 @@
     },
     "packages/workflow/workflow-worker-thread/README.ru.md": {
       "source": "packages/workflow/workflow-worker-thread/README.md",
-      "sourceBlob": "ba32c9dab4e870dd52c8f8acba3cfa627fa78000",
-      "ruBlob": "490a20df3d7aff50a3573c148e73a2ad1878e01e"
       "sourceBlob": "6e272b02d0f0d334968bfdc9dbf042bb320387d8",
-      "ruBlob": "d769b4dce8e4e0b6586fd958ce3b85fe6fc83eed"
+      "ruBlob": "359c3c2ec3ded8d99a8dc0f1263dbdced85f24eb"
     },
     "packages/test-support/llm-replay/README.ru.md": {
       "source": "packages/test-support/llm-replay/README.md",
-      "sourceBlob": "57fdee974332abd354022fd935f5f21364de52a8",
-      "ruBlob": "83fa4308f1a07df1ca5868601721db6852cfd36b"
+      "sourceBlob": "0eb36841f2ec18280de0803a0d7da5324c3b331b",
+      "ruBlob": "52cd9105d83708350db1ffc386b0d1363f35ed32"
     },
     "packages/mcp/mcp-client/README.ru.md": {
       "source": "packages/mcp/mcp-client/README.md",
@@ -759,32 +687,28 @@
     },
     "packages/skill/skill/README.ru.md": {
       "source": "packages/skill/skill/README.md",
-      "sourceBlob": "ae8812aeb3cc6583677d22bd5c35639318d15237",
-      "ruBlob": "4649879e1163707da4570bae16d7797176206fa0"
+      "sourceBlob": "2e5ef180d04aad38dddb907fd62c0e08b493ae99",
+      "ruBlob": "addc5df5c2c1e7c1bdc92fcd5d992eb38bc22c23"
     },
     "packages/client/ui-user-questions/README.ru.md": {
       "source": "packages/client/ui-user-questions/README.md",
-      "sourceBlob": "4c7c54ad3c9dd5a06f8bd0f5537044479e4ad7e2",
-      "ruBlob": "6050a8096485a1f089283326db84110454d50157"
+      "sourceBlob": "37043f16e96b9b34d903d6bc6cfc66683a4aef1a",
+      "ruBlob": "87527859956fc55a9d7c5b1f306e5ba1f303a7c9"
     },
     "packages/subagent/tool-subagent/README.ru.md": {
       "source": "packages/subagent/tool-subagent/README.md",
-      "sourceBlob": "28e6213b903ffffa7934e244b2a74ada519b32b2",
-      "ruBlob": "c13a2891e3f4b7d5997a2d4fb7d83e652bc237fd"
       "sourceBlob": "c0e800b987fa705a94e338c32dcc5ffbcf8fb8e3",
-      "ruBlob": "807b1a0aa6de7b17769ee9992bb4dbfa7cb1d671"
+      "ruBlob": "4c00ad5302592c836b2106438b89903fdfdd7309"
     },
     "packages/client/ui-agent-preset/README.ru.md": {
       "source": "packages/client/ui-agent-preset/README.md",
-      "sourceBlob": "f0fdff4b1f2453be9e8b4c1d20f7ca0fee506d55",
-      "ruBlob": "4f5f394872555d77c3643db4c186b1bc909f2cac"
+      "sourceBlob": "cc41374b3100771ca7fd2de2ac0e0217d9a5495b",
+      "ruBlob": "ff039de5bfaacbf6829072ecea6561571f271ea2"
     },
     "packages/shell/bash-sandbox/README.ru.md": {
       "source": "packages/shell/bash-sandbox/README.md",
-      "sourceBlob": "dd0f6dd80394ee8bf0349f706e8fd77cd3c14189",
-      "ruBlob": "cbce7054dc33884120e56553e15c4f14e8631ce9"
       "sourceBlob": "e2c8f5631f0374d106d78fd3c7f59c1a478e9570",
-      "ruBlob": "b0ee643464ed67e0ead611c80a2de22226145a14"
+      "ruBlob": "91de2a133d006af14a85e1a4fc942c74b8a0bc69"
     },
     "packages/code-runtime/code-runtime-worker-thread/README.ru.md": {
       "source": "packages/code-runtime/code-runtime-worker-thread/README.md",
@@ -798,22 +722,18 @@
     },
     "packages/subagent/subagent-in-process-driver/README.ru.md": {
       "source": "packages/subagent/subagent-in-process-driver/README.md",
-      "sourceBlob": "47a5c09fc1c80c5dc3062be82e7355b874a627d3",
-      "ruBlob": "a9351acfc9766389d14f81b1662c0cd104cd05cc"
       "sourceBlob": "b8f0a00aad396df730bceef4675019427c2f6d0c",
-      "ruBlob": "eb4e01f672e9ee67e4d2d2f736a00b4702d03076"
+      "ruBlob": "2c0c1f060e7912191258fef26b35f660a74783a9"
     },
     "packages/session/session-telemetry/README.ru.md": {
       "source": "packages/session/session-telemetry/README.md",
-      "sourceBlob": "e4ebee1324bc1228d6d97d891159685b05f94e4f",
-      "ruBlob": "171f7b9bc3161c9c861890aab7333e3ad87b37ae"
       "sourceBlob": "fb0ad947f91a40e7e9b13540254e3579d1275dc6",
-      "ruBlob": "80dabd6fb9eb80748111d3fc866b2a80747573a1"
+      "ruBlob": "a4baf1b0b12ed69efa26cc29e721d9730d91343d"
     },
     "packages/e2b/subprocess-e2b/README.ru.md": {
       "source": "packages/e2b/subprocess-e2b/README.md",
-      "sourceBlob": "6e0ef633577377af6045c8b81d6f1e141bc46b54",
-      "ruBlob": "fb23b8aad6162b601678c1ce3378ab7ee9790968"
+      "sourceBlob": "d782efdbbed7e43eefba9f08f5778a50ace398f7",
+      "ruBlob": "e38a2cb1a4c610e4bb1f294019c489d49acc9f80"
     },
     "packages/feedback/message-feedback/README.ru.md": {
       "source": "packages/feedback/message-feedback/README.md",
@@ -822,8 +742,8 @@
     },
     "packages/subprocess/subprocess-local/README.ru.md": {
       "source": "packages/subprocess/subprocess-local/README.md",
-      "sourceBlob": "0935bb309bd10dec7503a74708a28442223bf296",
-      "ruBlob": "9feb528c63448300bcffd8abde96f3f5e550e811"
+      "sourceBlob": "d984e327e7f3f6e1e76885cf5750e47feec389c7",
+      "ruBlob": "381a62e4fc5daa63e498794516009219b5fc2243"
     },
     "packages/extensions/ui-cordis/README.ru.md": {
       "source": "packages/extensions/ui-cordis/README.md",
@@ -832,30 +752,28 @@
     },
     "packages/experimental/agent-team/README.ru.md": {
       "source": "packages/experimental/agent-team/README.md",
-      "sourceBlob": "49bb33d3bef2b86f154a5ee9cfe52a2c4c1f57c1",
-      "ruBlob": "f68d6dd589ff75e752a014f422fa5ba709d53bb2"
+      "sourceBlob": "185f64446c3e8db9218695a4911a0f082ff32cc5",
+      "ruBlob": "65afb6d2a540f6bef334b061aa15c4994a79f389"
     },
     "packages/skill/skill-filesystem/README.ru.md": {
       "source": "packages/skill/skill-filesystem/README.md",
-      "sourceBlob": "33fb550a9ca804c4f0f380232c2bfd94cc58a67e",
-      "ruBlob": "4d115d02ac7df4c469d1ed3641eb118bde9f5f63"
+      "sourceBlob": "e971e6ca4bdffe5c658217c07cfb2a0e17cd5ede",
+      "ruBlob": "e9d0b2e1f492982f6fdea7c5b61a39eae62c590e"
     },
     "packages/shell/pwsh-local/README.ru.md": {
       "source": "packages/shell/pwsh-local/README.md",
-      "sourceBlob": "2eccc59b919d1f729eef52a42581f4da0f1d9e60",
-      "ruBlob": "6c97b87e9b4a873841d0b6d7fe48d015eba3aca8"
       "sourceBlob": "ff73ff5812eef295b7985e58891c3f18c6366b16",
-      "ruBlob": "acbec821463c9e0f8a41d2872cd6fa338e086a7d"
+      "ruBlob": "51c50ccb1ebb7899da46dbfec37a6ac9acfffdc8"
     },
     "packages/fs/fs-local/README.ru.md": {
       "source": "packages/fs/fs-local/README.md",
-      "sourceBlob": "4d5c42945b86ccdc8b041d9d7f99a067ab9a37f5",
-      "ruBlob": "5224ddc534ec09ec0d17b4acfe319cd6f989679e"
+      "sourceBlob": "d68c4079c59e45ec76203566271a42992fe6a9ae",
+      "ruBlob": "d2b3a9c54eb5078ad948e6a755a0b82f05a641fc"
     },
     "native/landlock-run/packages/linux-arm64/README.ru.md": {
       "source": "native/landlock-run/packages/linux-arm64/README.md",
-      "sourceBlob": "0f444f66abd820531b38bdeb7d294e10c2142b3d",
-      "ruBlob": "2d043da80eaf7234b82ac6a031e72f41a4b85690"
+      "sourceBlob": "dfcc9e97dc1393a42ff4b89ac009cdfd31e1497b",
+      "ruBlob": "dc8c88b14aa1304841e4e7d24c72cef83cf1e468"
     },
     "packages/session-query/session-query/README.ru.md": {
       "source": "packages/session-query/session-query/README.md",
@@ -869,95 +787,78 @@
     },
     "packages/plan/plan-mode/README.ru.md": {
       "source": "packages/plan/plan-mode/README.md",
-      "sourceBlob": "3eabe2cb3f04b434b7f908f7beca869f1022a59e",
-      "ruBlob": "59cada5fa8754e2374584ba99f8a48e4a60b8722"
       "sourceBlob": "a272962cbc45175f643f4841e558174620af9a5f",
-      "ruBlob": "8829f1ff270a2cd822bf4f4f83e657e3fb054ade"
+      "ruBlob": "10506523c25bf66b9382a3f680f608ec5686157b"
     },
     "packages/credentials/credentials-local/README.ru.md": {
       "source": "packages/credentials/credentials-local/README.md",
-      "sourceBlob": "7acd89ea24be4da3d2cecc6efe619e73e05bb823",
-      "ruBlob": "722d0516b4a35f1c890abc132ac7ef51aab19913"
+      "sourceBlob": "a923c909d0d5e38e645b18f379f8939483f3e326",
+      "ruBlob": "c04af9ff85579e7ef1e1fb93a93316c4eccc39e5"
     },
     "packages/subagent/tool-subagent-control/README.ru.md": {
       "source": "packages/subagent/tool-subagent-control/README.md",
-      "sourceBlob": "91f8d23ac092049e5315418070cdaae025054860",
-      "ruBlob": "135f3c4facfe2dbfa4a9e12b68d43d847dd0e731"
-    },
-    "packages/shell/tool-bash-persistent/README.ru.md": {
-      "source": "packages/shell/tool-bash-persistent/README.md",
-      "sourceBlob": "606920d087b42344f34b70103e167b0046d3cfd5",
-      "ruBlob": "e702f4e6416f63ce55787c6016f9959bbe449832"
       "sourceBlob": "2c3076fa9345457adbe6c019c0ec8b833f1d4721",
-      "ruBlob": "6c1861c30686d53ecc20843c513958f0837fe22a"
+      "ruBlob": "18c6b1a959ca0b91bedcc41fe6366b30f85d14e0"
     },
     "packages/shell/tool-bash-persistent/README.ru.md": {
       "source": "packages/shell/tool-bash-persistent/README.md",
       "sourceBlob": "1bb6980c4b8c29749e65f05d5b835e3b0d8d7883",
-      "ruBlob": "e4e18152058c1432d92af4219a571bf8a6ff1dec"
+      "ruBlob": "ef007b9750e0b335d5dca9e5763f8124d88daa6d"
     },
     "packages/web/web-search-deepseek/README.ru.md": {
       "source": "packages/web/web-search-deepseek/README.md",
-      "sourceBlob": "25162a3e82a05bb17f31a69bc65f6552e42906ad",
-      "ruBlob": "4f5c4f9bfb1a4f6ea9047c070073c0f9a547e75c"
+      "sourceBlob": "34460b958a216e4f921a666c0785b456abf8a549",
+      "ruBlob": "f96ad2858ac4d592097145a9eeaecaa804c978ef"
     },
     "packages/session/session-persistence-sqlite/README.ru.md": {
       "source": "packages/session/session-persistence-sqlite/README.md",
-      "sourceBlob": "ba005d79771bcbc2c0c1632da77d694aa3a18c07",
-      "ruBlob": "02db04e44f4fc82cbadfd40bcbff1c876f401fb8"
+      "sourceBlob": "ee37a8229598420d82c88070524539cb10a4fd8a",
+      "ruBlob": "b427c820a4349b45e66aeb0c5f4e7b2a567aeeb4"
     },
     "packages/subagent/subagent-dsh-sdk/README.ru.md": {
       "source": "packages/subagent/subagent-dsh-sdk/README.md",
-      "sourceBlob": "8d20b44dacd773345986e2a2fc0e6aca9470bf2c",
-      "ruBlob": "8207ad66086468272cf64de982ffe9d5fedf61b3"
+      "sourceBlob": "d5e6e3230a8646f21c5d861a696879f94a6910cf",
+      "ruBlob": "87642e5d8e429d911debe4aa96ade22bd61fa6e1"
     },
     "packages/README.ru.md": {
       "source": "packages/README.md",
       "sourceBlob": "c455feb38489400b6e96101661103dfdeb0d2083",
       "ruBlob": "19f4edf3089aecbe1ee94182439deed616cbb44f"
-      "sourceBlob": "58ce8a9a4fb161962bd175eb1f3437251bd0e3b2",
-      "ruBlob": "79d3c62aef4b9b6d4b81de08f9718bd35bb41749"
     },
     "packages/subagent/subagent-acp/README.ru.md": {
       "source": "packages/subagent/subagent-acp/README.md",
-      "sourceBlob": "3bccddbca021bed1f8bf5766b9575f3bd7441669",
-      "ruBlob": "4da7c827914dd2966f9ec2e0b08a71cf2e670fd8"
+      "sourceBlob": "a7f25b0fc562edca974395c8f2de221b0e5c5d63",
+      "ruBlob": "bf96c1276d794b03e4ccd24a452e86500d139ecf"
     },
     "packages/guard/timeout-policy/README.ru.md": {
       "source": "packages/guard/timeout-policy/README.md",
-      "sourceBlob": "4b0ea4e541f0740289623f5e81d79e168240a402",
-      "ruBlob": "63d3efb81c3cc757248137cb37b22b5c20d73af1"
+      "sourceBlob": "35bcedabbabb005c436982c1569df9933ebe98de",
+      "ruBlob": "1d686bf41b02fa9bf5ddff88bb944ad0702b706e"
     },
     "packages/session/session-telemetry-otel/README.ru.md": {
       "source": "packages/session/session-telemetry-otel/README.md",
-      "sourceBlob": "351690b5941bfe33cfbbf591269683f706701978",
-      "ruBlob": "3e5d9057f2d7574f46986bba7278e7839257e1f7"
+      "sourceBlob": "1cfa920fdf6ae7d50a4021caabc959a26071e922",
+      "ruBlob": "3f8c8e9b68c9387f046101ec322a2333b72e6e24"
     },
     "packages/llm/token-meter/README.ru.md": {
       "source": "packages/llm/token-meter/README.md",
-      "sourceBlob": "a2deab11a31285ba598b8864d3a734ecf7c56620",
-      "ruBlob": "4a57d98bb40959d8a75758546f2be64a41bc9e9b"
+      "sourceBlob": "5153fd39142e701a7dd1912f7ed96665c911083e",
+      "ruBlob": "2f8e4575804919d094acecae37c30f61c3074108"
     },
     "packages/subagent/tool-subagent-report/README.ru.md": {
       "source": "packages/subagent/tool-subagent-report/README.md",
-      "sourceBlob": "ab2bcc5e4b829b66810da4089edb7146ebc1c791",
-      "ruBlob": "80d52f95e83d0cc096be39953f927337532f01b7"
       "sourceBlob": "aec06e12c5939c6a01c6b4f6b67eee8e1f441d06",
-      "ruBlob": "361066e66fa784effcbcf303e5711bf4c4562b70"
+      "ruBlob": "f029924cfe8ad044bf6ddf333b5323a617878f42"
     },
     "packages/jobs/tool-jobs/README.ru.md": {
       "source": "packages/jobs/tool-jobs/README.md",
       "sourceBlob": "8d6a00651f69258d764904ac99d000c2055982dc",
       "ruBlob": "a5f1f4a2a557b322e028aa7ec3c43d43aa3bf6ed"
-      "sourceBlob": "22d71bb055df247255a2daa7d645d2b19ec2d590",
-      "ruBlob": "55cd122497a3440e8c71ff2fe61ed7cd937b1312"
     },
     "packages/settings/settings/README.ru.md": {
       "source": "packages/settings/settings/README.md",
-      "sourceBlob": "b1c32c7f4cd05b05802400b33dfdd40f7ed20e61",
-      "ruBlob": "f1228cbd7380b06fb8cf97abaa63936c4b41e9f2"
       "sourceBlob": "bb72be66b33a959e9fd1584ded56fd1ee0cec994",
-      "ruBlob": "21e568d3b9ebb12d6e1ed6f628015e593f3b0acb"
+      "ruBlob": "25e7d4b08b5f44aaf97f0bbfcbabcb8c922c1df3"
     },
     "packages/sandbox/sandbox-policy/README.ru.md": {
       "source": "packages/sandbox/sandbox-policy/README.md",
@@ -966,10 +867,8 @@
     },
     "packages/workflow/tool-ralph/README.ru.md": {
       "source": "packages/workflow/tool-ralph/README.md",
-      "sourceBlob": "ae9d7c80763f751860bc2073950dde331fdd5a8e",
-      "ruBlob": "6fcf8cd6f9d5f64c096a3e9f35ec51596b5f0557"
       "sourceBlob": "c95d9e6dc4f9d586cd1d054e92284fa4e14d5dba",
-      "ruBlob": "f2df41c4cd89ae01ee8695a5068833ec651f0511"
+      "ruBlob": "d0f3923fa7ef6057bf866bd5bab3a957d6373100"
     },
     "packages/runtime-diagnostics/invariants/README.ru.md": {
       "source": "packages/runtime-diagnostics/invariants/README.md",
@@ -978,77 +877,68 @@
     },
     "packages/terminal/terminal-bash/README.ru.md": {
       "source": "packages/terminal/terminal-bash/README.md",
-      "sourceBlob": "2f3f59b1acb88ff9905e78e7fc8d0d9fbcdbf0ba",
-      "ruBlob": "a0738add7c7f0e9e4d6aaa21ae14b0d1c5fe26d6"
+      "sourceBlob": "17bcc3bb52d2caea7c96a1746f4a446f5348c48b",
+      "ruBlob": "800125ac69f5e2e44bf77332f8fb57ef0e6144fa"
     },
     "packages/core/scope/README.ru.md": {
       "source": "packages/core/scope/README.md",
-      "sourceBlob": "1ed09acd7ccb864b16fb5d2ac4390264085d1c9e",
-      "ruBlob": "6e0d70daa77c9b78575e81066ba3087fc521cea5"
+      "sourceBlob": "28e31f2b8bf10e46bfc3c327f22672cd4c9ccf18",
+      "ruBlob": "5e123fe5c2df74bd457a37ef1f8bb3b80e6af85d"
     },
     "packages/acp/acp/README.ru.md": {
       "source": "packages/acp/acp/README.md",
-      "sourceBlob": "aaabb0c824e12c250851985e92c0473f147e8efa",
-      "ruBlob": "8dc788ce5eb550a6c78e7f4981601bcec8e143ce"
+      "sourceBlob": "d7ee07f44ee352c696e52c017724912466dcc42e",
+      "ruBlob": "26c42d2dcd98fb5c27ff65dc146381a3b7c64b5e"
     },
     "packages/guard/repeat-tool-reminder/README.ru.md": {
       "source": "packages/guard/repeat-tool-reminder/README.md",
-      "sourceBlob": "cfece8150dce8e2fe45b4e942bf7188f46836551",
-      "ruBlob": "8678e1057e45036a8942f707b66ce4fe9e882873"
+      "sourceBlob": "7c00c35495c4f5e803dcae3d41bf7719b85fb96c",
+      "ruBlob": "46191c4ff455f2c446edd09d8c3908aa1b941e81"
     },
     "packages/client/connection/README.ru.md": {
       "source": "packages/client/connection/README.md",
-      "sourceBlob": "71ef204a589bb67c15ccab58d3cac5a13782ce27",
-      "ruBlob": "f51b3ebab6b9a6db54b27adc38893abcba31283d"
       "sourceBlob": "4d50152da9a4bf107be599a2840d1532b73701ad",
-      "ruBlob": "5d44655f85678189e4ba01546d3189a74c6822ef"
+      "ruBlob": "582b50b2ca3de3a22ead5d65c2fb40a96e56bce0"
     },
     "packages/goal/tool-goal/README.ru.md": {
       "source": "packages/goal/tool-goal/README.md",
-      "sourceBlob": "c590d6deab92d1a73c64c4e0e4bb51d7e582916f",
-      "ruBlob": "6af8934bc401e66da92fe1599dab964f17b2b128"
+      "sourceBlob": "f8accfaaee2b68b090bc5dfd66a260c4af170530",
+      "ruBlob": "05909a97148e5a033461db63469a364764c9ce00"
     },
     "packages/util/output-retention/README.ru.md": {
       "source": "packages/util/output-retention/README.md",
-      "sourceBlob": "e1d2c828fd4c6526cc391e7f93d7fe20df26e268",
-      "ruBlob": "faeb1d50758ec5bd931947540fe4f706f4401e40"
+      "sourceBlob": "b12f085fb37f274e01b7ddc467d5534441df6596",
+      "ruBlob": "aff62d6c398ce8b2ecfa34908934fb4f1c8f2394"
     },
     "packages/credentials/authorization/README.ru.md": {
       "source": "packages/credentials/authorization/README.md",
-      "sourceBlob": "373a070c1a5cbb9a60e7ae14734a752515e0a0e4",
-      "ruBlob": "5b9dd5762467541cca4e674b807105b1b15759b9"
+      "sourceBlob": "cbf1cfe37893f6e14116d8f44a966016a91fb6a1",
+      "ruBlob": "78300521745cb52e78ff605d197950b7beee6437"
     },
     "packages/fs/fs-observation-policy/README.ru.md": {
       "source": "packages/fs/fs-observation-policy/README.md",
-      "sourceBlob": "a126c7d0e3c806e3ce22eedfb05b21d8fd5aba60",
-      "ruBlob": "8cc78eea0de16af6b92b26cb3d6fdc8d996ce376"
-    },
-    "packages/session/session-projection/README.ru.md": {
-      "source": "packages/session/session-projection/README.md",
-      "sourceBlob": "3b7ccecb7040b5340cd24da45d99bbfdc13fa15c",
-      "ruBlob": "18ccfe6756e3ea4de2525d7a8e6668749937e166"
       "sourceBlob": "964b9ab4b09001959015a9c5ee737a0bf1856867",
-      "ruBlob": "1735d195cfb914004d8abdef076cb3109744ffa8"
+      "ruBlob": "9046281ad4b770f6c706de9eb73d8ce7d345def9"
     },
     "packages/session/session-projection/README.ru.md": {
       "source": "packages/session/session-projection/README.md",
       "sourceBlob": "7fb56459b1b3ac50c0fc83f516d263a5f377244d",
-      "ruBlob": "00786d76d5e64b2ac3407fd5da1b806d4c197a3a"
+      "ruBlob": "2a5eb7f47567b1b0330db4fa69d4660b16ac1e18"
     },
     "packages/sdk/client/README.ru.md": {
       "source": "packages/sdk/client/README.md",
-      "sourceBlob": "b33457875f81d11d09bab2e5aa5ce730e233c78a",
-      "ruBlob": "2e6bb4c1f52d80c2aa26f9ae80bfdcfbbe7f0293"
+      "sourceBlob": "52dae11e443c076766b555fc2ea36a7ea56704f2",
+      "ruBlob": "b3d7f2a782ceb46858e16ee67adb7cf615b77330"
     },
     "packages/lsp/lsp-stdio/README.ru.md": {
       "source": "packages/lsp/lsp-stdio/README.md",
-      "sourceBlob": "beadc34ec738ae3f6511cae764240c0e9d8c61d7",
-      "ruBlob": "7f0e635d08633f22698afeb11060efd990d894f1"
+      "sourceBlob": "a2afc14b5fd6b430b1455bcfd16c9a1574332cd9",
+      "ruBlob": "1ebcaf859f63503d20c30a44fed671e31a03f8f3"
     },
     "packages/credentials/credentials/README.ru.md": {
       "source": "packages/credentials/credentials/README.md",
-      "sourceBlob": "ff2e9a7002a3a4a2527ec0a36a4472711da5be2a",
-      "ruBlob": "14587b9f71784ab2a06c99a19cd59f97261a098f"
+      "sourceBlob": "6851b4b021780c8ba6cb43548653a8738029e592",
+      "ruBlob": "63ef50dc36ea8de7e337cf6a15aa42de9991119c"
     },
     "packages/examples/agent-spine-demo/README.ru.md": {
       "source": "packages/examples/agent-spine-demo/README.md",
@@ -1057,93 +947,73 @@
     },
     "packages/workflow/tool-workflow/README.ru.md": {
       "source": "packages/workflow/tool-workflow/README.md",
-      "sourceBlob": "918fe5b9aff74b3b959107ec1eebfd7966afe6d1",
-      "ruBlob": "9cebd944e37b3ac7e1b047b7c27c9ad55fd7af27"
       "sourceBlob": "f6cc4885dce4f35c1eca980b2c079fb6c1214bc1",
-      "ruBlob": "b1bd19716bf5ec433c9c75d33f0073858460a6ae"
+      "ruBlob": "ce2e348b8ba5d6286cf586afdef53e255810dea6"
     },
     "packages/shell/shell/README.ru.md": {
       "source": "packages/shell/shell/README.md",
-      "sourceBlob": "a15980ead797a73c18dd6d8825a4b38cf845df60",
-      "ruBlob": "205457fbd9b7f0d98e2e2ac1f97c4ea235758647"
       "sourceBlob": "99ea2bf2deb3431b97d71536ab53dec4afd29826",
-      "ruBlob": "8219947ada1ac0c1858a0d261119995e9ecaae78"
+      "ruBlob": "b522c6e442944bae0a0f7c146284c64ddc44b9ae"
     },
     "packages/context/session-reference/README.ru.md": {
       "source": "packages/context/session-reference/README.md",
-      "sourceBlob": "1ce5ab0a3b0cb5342c1087ddd644933a92b2a596",
-      "ruBlob": "6b25b9f81778cf94b8bfb73d39fdf0b730cd1fbe"
+      "sourceBlob": "ac5c3a7d6372c2270afccf8610ca614052f4975f",
+      "ruBlob": "1dca61ec43fb8be031f9ada209f385fde468566f"
     },
     "packages/subagent/subagent-spawn-in-process/README.ru.md": {
       "source": "packages/subagent/subagent-spawn-in-process/README.md",
-      "sourceBlob": "f1fb96f2230359cb3ff55c630f29fd34345dbed7",
-      "ruBlob": "3fc8e93e8ef65e1260bae822c7289c59da543c35"
+      "sourceBlob": "28d1c8fb90b3258a33cc3a7f520bc8e26fbb295f",
+      "ruBlob": "9c0822723cbc622dc55fc525cc060bbc78206cbe"
     },
     "packages/hooks/hook-protocol/README.ru.md": {
       "source": "packages/hooks/hook-protocol/README.md",
-      "sourceBlob": "cebf93a04caef67a82549663018c10aac4cd535d",
-      "ruBlob": "2cc9509003c47ca22fb6de61130139050056c914"
-    },
-    "packages/interaction/commands/README.ru.md": {
-      "source": "packages/interaction/commands/README.md",
-      "sourceBlob": "4a4cb2a70b56ba1a18e9f4719541a50a9683510c",
-      "ruBlob": "acc1c4ba5339262e333c9aada56de8a676fe0652"
       "sourceBlob": "2eda741f3ac02fb0f2847703925c6c36da40fe5f",
-      "ruBlob": "b139098d4db761442446118166fcf6c1bea1bb10"
+      "ruBlob": "a22eaa9e0b12229982a1597e9488c46268413043"
     },
     "packages/interaction/commands/README.ru.md": {
       "source": "packages/interaction/commands/README.md",
       "sourceBlob": "796e29667a4ed746570701e7f2d9997a88df5037",
-      "ruBlob": "dd66eb5383a5715bed78ca7a0c57caa90aca0f3a"
+      "ruBlob": "49562474277504224f71c7d99e7c8eccbe9dc51a"
     },
     "packages/client/ui-subagent/README.ru.md": {
       "source": "packages/client/ui-subagent/README.md",
-      "sourceBlob": "d4a804a94b0f2cb295fd29c09c7f32385e423495",
-      "ruBlob": "c3c1521b6bb2f901b59d57010c86a51c4d595404"
+      "sourceBlob": "e6b7120da6341793ee81296d3111db6ef12f7814",
+      "ruBlob": "e2a7db86a9c25e330569ca7557d98a9fe7e3e57b"
     },
     "packages/todo/tool-todo/README.ru.md": {
       "source": "packages/todo/tool-todo/README.md",
-      "sourceBlob": "4848758dd8f2049221901744e5d09cef2dd31591",
-      "ruBlob": "f3f3c00c12f2101008ece344ba23b65824b4deeb"
-    },
-    "packages/util/timeout/README.ru.md": {
-      "source": "packages/util/timeout/README.md",
-      "sourceBlob": "c29f6a7661abf40eadafc7637c1bbca509a62a24",
-      "ruBlob": "f6dfc27cf0f2573c6f288c8e0e8142ef7677e460"
       "sourceBlob": "1ef744881c102a9ad4759430f2900256c40f76e4",
-      "ruBlob": "d5b446eee8684e93387fca1c6d67b19d82e336e4"
+      "ruBlob": "887c3799f8f41dc0836e9644b43d0d680a9c25f2"
     },
     "packages/util/timeout/README.ru.md": {
       "source": "packages/util/timeout/README.md",
       "sourceBlob": "5cefb5bee8fd18e061e1bd1ac9d6b5a475b4d415",
-      "ruBlob": "7833170912fcb94338c0da9b6eda5c2b1fc4c365"
+      "ruBlob": "0d9d251c36b77f7e98f0c1393b607154e7bc88b6"
     },
     "packages/client/ui-commands/README.ru.md": {
       "source": "packages/client/ui-commands/README.md",
-      "sourceBlob": "7f1a54c99e4f9cf52af09e10b4c008b5c0f3e8da",
-      "ruBlob": "57f18636b544b7460a668cd9c40bab62c5627689"
+      "sourceBlob": "c42cd93949656a37cc1c9d19bc3bc6d68a12f034",
+      "ruBlob": "5bf87855a7b17c624114c0ef01a68d96fa14474c"
     },
     "packages/context/time-context/README.ru.md": {
       "source": "packages/context/time-context/README.md",
-      "sourceBlob": "0bdb0d463362427d6a7050c2d7d6d55f96779f9c",
-      "ruBlob": "2923ff6d1aa7235fcb447c93c51d78de9804fdae"
       "sourceBlob": "5e9d6eea3bc58f52e4bb781417cc718e0fa7d630",
-      "ruBlob": "a95b153e8b3663ad4bcaaa9261f1502db0cc0628"
+      "ruBlob": "b97c9c281b688c7bae0c124d4ca7c5b1c13fe2e5"
     },
     "packages/client/ui-brand-official/README.ru.md": {
       "source": "packages/client/ui-brand-official/README.md",
-      "sourceBlob": "7197bc7f4731cd3e6471549900e4868ad6d4796d",
-      "ruBlob": "976fb90c9af862001cf850a9eea76919962fa7fb"
+      "sourceBlob": "8703d7a63ad9408c663a1e15248e1302229ba0f3",
+      "ruBlob": "339fd8fe373d836feae65a1e7d53aedb4f2b46f9"
     },
     "packages/api/remotes/README.ru.md": {
       "source": "packages/api/remotes/README.md",
-      "sourceBlob": "18d39c6e86f114d2aac2f24e5d15c13335eab020",
-      "ruBlob": "38823e79cc54a3405b7e4f6c14045e6922000a87"
+      "sourceBlob": "3cf64db482982508405a499a7aa57ba363b5ae57",
+      "ruBlob": "18b54cf2dba36de1ffeaadc695c3ee48e471389f"
     },
     "packages/client/ui-settings-plugins/README.ru.md": {
       "source": "packages/client/ui-settings-plugins/README.md",
-      "sourceBlob": "0ee0edbebadad8e8e895002cd9eb60a20f45809d",
-      "ruBlob": "c2f5ff0caf3a58a114aa60a8e0e97f45ed5cbbe3"
+      "sourceBlob": "7461dd0f4e9a3015fa460432dd5d97315d47ea7b",
+      "ruBlob": "0f2c454e1865fc8a63450309a00f0a85ad065d4d"
     },
     "packages/sandbox/sandbox-local/README.ru.md": {
       "source": "packages/sandbox/sandbox-local/README.md",
@@ -1152,8 +1022,8 @@
     },
     "packages/llm/llm-retry/README.ru.md": {
       "source": "packages/llm/llm-retry/README.md",
-      "sourceBlob": "1dd530051e387230510414e35701db10c7c7c063",
-      "ruBlob": "3c1e94a32b20cdf16abf77353267f5675540584c"
+      "sourceBlob": "3447da05d37d25366b4ed569e86c651da25ba53b",
+      "ruBlob": "8c30aabe2e917ada221b6b6c1e23d2ef4f1d9385"
     },
     "packages/goal/goal-round-driver/README.ru.md": {
       "source": "packages/goal/goal-round-driver/README.md",
@@ -1162,8 +1032,8 @@
     },
     "packages/web/web/README.ru.md": {
       "source": "packages/web/web/README.md",
-      "sourceBlob": "8dfc7f032e25e40207bb3880777b814e67175a20",
-      "ruBlob": "a60075c712b803fb5b66d374feb9934cc7cb4de3"
+      "sourceBlob": "0fa78ded4f44f8b8cf7242aa35f16b1ba52bfee8",
+      "ruBlob": "2daa457301a1aa3c8312707b3b26702a4b9af5ed"
     },
     "packages/workspace/workspace/README.ru.md": {
       "source": "packages/workspace/workspace/README.md",
@@ -1172,22 +1042,18 @@
     },
     "packages/shell/tool-pwsh-persistent/README.ru.md": {
       "source": "packages/shell/tool-pwsh-persistent/README.md",
-      "sourceBlob": "a57c940801606c2eef450f0e54fecb434c62a406",
-      "ruBlob": "0f492401208d16b26982a8192ee1b1790b5396fe"
       "sourceBlob": "88c108d0d89142e9cacdd44480d1974224d76a77",
-      "ruBlob": "c45bd8b5b014bb3b4dccb2ef9ff28999f16fea2c"
+      "ruBlob": "14403761f1d0aebd8846b0b2a0e68e047dc5b38f"
     },
     "packages/test-support/llm-mock-server/README.ru.md": {
       "source": "packages/test-support/llm-mock-server/README.md",
-      "sourceBlob": "afd3504d4bb288c23248db540f6d640c4bc58326",
-      "ruBlob": "9f0a595e170ccf551de754892eae7dc1dc3478f3"
+      "sourceBlob": "919bbc923110459e9ee4fc26f6db7e8b35ab1abb",
+      "ruBlob": "a0363dc091e1ad797555fee09669202a004a0916"
     },
     "packages/session-query/tool-session-query/README.ru.md": {
       "source": "packages/session-query/tool-session-query/README.md",
       "sourceBlob": "d973daf1124c4be05f7335b18661d431d45be39f",
       "ruBlob": "a3afdc9bf714a788ba5188c473dc8db5a5472e86"
-      "sourceBlob": "2b635e4a2279cbfb682a350fdac8b7f4b48d3a8c",
-      "ruBlob": "779363e1cea8d8e4c98c20f8111ed304372830b6"
     },
     "packages/goal/command-goal/README.ru.md": {
       "source": "packages/goal/command-goal/README.md",
@@ -1196,96 +1062,73 @@
     },
     "packages/lsp/tool-lsp/README.ru.md": {
       "source": "packages/lsp/tool-lsp/README.md",
-      "sourceBlob": "e0fd5738cf114314a8483125d20142d5f1ffac40",
-      "ruBlob": "9b86aecfe76b817053b1acff7c598d62aae8d221"
       "sourceBlob": "8dfd9494a3a294c7554cc5d45749ee1611c3014f",
-      "ruBlob": "bb0729614ca4bc76aec8150ddcaeb52617d70581"
+      "ruBlob": "323e31d1e2aa4ad9e9a377b721fe255be6ebf283"
     },
     "packages/client/README.ru.md": {
       "source": "packages/client/README.md",
-      "sourceBlob": "b18aad486cd7d3fafe8261fee61fa9e26a7feaa6",
-      "ruBlob": "2b2bb5c299df0753c611a32c5196a028679dbc9c"
+      "sourceBlob": "a7ca5daaf19113bb2f782a8180add7cca71b3979",
+      "ruBlob": "996f4c7fc409289c2e4ab8cb3c185c2f9ec75fe6"
     },
     "packages/client/ui-input-trigger/README.ru.md": {
       "source": "packages/client/ui-input-trigger/README.md",
-      "sourceBlob": "248fd14e5c441ebb3ebf7806919d30a5f71a78e4",
-      "ruBlob": "0d2ad9f7b6fd5a7fd7801938463f75c7068d7509"
+      "sourceBlob": "af41a3acb6f3f44a5f94da93cc07a2e513955a93",
+      "ruBlob": "e27cd98d5bf5ff1e33a5bc7c1cb92ad18869571e"
     },
     "packages/client/ui-skill/README.ru.md": {
       "source": "packages/client/ui-skill/README.md",
-      "sourceBlob": "f2e2ec8a3061f2cd8617123013d63fad63abf237",
-      "ruBlob": "a4ede6502872abf7bc7bce2aca2ba5b3e565b185"
-    },
-    "packages/workflow/workflow/README.ru.md": {
-      "source": "packages/workflow/workflow/README.md",
-      "sourceBlob": "cc2c24f62512273ea1657542d0d904b0b870e236",
-      "ruBlob": "eb8c7227435e48d28e5ee10f73cfb7df08001209"
       "sourceBlob": "a671d53da0176823be073397dbcdfb18e74ebe80",
-      "ruBlob": "ea3bfecc1b3cd3b65aba31f5a93d05a3812de181"
+      "ruBlob": "56ab3e4f2126d644378de8e1b172abf80da663cc"
     },
     "packages/workflow/workflow/README.ru.md": {
       "source": "packages/workflow/workflow/README.md",
       "sourceBlob": "61663b3cb3d84bece071e2040d8edb66c06700f6",
-      "ruBlob": "9c0aece1f291f476915449029ce701c2db6471e6"
+      "ruBlob": "d67b7b76d6e5aba181afc5464fad2fa92838ee7e"
     },
     "native/landlock-run/README.ru.md": {
       "source": "native/landlock-run/README.md",
-      "sourceBlob": "8d09be9ffbd3c14df978a4b633c35a27125fcefc",
-      "ruBlob": "39aa85b07cbc334b86cae8f2cad8575f7c514f74"
+      "sourceBlob": "bf9b163d42a9b7402dbf4c045d47e7b8d36e15ab",
+      "ruBlob": "dc25133443f11e8b2e117db221334782f7813d11"
     },
     "packages/goal/goal/README.ru.md": {
       "source": "packages/goal/goal/README.md",
-      "sourceBlob": "6a9994dff2b6de14cf34d245939ae7adc20b51bb",
-      "ruBlob": "466f61e78c6f3da2c6c84e05b1b0dede046b82d1"
+      "sourceBlob": "98765a809820bcd4aeba31e1dd4ef6e92eb30760",
+      "ruBlob": "dbbc47b2f03f7a42a84c889c490a6c16e0184738"
     },
     "packages/spill/spill-policy/README.ru.md": {
       "source": "packages/spill/spill-policy/README.md",
-      "sourceBlob": "1ce8fea2baefec2c901dd15d52b9c9f3ed71865a",
-      "ruBlob": "3deaba46950a6c8a66962adcfd05f4317b2bde35"
+      "sourceBlob": "715d10bee6d32b0753e0f6afcc18d83fe0261a60",
+      "ruBlob": "cb87ff4396071b8c27ef0ce9613385b378be44e1"
     },
     "packages/settings/settings-file/README.ru.md": {
       "source": "packages/settings/settings-file/README.md",
-      "sourceBlob": "78ff50bd3f9b7c0bd52d50a837bc3cb7dad7c5be",
-      "ruBlob": "42672a792eecdd4fa2b1f3d6bb4173eb7b9bf80c"
+      "sourceBlob": "9e8e32e7d52bdcbf9b73c83ecbf876974892732f",
+      "ruBlob": "6a5e9bc62cc8015d5a3d9db5222f0f37b73f5bd8"
     },
     "packages/session/session-projection-cache/README.ru.md": {
       "source": "packages/session/session-projection-cache/README.md",
-      "sourceBlob": "33908578a5127f2b6bb78ed7467833aaaa2cf085",
-      "ruBlob": "ddb06247e7acb059cd6fa9f51ea99ae738d1c546"
-    },
-    "packages/bundle/web-app/README.ru.md": {
-      "source": "packages/bundle/web-app/README.md",
-      "sourceBlob": "c8a6874bc01696fc7c9ca65faf772da81ac1e964",
-      "ruBlob": "8c2573544e42bde2caed86b872c7e3fa1303ee18"
-    },
-    "packages/shell/bash-local/README.ru.md": {
-      "source": "packages/shell/bash-local/README.md",
-      "sourceBlob": "5e62ea24676f3bedf32b1b48f8618d703d5fb462",
-      "ruBlob": "bcc72e25147f6ec2627408b7ef26d394486111ce"
       "sourceBlob": "7d41233a185e7a00c8f09b61865e3f65e674aa09",
-      "ruBlob": "5b26d75b00bf2665cebc7869ab86dfe52bbe989e"
+      "ruBlob": "a1fb3a47b91021abb389322be47485aa625dade1"
     },
     "packages/bundle/web-app/README.ru.md": {
       "source": "packages/bundle/web-app/README.md",
       "sourceBlob": "60ccc574c0e4a3f28de70477c2cb3c34d8209b93",
-      "ruBlob": "405ffb7b70f629b1deacb95120e37c5c8b20689f"
+      "ruBlob": "63aac1fceb8c6530a5ccc18b09ca196dab7802f8"
     },
     "packages/shell/bash-local/README.ru.md": {
       "source": "packages/shell/bash-local/README.md",
       "sourceBlob": "a1dbd3466fdcb80c997a8ba41c6cf5ef8152cfa0",
-      "ruBlob": "b4c5dcd791c43abd6b8e212bb005a929a8404cd5"
+      "ruBlob": "515ea9393a4ef2954e350ecb8c989befde3e9bf0"
     },
     "packages/code-runtime/code-runtime/README.ru.md": {
       "source": "packages/code-runtime/code-runtime/README.md",
-      "sourceBlob": "5e684ff52fd3ac3de8193a7df0c6db1804672b72",
-      "ruBlob": "9c2d16b05436975149cccc88810224aee9413ef4"
+      "sourceBlob": "ee64f7a16295bcf31e40eb305ca35aa774dac8d2",
+      "ruBlob": "f23654d4e7239c160413f505cd5c5fb69539dddb"
     },
     "packages/client/ui-deliverables/README.ru.md": {
       "source": "packages/client/ui-deliverables/README.md",
-      "sourceBlob": "e7118eac75f31b3ffc3f2434371dba06f029d241",
-      "ruBlob": "073d858eeafd4f43d3675554b445b293a5b505c0"
       "sourceBlob": "48020518f1f5349e2b5ab0d8a69d28382332823b",
-      "ruBlob": "4edbc7f0766fa48bbe58827d73c3feb173a452b8"
+      "ruBlob": "06c734e7cf3a9b24d2e42472844553d8c867df8e"
     },
     "packages/feedback/README.ru.md": {
       "source": "packages/feedback/README.md",
@@ -1294,35 +1137,33 @@
     },
     "packages/client/ui-theme/README.ru.md": {
       "source": "packages/client/ui-theme/README.md",
-      "sourceBlob": "a9f0eb428789bc117e2fcbbdd2366066e0b994cc",
-      "ruBlob": "31ef3aca4d0a2503a51424f871acf589740c2523"
+      "sourceBlob": "8009fc5d8c463594e03403a67fa59045f3da63c9",
+      "ruBlob": "42778e280c8a28265dc53d5cf7e09bb5fbf00c77"
     },
     "packages/typert/generator/README.ru.md": {
       "source": "packages/typert/generator/README.md",
-      "sourceBlob": "06fcc69ce860a7cd0e893289ba59835ef3e160a7",
-      "ruBlob": "76e966a3eeb8e651f7f11e10d3122095ba6ceefb"
+      "sourceBlob": "432d57f0a87f19aff607e0ffee4e8b32b40b58c4",
+      "ruBlob": "e043a15f99ef0d0f2fefaa06e8cb2150fb264a7c"
     },
     "packages/context/tmux-context/README.ru.md": {
       "source": "packages/context/tmux-context/README.md",
-      "sourceBlob": "006d4b1e6d824fd255d745cba2ae78ae86eed751",
-      "ruBlob": "3c888e6b03b85f9bef9573055375e9014e1e2c4d"
+      "sourceBlob": "70e20297b9d9c3482b465c3c3fb2dbb0e2409db2",
+      "ruBlob": "9b39698289b6cfe09e8bb7aec44589c33b3a7895"
     },
     "packages/session/session-title/README.ru.md": {
       "source": "packages/session/session-title/README.md",
-      "sourceBlob": "e923bd9700180214f235c4971d4b020565bfee43",
-      "ruBlob": "e626df095ff4f9731b97922da5cffa8cf9e7a2e3"
       "sourceBlob": "e93b008f239777a90833eb4d1d159a34dec24269",
-      "ruBlob": "24d79d7651f3a9018b393e7e6ee6f90004a82e02"
+      "ruBlob": "be8a11ceddb811a5f41ac20b61097aabe199a92e"
     },
     "packages/compaction/command-compact/README.ru.md": {
       "source": "packages/compaction/command-compact/README.md",
-      "sourceBlob": "b491df8bf08f85cc602bf3e9248624502e873f13",
-      "ruBlob": "d2623f4a7793772ef10d71fce5cafbfab109407e"
+      "sourceBlob": "aa5f583ad479229d32ae823bda473f3e94c9b368",
+      "ruBlob": "2e42ea5f4dced722d95dc4b5e60fe5847502f9b5"
     },
     "packages/fs/fs-sandbox/README.ru.md": {
       "source": "packages/fs/fs-sandbox/README.md",
-      "sourceBlob": "73df31d0f98b602c57a3e86340c3dfe0ee836cd0",
-      "ruBlob": "cf6b63b77bfcadda4e4671bcfd6a322e69afd019"
+      "sourceBlob": "7ae18d44b0e5dd5c3a8b45b3821a06d9a83fd1f3",
+      "ruBlob": "3a6aafd8c290e658666d780536edfbac90c7c227"
     },
     "packages/jobs/jobs/README.ru.md": {
       "source": "packages/jobs/jobs/README.md",
@@ -1331,30 +1172,28 @@
     },
     "packages/e2b/fs-e2b/README.ru.md": {
       "source": "packages/e2b/fs-e2b/README.md",
-      "sourceBlob": "9171989f968f144593107eb918fe75cd12de7768",
-      "ruBlob": "24d1950ce526ec764490dfe63f49718c52e6ad5e"
+      "sourceBlob": "8520797fb10c0bad96e8862172fb9047ef701a33",
+      "ruBlob": "4ed8bd5238ac3a4479ca1fda36dc967e76d4ccb6"
     },
     "packages/subprocess/subprocess/README.ru.md": {
       "source": "packages/subprocess/subprocess/README.md",
-      "sourceBlob": "5e80bc7205c2f06b3528bbcfcb775941d2fa4545",
-      "ruBlob": "cd6f544f6c82fbca2a26a4e559f852a4938dabd1"
+      "sourceBlob": "0eaeb71ad97dac5a451ebdf72042486f70a711cc",
+      "ruBlob": "d2765eea0a46281d2c42228b86f35d9f3dd3a47c"
     },
     "native/landlock-run/packages/linux-x64/README.ru.md": {
       "source": "native/landlock-run/packages/linux-x64/README.md",
-      "sourceBlob": "8e2b4c07bcfad2630110d5e8cc35fe2493c243d2",
-      "ruBlob": "adf7fd95f3d96317526358e9a54f8a945567ee5b"
+      "sourceBlob": "d08cc0c4abbc74f64c5d1075dea796427211bd8f",
+      "ruBlob": "d076a7c731767a73c1677c28219e1e92b71d4ebd"
     },
     "packages/sdk/server/README.ru.md": {
       "source": "packages/sdk/server/README.md",
-      "sourceBlob": "29ad5840b9d70c9c22ecd387730ba21ce89cbe07",
-      "ruBlob": "262b98674b9f786433f8712d6861701e88ad28bc"
       "sourceBlob": "5cea2ab1f423f20ac7985727ff48343dc39ae1ca",
-      "ruBlob": "487900c1c3c818fe7740e2d14df223edc47c32de"
+      "ruBlob": "ebdfeef1f6a5602768b1cfddebe58c84aba021b0"
     },
     "packages/sdk/protocol/README.ru.md": {
       "source": "packages/sdk/protocol/README.md",
-      "sourceBlob": "9024f9ca34a5467aff1b83cb9cd864c1ec06e56b",
-      "ruBlob": "2e8925bf18daafd581abb2df7d8a514142e7d5ef"
+      "sourceBlob": "58f7fe626e7843c71c4635e7a1e80a40c4cf9e3a",
+      "ruBlob": "a0343416312bd32607c279096bbd71aad346b4a6"
     },
     "packages/code-runtime/code-runtime-python/README.ru.md": {
       "source": "packages/code-runtime/code-runtime-python/README.md",
@@ -1363,10 +1202,8 @@
     },
     "packages/compaction/compaction-tool-result-pruner/README.ru.md": {
       "source": "packages/compaction/compaction-tool-result-pruner/README.md",
-      "sourceBlob": "16a5ba5fa989ab64ff8a59f72322772827bed1fb",
-      "ruBlob": "557f7d4072f6857df68a45e965e767fc938fe103"
       "sourceBlob": "972fd5aa5adeeb662a0f0c91b006666e60451f5f",
-      "ruBlob": "e05b4b3ccae8552880c9c6c7f8df0d9ae74b8ba0"
+      "ruBlob": "eecca4c9df5adb46eae3419902d4c3d9fd53ce89"
     },
     "packages/test-support/agent-loop-testkit/README.ru.md": {
       "source": "packages/test-support/agent-loop-testkit/README.md",
@@ -1375,44 +1212,38 @@
     },
     "packages/interaction/user-questions/README.ru.md": {
       "source": "packages/interaction/user-questions/README.md",
-      "sourceBlob": "53459c39c75d5d3907b002239c83db5f82e024f5",
-      "ruBlob": "5d5f9cc0f438abe6e75bf9c0f8c8876f026db5f0"
       "sourceBlob": "1aa5ac9b50fb73cc0d84f69e5bfc6c41ce62b33d",
-      "ruBlob": "129ff3edcf1e906ce26cbb60ffa2b02a61316603"
+      "ruBlob": "d605f2933d6dbb6ac3e04bf194a0c1a93e1a3ffa"
     },
     "packages/client/ui-attachment/README.ru.md": {
       "source": "packages/client/ui-attachment/README.md",
-      "sourceBlob": "925187da23e9acec9a69959bfc29ce7ec62f0096",
-      "ruBlob": "550e2d30dc87d82c8dc992b12c15550e2400fcc5"
+      "sourceBlob": "dcdeb9b996725aeb98029a5599bd5f97ea5d8a6e",
+      "ruBlob": "e5497f81463f509a67c394f0b49cfd42105a72c6"
     },
     "packages/client/ui-model-selection/README.ru.md": {
       "source": "packages/client/ui-model-selection/README.md",
-      "sourceBlob": "929d23ad4af1fe41e1cc7398ef432e73ca2a7a94",
-      "ruBlob": "384c0abd994184ea79cb354f17635a0d6cb77d0e"
+      "sourceBlob": "9931a9975e2a936911c25b9a20fb27ebd102b024",
+      "ruBlob": "ca6d467de5534db96223a0308c9ec0b4fa5cb334"
     },
     "packages/subagent/subagent-fork-in-process/README.ru.md": {
       "source": "packages/subagent/subagent-fork-in-process/README.md",
-      "sourceBlob": "74c27ff10c76aa711ed3e954e806c00a27aacfa5",
-      "ruBlob": "2f43782ef5aab929f1192126d77938d48feed8d9"
+      "sourceBlob": "7ba25d4cba2529eecfeca146186c87c9acb25dda",
+      "ruBlob": "ab735cde3d6528c9f56bc14a6495b933a910a11d"
     },
     "packages/client/ui-slots/README.ru.md": {
       "source": "packages/client/ui-slots/README.md",
-      "sourceBlob": "332bd092e8a4dec5a424acccce57c3dd0d8c27d8",
-      "ruBlob": "2973073880a519e2017f7850e47a733f37d92070"
+      "sourceBlob": "bee7490c8e684166de2be69a0d115ee0e104f405",
+      "ruBlob": "0701ce020371224a0959a307bc69f9e30cbf898f"
     },
     "packages/terminal/tool-terminal/README.ru.md": {
       "source": "packages/terminal/tool-terminal/README.md",
-      "sourceBlob": "f6fd4020d423425d7b20ad6bc21b4e009cf25c85",
-      "ruBlob": "1910855caf73a72da5212d12c3b918e095c2569c"
       "sourceBlob": "eaece773d6506c83b50fc8b996bc96933e1ca9f4",
-      "ruBlob": "8981c4b432a085b6fb22614834460e24e1171b7e"
+      "ruBlob": "4d06ac884d317378082c5d8f36bb5fb01fd95783"
     },
     "packages/web/web-fetch-http/README.ru.md": {
       "source": "packages/web/web-fetch-http/README.md",
-      "sourceBlob": "5589a8e8605a64ae9ef5f6d9978a9b63331d5b0d",
-      "ruBlob": "015f7d4bd3e21b8d36eefbeeda53664f38b67b6a"
       "sourceBlob": "fe7d382cdcb610b841e34dedf6b686abc16b7e1a",
-      "ruBlob": "2915ec208bf5843f08143402c2aa0c140614d33b"
+      "ruBlob": "48802d935e5a62d1c06f7ae4c9bcc5ff5a3aab29"
     },
     "packages/sandbox/sandbox/README.ru.md": {
       "source": "packages/sandbox/sandbox/README.md",
@@ -1421,8 +1252,8 @@
     },
     "packages/boot/cmdline/README.ru.md": {
       "source": "packages/boot/cmdline/README.md",
-      "sourceBlob": "33125014539e801dbd2952a3b4513cafc80bdcee",
-      "ruBlob": "f1a62c7242822c8defae4f004f03bd58e901056a"
+      "sourceBlob": "657594abf5892bc0a08c3d5db092ad7cbf2f62d4",
+      "ruBlob": "ea726c1d02c5f1ccafef2da1663b021c7ec01b13"
     },
     "packages/attachment/attachment-local/README.ru.md": {
       "source": "packages/attachment/attachment-local/README.md",
@@ -1431,28 +1262,28 @@
     },
     "packages/web/web-search-perplexity/README.ru.md": {
       "source": "packages/web/web-search-perplexity/README.md",
-      "sourceBlob": "8800609a05e99d3fa8a61e12b2360e633f0fd330",
-      "ruBlob": "fd4eb3da055761413d26b10347eb0986baa2ab76"
+      "sourceBlob": "6651a5f08e30ed0bd53ba2443d456dc9a1f3db96",
+      "ruBlob": "b8a022ffed6306979310ef7f3809ca9db3d359dc"
     },
     "packages/session/session-title-llm/README.ru.md": {
       "source": "packages/session/session-title-llm/README.md",
-      "sourceBlob": "db03205cabf9f723ee9bf6ad122026d75cb92113",
-      "ruBlob": "3cdf52d624e2b48e391b8fe00b89d2d922adbf40"
+      "sourceBlob": "42767c0e25ee1680bffa1b06c68e88a79cf17243",
+      "ruBlob": "13488b1d6392224a912fafcbf17285126e77d8ce"
     },
     "packages/interaction/user-approval/README.ru.md": {
       "source": "packages/interaction/user-approval/README.md",
-      "sourceBlob": "0cf5d458863194e29f8c84168a6f089baabbf3d2",
-      "ruBlob": "5fd67b388ba0bfb9e36cbdea8dacf411f5378dea"
+      "sourceBlob": "83807d714b0624d6d9646196d5f2e573b5aed709",
+      "ruBlob": "a610d298414ec64d30013e3854f6f5a50917523d"
     },
     "packages/client/modules/README.ru.md": {
       "source": "packages/client/modules/README.md",
-      "sourceBlob": "eaf64599bc5fc5d9663d00c3b341764a4ccd38c8",
-      "ruBlob": "f7f83f2f2ad536a6e7b7fb1dc493809b4fa11db6"
+      "sourceBlob": "2d961cfbdf5a651c35911708fef33c97a41d10f6",
+      "ruBlob": "09a3174acf118297bbae1e058361e228c87bed44"
     },
     "packages/lsp/lsp/README.ru.md": {
       "source": "packages/lsp/lsp/README.md",
-      "sourceBlob": "cf32f9cc60a346def48d9720bf0695db36553b0e",
-      "ruBlob": "5be6ba3fc7f824cd24c13b625b7e9c6382b95be1"
+      "sourceBlob": "98dbede7152dbb7dc82f22694d92b11a2c8d195c",
+      "ruBlob": "a84131e821bd1754fce48241a034696dce3af470"
     },
     "packages/client/ui-sidebar/README.ru.md": {
       "source": "packages/client/ui-sidebar/README.md",
@@ -1461,33 +1292,33 @@
     },
     "packages/client/ui-workflow-run/README.ru.md": {
       "source": "packages/client/ui-workflow-run/README.md",
-      "sourceBlob": "5093050ac7bd7e5d8a8779c4fe9848ee4f7da28b",
-      "ruBlob": "c742add03fa05a0f214382b32f7370a0594447f7"
+      "sourceBlob": "ef47a6c8cc58dced8433608054aa739f1377fefe",
+      "ruBlob": "4665d1e74e50bd47c60b7e274f09b29fa09e10dd"
     },
     "packages/client/ui-tool/README.ru.md": {
       "source": "packages/client/ui-tool/README.md",
-      "sourceBlob": "b87236309c9bafe3e35d3d5977d56bd62a24de31",
-      "ruBlob": "0cab6bd13bd0be129b71d4378942f4956abb4a0a"
+      "sourceBlob": "8d7b52b7fb5ca187e514b80331be43d7b8a92745",
+      "ruBlob": "5e92932949399fb469fe10b453c51c69b6251a65"
     },
     "packages/session/README.ru.md": {
       "source": "packages/session/README.md",
-      "sourceBlob": "78fbc0ab6f0a3b9a77c9e3b1a538dd227c532296",
-      "ruBlob": "c13ed53180dd25a15edaf906105fdac538555beb"
+      "sourceBlob": "f714bbcc036a4e0ed2da0886ee32d979a891bb88",
+      "ruBlob": "ec968131699cff345c79d1ea9e9f932d64344806"
     },
     "packages/fs/README.ru.md": {
       "source": "packages/fs/README.md",
-      "sourceBlob": "344ebc309769290064952bbfac2faacabc339ea3",
-      "ruBlob": "04624ad5b44e107026da06e45b754a8b5cecfa20"
+      "sourceBlob": "132055ac2d1719485db0d560725e12f817a0a02f",
+      "ruBlob": "a734f94b728d0992c5f170959ef3f64f17490bcc"
     },
     "packages/host/webserver/README.ru.md": {
       "source": "packages/host/webserver/README.md",
-      "sourceBlob": "b6424262305b062f4c57774c446ac1d50e490a03",
-      "ruBlob": "766cd01fcc2090a9e93b58b8bc6b6c6bb3e0812d"
+      "sourceBlob": "81d4e5f0eaafdb6249b11bde79a9b92c9e2318e7",
+      "ruBlob": "f7cd65969cb31f9060ba12e6875883918bf34dc9"
     },
     "packages/client/ui-trajectory/README.ru.md": {
       "source": "packages/client/ui-trajectory/README.md",
-      "sourceBlob": "13ccc97ae3cefbcddfb4f31cb290a3da314cc86e",
-      "ruBlob": "4f6c858c6e06251bc6e9091652a457bc1400fd92"
+      "sourceBlob": "32c8355902d003024044ae1db3760154edd7d0ff",
+      "ruBlob": "654da7c5a08fd85e35f2ffc1ae734d6769e29f6b"
     },
     "packages/jobs/jobs-local/README.ru.md": {
       "source": "packages/jobs/jobs-local/README.md",
@@ -1496,58 +1327,58 @@
     },
     "packages/experimental/tool-agent-team/README.ru.md": {
       "source": "packages/experimental/tool-agent-team/README.md",
-      "sourceBlob": "e7f1eb1a072481f63c2b9e72cb3d9da908c5f76c",
-      "ruBlob": "670b997d01efaa4e4c7c768dbe6312dfc42c6a6e"
+      "sourceBlob": "a0ff967199e8a22b60483aa59442a1cbefb261a8",
+      "ruBlob": "583bdebbb1ef8a6b0735f63c45e11c748df0a3a9"
     },
     "packages/interaction/permission-presets/README.ru.md": {
       "source": "packages/interaction/permission-presets/README.md",
-      "sourceBlob": "2b671f9e6e835c529453dc7d4ca7bc2eff01f2b6",
-      "ruBlob": "16016e3538033064aedef369706a82a0a8135b2b"
+      "sourceBlob": "c430f2cfed686dfc2d5af8e1681a2f8d5d641ab9",
+      "ruBlob": "21fe8b5abceeaa9eac350301896b87c0144daae2"
     },
     "packages/client/ui-settings/README.ru.md": {
       "source": "packages/client/ui-settings/README.md",
-      "sourceBlob": "990469573309b3a92b5eeb8bc41d89b226dbd0d4",
-      "ruBlob": "1915f065e41e2a23bad02cfc19781389bf7cb824"
+      "sourceBlob": "0daff5558297802afdf8adffa08767ff4f01d8c8",
+      "ruBlob": "1eb75912b4ae7f71eb698366cd9619aa3c6c7d62"
     },
     "packages/typert/protocol/README.ru.md": {
       "source": "packages/typert/protocol/README.md",
-      "sourceBlob": "84f9f1b31cca35cffce5dc5fc84db1017adaad08",
-      "ruBlob": "5e2cb151128648e562306cd1f0a903ed96b13a03"
+      "sourceBlob": "06a956539990eaeb0425eda0bf17409d1bee2d41",
+      "ruBlob": "16a7e6098dbc5ed0c49f93608bc9442ce5cf614f"
     },
     "packages/client/locale/README.ru.md": {
       "source": "packages/client/locale/README.md",
       "sourceBlob": "95b2ed792836bafa108e8a3971e8df1f566dfbb8",
-      "ruBlob": "04aafaf3236352576584037fef5debd2abe9d98a"
+      "ruBlob": "ee3c96a876adc96c3a5f01924929f1c66efebb41"
     },
     "packages/bundle/base/README.ru.md": {
       "source": "packages/bundle/base/README.md",
-      "sourceBlob": "8487426ee7bf1b39a79b4e80b9c7bd661f317998",
-      "ruBlob": "97248a0fb96631a3cc53958859b3215671aadb1c"
+      "sourceBlob": "13907bbb734f0b1fe7f4e28558ae9b296beaccb2",
+      "ruBlob": "7f5a2ed55d55e2768316c9868f6f51709f05fbeb"
     },
     "packages/client/ui-directory-picker-browse/README.ru.md": {
       "source": "packages/client/ui-directory-picker-browse/README.md",
-      "sourceBlob": "5e27ba081a921593b53d4d91805965c629139d37",
-      "ruBlob": "229e2ac971de432a724ac2e876b8ea83758caf8a"
+      "sourceBlob": "92b706814013839362d02c55d09b78c57ef18d53",
+      "ruBlob": "9a9a8a308fe9e9c4900cf9c08fafaec231a99047"
     },
     "packages/client/ui-goal/README.ru.md": {
       "source": "packages/client/ui-goal/README.md",
-      "sourceBlob": "c79d6f5a68f1b4b40f4b57f5745feeed63a25fcd",
-      "ruBlob": "057fa2166c7add59a8755b8b181e647b829ef771"
+      "sourceBlob": "0372e170b0cbebbac0ae20d55e066f4a86884541",
+      "ruBlob": "39589da2c9f8c36a9435dfba273687854219b08d"
     },
     "packages/client/ui-jobs/README.ru.md": {
       "source": "packages/client/ui-jobs/README.md",
-      "sourceBlob": "d9720329ee537fdc303b8191b714c315b7535f9c",
-      "ruBlob": "f209fd7177c02e6c1c3bee1ad157dd9c01a4cd36"
+      "sourceBlob": "038e7cbaed555e4b55783022c8c9db57cce93d3c",
+      "ruBlob": "09ab301be8ec1dc2a5e7c72010637086ed92c977"
     },
     "packages/client/ui-message-feedback/README.ru.md": {
       "source": "packages/client/ui-message-feedback/README.md",
-      "sourceBlob": "d3bb4e28b95da2fde0d26b7ef83ebca377b4939f",
-      "ruBlob": "eb1e1d35a6e57e22f08dd21aad9e7267821bd6e3"
+      "sourceBlob": "da2424d597834483273fe3683e47c6187f93ea33",
+      "ruBlob": "be853e4c36302f5d9676df01941e265a53bca5e1"
     },
     "packages/preset/persona/README.ru.md": {
       "source": "packages/preset/persona/README.md",
-      "sourceBlob": "978d01ddbd52095bc2486d27d08fde2d4a8fa79b",
-      "ruBlob": "ecd2b8a00e631509210ee900bd7ef724bc841dfc"
+      "sourceBlob": "4c388c7109c4e1352ef36b4739c455e8db59b6dd",
+      "ruBlob": "0df26dc1aaef24efd60889855b0b4b365ba609e7"
     },
     "packages/session-query/session-log-export/README.ru.md": {
       "source": "packages/session-query/session-log-export/README.md",
@@ -1556,20 +1387,18 @@
     },
     "packages/session/session-checkpoint-policy/README.ru.md": {
       "source": "packages/session/session-checkpoint-policy/README.md",
-      "sourceBlob": "01ed3c694967b1a86245d01b9d9f7eecd1193348",
-      "ruBlob": "0741786118d4d90899964bfbcc8f10fe8f2dff2b"
       "sourceBlob": "968330e199dff3d122fd4303ce2686edae5be39a",
-      "ruBlob": "47339267d80e5667dbd112c1acc4eb552eab6f47"
+      "ruBlob": "bfbeab01712b6b6d568cd9d853492441815caf6d"
     },
     "packages/session/session-stats/README.ru.md": {
       "source": "packages/session/session-stats/README.md",
-      "sourceBlob": "81b0de17e335b67936afd6fb11f15411beee3b76",
-      "ruBlob": "2d280d2b9b384c26ca51c5c0192f6c6282ca5545"
+      "sourceBlob": "a341c32c1dba01b8934fea31529f199e549ec69c",
+      "ruBlob": "4a361bfac0416818d1a89e69dfba3cf98c5b566e"
     },
     "packages/shell/shell-env/README.ru.md": {
       "source": "packages/shell/shell-env/README.md",
-      "sourceBlob": "b056289bd58e960e9fd36ee84ed20579e7bde42e",
-      "ruBlob": "7035e9b007ab1804d4e00bd8e981ec8acbf181fe"
+      "sourceBlob": "01a840cf062052b8edf65d1c0d1ae2498ed84f78",
+      "ruBlob": "b976387a51aa6d9a9d10794ae62677f60db248dd"
     },
     "packages/storage/storage-sqlite/README.ru.md": {
       "source": "packages/storage/storage-sqlite/README.md",
@@ -1578,8 +1407,8 @@
     },
     "packages/subagent/README.ru.md": {
       "source": "packages/subagent/README.md",
-      "sourceBlob": "1b3ccb6afba226e0b6bcf9aacd0c9fa752fdfdbb",
-      "ruBlob": "b17e8a1f3e98b895dca0c3e6b362049ba9f3618d"
+      "sourceBlob": "718d5e98d1567aab8ff194c907a7e7c29077a018",
+      "ruBlob": "6f7fc437c7bc42b41f9d48689ad965c09a1b1703"
     },
     "packages/test-support/client-runtime/README.ru.md": {
       "source": "packages/test-support/client-runtime/README.md",
@@ -1588,82 +1417,78 @@
     },
     "packages/util/atomic-write/README.ru.md": {
       "source": "packages/util/atomic-write/README.md",
-      "sourceBlob": "0e6501c0ae35bf26d7df67f28ce0ae24c85ecca6",
-      "ruBlob": "bdfb3e581d86638faac55997ba43ef11fc95b2c0"
+      "sourceBlob": "b73df7dfa71a804538a6737e8dae2c5397fb2198",
+      "ruBlob": "53bf6c3dd56b108fd1993b83b57d772738c09605"
     },
     "packages/web/web-search-exa/README.ru.md": {
       "source": "packages/web/web-search-exa/README.md",
-      "sourceBlob": "5b1212c1fb210a3aca7836875cc295fad87e7437",
-      "ruBlob": "f5d9444f9b18211e322e703ad37cf23f77be1aa5"
+      "sourceBlob": "9904094350cdad7bef7a6ddc9737c0b067e67b73",
+      "ruBlob": "2f3d87673246ea0f7d2b25d39a77032a6eb23750"
     },
     "packages/client/ui-renderer/README.ru.md": {
       "source": "packages/client/ui-renderer/README.md",
-      "sourceBlob": "f63f1eff99d8d3357280f81648899bb68f5e2ef9",
-      "ruBlob": "d4ca12b8a365b1ceb5347e23c9b2b4e1d16d9ee2"
+      "sourceBlob": "b17c5d9e2be53cc6eb921edb932623ec3ff4a879",
+      "ruBlob": "6714434cd1627b5774601f8294131e9f2c318bec"
     },
     "packages/client/ui-settings-general/README.ru.md": {
       "source": "packages/client/ui-settings-general/README.md",
-      "sourceBlob": "c59b77617cfd5848553ba340e97bafe37b7b2a2f",
-      "ruBlob": "c236c2a61e57def5c1c06adc31b97c2612569d6d"
+      "sourceBlob": "950e54106c6fa7d23f111b12c1dc01ca581cfd6e",
+      "ruBlob": "b621c23ff0c8d1e8c42588e7bb8ba3e859e74a96"
     },
     "packages/client/ui-settings-plugin-inventory/README.ru.md": {
       "source": "packages/client/ui-settings-plugin-inventory/README.md",
-      "sourceBlob": "d3410d1387b4a51a0ecaeee4ec9f80913157d453",
-      "ruBlob": "af7486a855b5996d65dea0d0e170b92f5651d71f"
+      "sourceBlob": "4b49f4dec0bebee8772134f25681f311636719ac",
+      "ruBlob": "a5825a1d31dabd9b006dfad50042d4a965ac52af"
     },
     "packages/compaction/README.ru.md": {
       "source": "packages/compaction/README.md",
-      "sourceBlob": "f0be51421229ae4e7b150c8363c2c0779f2109a5",
-      "ruBlob": "ade58f8e755335b35ea4072608d211a78031f888"
+      "sourceBlob": "df3fc35c107a292acb5a48f3804c405c94c9b74e",
+      "ruBlob": "05ba99fc3c92371fbb66454e0ed67a6714a10e2a"
     },
     "packages/context/README.ru.md": {
       "source": "packages/context/README.md",
-      "sourceBlob": "ac1f6c302ce557adb71974c4d80b3b61e27f049c",
-      "ruBlob": "ddb5602b16c0b0a84f43df1eaf67f991994e572f"
+      "sourceBlob": "94de546d3037ba61a24740d4bac6dd44d4969e9e",
+      "ruBlob": "d6573f5c4757edb0266173110ccc720d2b74547b"
     },
     "packages/context/file-reference/README.ru.md": {
       "source": "packages/context/file-reference/README.md",
-      "sourceBlob": "ae0e1ef68f927890af78767660cac094d831380c",
-      "ruBlob": "03b78dae0cc08a3ac0a77e86bb3457455e56f3cc"
+      "sourceBlob": "d9ae0f5365c101f8eba8c06b3d067767dc00dd1f",
+      "ruBlob": "941b0d0a6b7c535a1ac273d7b4c3dea7f043ea2d"
     },
     "packages/context/file-reference-local/README.ru.md": {
       "source": "packages/context/file-reference-local/README.md",
-      "sourceBlob": "67b07eef4b59fdcc5e21104cac4628feb1c15f4e",
-      "ruBlob": "4bb8bce11198f19b048333f51a3e467f93f1d376"
       "sourceBlob": "4d80d174163b57ebb7a79a63610af8c96bd98e73",
-      "ruBlob": "adc8342d9bc843634f141b2f1dddad1765cfbb9a"
+      "ruBlob": "f5f6bdd77497f7927c1eb83d90c76f6b09c4ecf7"
     },
     "packages/core/README.ru.md": {
       "source": "packages/core/README.md",
-      "sourceBlob": "504686f8563f073fc8261c88275a5cdd172dd060",
-      "ruBlob": "0d3c3a98a3fce2c08ffe66fd845dd4e65829f9b8"
+      "sourceBlob": "d72d39caf1a1be7034d6be540e3a92e3497bddc1",
+      "ruBlob": "369d47f1bfcbcf74c95d47ebeb6edba5e33cad1b"
     },
     "packages/core/agent-default-model/README.ru.md": {
       "source": "packages/core/agent-default-model/README.md",
-      "sourceBlob": "4b9e06c1f68150633afa8aad752845f6d96dda85",
-      "ruBlob": "87a265334f47ac5b897db5414c18f860a1d70221"
+      "sourceBlob": "93cfccb4b234ea2430d92cf3e4386700c49ec199",
+      "ruBlob": "68dd544254af1bd1f0276b74f8d99e1ff81d72db"
     },
     "packages/core/agent-tool-presentation/README.ru.md": {
       "source": "packages/core/agent-tool-presentation/README.md",
-      "sourceBlob": "a4747d4d95a732f4eccb81ed44b68c961895d773",
-      "ruBlob": "236c95ff12bed1c74f8cb45c81ddde3cfc197f51"
+      "sourceBlob": "e246a75f811d528c0c1d2f2edff1f268e5a2fb33",
+      "ruBlob": "7f57658c44cc99c2f9fc888f07b6ec619f19b835"
     },
     "packages/credentials/README.ru.md": {
       "source": "packages/credentials/README.md",
-      "sourceBlob": "032f0f38319e276b613241ba89a956a341eaa09c",
-      "ruBlob": "f0ed0fe36c86359220d321afe730492e5fd51443"
+      "sourceBlob": "a2988da476880f749fab3e75719dc1d92b214385",
+      "ruBlob": "561f694f81e5dfa6420815d7d7879fceb617a5b5"
     },
     "packages/e2b/README.ru.md": {
       "source": "packages/e2b/README.md",
-      "sourceBlob": "0ab23ee118200ca9b16eeab89849e04a6ef5b9f0",
-      "ruBlob": "d9190d2f50c40e7cd74cb60ae46b0aba7140687a"
+      "sourceBlob": "e23be7fd13b73dc16f561255638aa00cd2bffe27",
+      "ruBlob": "c16d56fc2ef318b007441576fff92f295b4883c5"
     },
     "packages/e2b/e2b/README.ru.md": {
       "source": "packages/e2b/e2b/README.md",
-      "sourceBlob": "7ade7c3d6522d8fa6d54d7011766238451b17c9a",
-      "ruBlob": "34da85f8620081dfcd6bdccebd00eee38ccfb36e"
       "sourceBlob": "cec2a9f57ed6b06f3e394ddd2ba1dd3bca3936dd",
-      "ruBlob": "83814c30e34ca83394907fc81218f1e62d01e030"
+      "ruBlob": "cf267fb5928ebc97b48ccd49dea9c3a3cb7e0887"
     },
     "packages/examples/README.ru.md": {
       "source": "packages/examples/README.md",
@@ -1672,8 +1497,8 @@
     },
     "packages/examples/jsonrpc-demo/README.ru.md": {
       "source": "packages/examples/jsonrpc-demo/README.md",
-      "sourceBlob": "d8fef1b2c78653afef9f879fb69c9e93229eb945",
-      "ruBlob": "783dbf224c430693b0729dd50beb5c91e1a28d88"
+      "sourceBlob": "28060bd5a90445529a31d4b2bc34033c88fa452c",
+      "ruBlob": "94800ee6e6bd0dbe8a94a153bcfa77d9beca8c8e"
     },
     "packages/experimental/README.ru.md": {
       "source": "packages/experimental/README.md",
@@ -1687,10 +1512,8 @@
     },
     "packages/fs/tool-str-replace-editor/README.ru.md": {
       "source": "packages/fs/tool-str-replace-editor/README.md",
-      "sourceBlob": "8b4772cc4eb40e23a5d6ea8e409188b5033318ba",
-      "ruBlob": "dcde9f67c93bbf6b1a50da94303e63cc31748420"
       "sourceBlob": "b2814d1813ef7b574192f5fb63d96904e9cae32b",
-      "ruBlob": "8bf36f62c5b6472dd4f2ae7275f97deb2b9ea866"
+      "ruBlob": "8257ba3e972fec4cbc9f19fff2a67b1cbd09a968"
     },
     "packages/goal/README.ru.md": {
       "source": "packages/goal/README.md",
@@ -1699,47 +1522,43 @@
     },
     "packages/guard/README.ru.md": {
       "source": "packages/guard/README.md",
-      "sourceBlob": "ce5c16dbfbae5c55430f4e8d8bb48ab50989b7ad",
-      "ruBlob": "1d09f1b9ce72a9cadc96f524044932bfd37514ea"
+      "sourceBlob": "c44b3214c1f74393cbf4bc5956477ebce52335ba",
+      "ruBlob": "ac640127048885a887ab74da05798287f5d07498"
     },
     "packages/hooks/README.ru.md": {
       "source": "packages/hooks/README.md",
-      "sourceBlob": "1e18144f1550187d280c6beb122fee11fdc43a23",
-      "ruBlob": "f3a3d3405e6e1f939ae178e17b869b6ef0d983d8"
+      "sourceBlob": "c674d31f0f595c3459ec2ae97e9dfe1ed0251144",
+      "ruBlob": "34e866729685cf900c3e12b161c9c46485ac5016"
     },
     "packages/host/README.ru.md": {
       "source": "packages/host/README.md",
-      "sourceBlob": "28a93e095f7c2a0fb08d6d10a8f5fe03f321dcbb",
-      "ruBlob": "b0240b6bf0b492874ba03216f95259784c164461"
+      "sourceBlob": "213fa8d5be3c356e5b47523f576ecf2f5d15698a",
+      "ruBlob": "5ea2b86a7be386f506db8ff7d45314d77fae1330"
     },
     "packages/host/directory-picker/README.ru.md": {
       "source": "packages/host/directory-picker/README.md",
-      "sourceBlob": "d90f939aca57b6bc520bb96b56b8a7738b69a522",
-      "ruBlob": "3899ce8cef2f3e02c67451c372336ab765d5600e"
       "sourceBlob": "c4628d76e9fd02fd775f1ab53f8eb9c27ad1ef59",
-      "ruBlob": "c524b966c6e2c479755cc2b482b6633d5275947b"
+      "ruBlob": "82398a5b7b60eddec28be9462c2b393fbf5da3d6"
     },
     "packages/host/directory-picker-auto/README.ru.md": {
       "source": "packages/host/directory-picker-auto/README.md",
-      "sourceBlob": "fd162e0652c7eb43de111323e93e0be936d39e2f",
-      "ruBlob": "10ed154ddea84776d9a148eae5b635ca9243f1b7"
+      "sourceBlob": "13275611f3b78ff5d004b45c99d63c75c5fc8a3d",
+      "ruBlob": "321d0e7cd435712449993b43860780342195162d"
     },
     "packages/host/directory-picker-native/README.ru.md": {
       "source": "packages/host/directory-picker-native/README.md",
-      "sourceBlob": "4dd0c79d080fe097d063cfd2200e30aafc2d2d42",
-      "ruBlob": "7d65c993ae99871fc19c04dc703bbdcec6a81e96"
       "sourceBlob": "2d7c3e886486222c15c601152b8adcc7c5846c1d",
-      "ruBlob": "ca8e2f7a65e19f7750932de857c9ce4df34cfbe6"
+      "ruBlob": "d9897726f37d848604ea4079033d5927bb7bcab5"
     },
     "packages/host/frontend-static/README.ru.md": {
       "source": "packages/host/frontend-static/README.md",
-      "sourceBlob": "e4f3765a0471566dfb2f6780b1072d3e79788dc5",
-      "ruBlob": "cc85a7c27dba828b27b6ac05678e81e446358182"
+      "sourceBlob": "ea1c29c0d03a064837a6dcee3ccfeccacc646f57",
+      "ruBlob": "1cc16be3faf61bca9cec4de45b14ce7a8bff5b50"
     },
     "packages/host/plugin-inventory/README.ru.md": {
       "source": "packages/host/plugin-inventory/README.md",
-      "sourceBlob": "a91c02df5e7a57db89c9a63af6c4355573b843da",
-      "ruBlob": "dbd11f620439c63a8339e15c6d9541128e150bae"
+      "sourceBlob": "23cd79b5d431702a95ca3be22c13d30f37a28248",
+      "ruBlob": "3f899a25c9a88b01cd407d7902e5b9b7a37038b4"
     },
     "packages/acp/README.ru.md": {
       "source": "packages/acp/README.md",
@@ -1748,8 +1567,8 @@
     },
     "packages/api/README.ru.md": {
       "source": "packages/api/README.md",
-      "sourceBlob": "2db5c518f75a1bba5790146a5f1b91a4fa5bf745",
-      "ruBlob": "805d919fe5fb1189a7b46739e80135341b065a63"
+      "sourceBlob": "3deac3e0c3453fc310a97cdde378cfa4b14a7426",
+      "ruBlob": "e259fd655d1fbd9a23ef8a59921e6ef71b316c5a"
     },
     "packages/attachment/README.ru.md": {
       "source": "packages/attachment/README.md",
@@ -1763,33 +1582,33 @@
     },
     "packages/boot/README.ru.md": {
       "source": "packages/boot/README.md",
-      "sourceBlob": "cdf551729567a7ad4be9dbd99861db4ad57cd5d7",
-      "ruBlob": "a047361af2d29b7b141032249a7dd779a4c0f31c"
+      "sourceBlob": "fc9ec7fc5a684700b3868197e60949abbfabef18",
+      "ruBlob": "64c51a67565077d32b1b877bf722706cf171e556"
     },
     "packages/bundle/README.ru.md": {
       "source": "packages/bundle/README.md",
-      "sourceBlob": "4d7a064939ae04f25737b324ec35332b7b944f80",
-      "ruBlob": "3260fdc3a8cbfcdb93507dd3679c0b8288175c54"
+      "sourceBlob": "9b9f52a74acf8802c5b04a8d0996f448fc2e2b9c",
+      "ruBlob": "71b419411a69e21658ee1a0abeb6b3b70e015d89"
     },
     "packages/bundle/headless/README.ru.md": {
       "source": "packages/bundle/headless/README.md",
-      "sourceBlob": "3d9ca350f5f8891e60cfc57c9ca89ef57d9790d3",
-      "ruBlob": "49a6121494b38cacd2f413bfb206694d5f09672f"
+      "sourceBlob": "b1ffda76d68fe98effbadc8684aca1f31d613cc5",
+      "ruBlob": "d7c1ec1a50e51da10410b5d98b4d8a7091173e8f"
     },
     "packages/client/hmr/README.ru.md": {
       "source": "packages/client/hmr/README.md",
-      "sourceBlob": "c355595dd53ddcb74be629a6d5e730c6c5fcebbf",
-      "ruBlob": "826df6899b94189089c4244604c917cd6f990078"
+      "sourceBlob": "fc3fb262073882be7eb42b1cdb2ff84aab28102f",
+      "ruBlob": "917e3ab8eecc7eb877798481dfaf952a857c9010"
     },
     "packages/client/ui-layout/README.ru.md": {
       "source": "packages/client/ui-layout/README.md",
-      "sourceBlob": "7c9d64b9ca7a5fada492c37200a283904466c36d",
-      "ruBlob": "05efc8cc3c86cc16cc7c9f60cbafb9038399989b"
+      "sourceBlob": "615f9e0d831961321504a930813d6c0efc34e073",
+      "ruBlob": "9ea2431cd7aa1e7375cbcaf5b666916e7ab46d3b"
     },
     "packages/client/ui-permission-presets/README.ru.md": {
       "source": "packages/client/ui-permission-presets/README.md",
-      "sourceBlob": "20529e6ce8a187254774fc85cfd981e4a9115937",
-      "ruBlob": "44543ffaea473595d0203c452397bebe23d0751a"
+      "sourceBlob": "d95985f712c031f7250bbacfb951144bd982b6a5",
+      "ruBlob": "c22dd00188c183581d190e3bcc524d14306fc04a"
     },
     "packages/client/ui-plan/README.ru.md": {
       "source": "packages/client/ui-plan/README.md",
@@ -1798,13 +1617,13 @@
     },
     "packages/client/ui-reference/README.ru.md": {
       "source": "packages/client/ui-reference/README.md",
-      "sourceBlob": "65387985b13a31c94d440c59f407811903645eac",
-      "ruBlob": "f0feb29df176db38fea193af79b243648a8e3daf"
+      "sourceBlob": "577753dec7cfd3af9b88528591bf1ecf1e3cc868",
+      "ruBlob": "fe9668a87f042864f07aee17912f5ba768890ae3"
     },
     "packages/client/web/README.ru.md": {
       "source": "packages/client/web/README.md",
-      "sourceBlob": "b4304ddc3f7d8fc0f8bfc5cb8373196a97e0273f",
-      "ruBlob": "8c1b38fcac7045f3258065cd4f718f87e805a1e6"
+      "sourceBlob": "86c4c1cb071dcf7bf7ed063a4cf920076758f889",
+      "ruBlob": "c383bb06e3ec89e883972be4061f564549bc9642"
     },
     "packages/code-runtime/README.ru.md": {
       "source": "packages/code-runtime/README.md",
@@ -1813,8 +1632,8 @@
     },
     "packages/shell/pwsh-sandbox/README.ru.md": {
       "source": "packages/shell/pwsh-sandbox/README.md",
-      "sourceBlob": "533b89b533084843a17153f3f3da39f21d271b04",
-      "ruBlob": "6a8662b6840a09ccc9c49560914cda639a547ade"
+      "sourceBlob": "d661e5b5f2ac3aa1a96668f66df50b4688bff2b6",
+      "ruBlob": "35d017299459e972898298a9042442f9accc2dd8"
     },
     "packages/skill/README.ru.md": {
       "source": "packages/skill/README.md",
@@ -1858,18 +1677,18 @@
     },
     "packages/subprocess/README.ru.md": {
       "source": "packages/subprocess/README.md",
-      "sourceBlob": "72a30775f45a8140935a013c63e9427e9cbd94d6",
-      "ruBlob": "3b057567ee77730eb100e36c414724abaf06ff28"
+      "sourceBlob": "9ea02c4be7236891d89061a9be95e17db3a55883",
+      "ruBlob": "f1bd9e00656f5859342c880b1041348b282ba6a8"
     },
     "packages/terminal/README.ru.md": {
       "source": "packages/terminal/README.md",
-      "sourceBlob": "6204eb4de27bc2361f2a49849865f65729dce12c",
-      "ruBlob": "27b314ff5a55a24725642ef2faea1d4ffc2eba80"
+      "sourceBlob": "c2239312493393d4bc5b20744523ced1d4d55168",
+      "ruBlob": "603c8bfae37cce897b086d74c5187d0bd58d16d8"
     },
     "packages/terminal/terminal/README.ru.md": {
       "source": "packages/terminal/terminal/README.md",
-      "sourceBlob": "e8959a1128575a00285a9d3b1165569d2dfbdc04",
-      "ruBlob": "1658121e19b3b12647c9f601c8cf0da0a926dce8"
+      "sourceBlob": "c8367987b841c69fef04d313428c60ddf074efbe",
+      "ruBlob": "a3b9548ff4321b49c5127e24e97e108d25d96aaa"
     },
     "packages/test-support/README.ru.md": {
       "source": "packages/test-support/README.md",
@@ -1883,8 +1702,8 @@
     },
     "packages/todo/README.ru.md": {
       "source": "packages/todo/README.md",
-      "sourceBlob": "6bbc9fe4f04cc4a82573c643c5c00bbecde069ed",
-      "ruBlob": "0299b8265893776b6bdf5d8094b5774fee9db51e"
+      "sourceBlob": "70c03494f333ca32cc962c0d4cfb854262c5c735",
+      "ruBlob": "2a8cc364634cc383ad2d2d4511e3cd1c5fb34400"
     },
     "packages/identity/README.ru.md": {
       "source": "packages/identity/README.md",
@@ -1893,20 +1712,18 @@
     },
     "packages/identity/anonymous-user-id/README.ru.md": {
       "source": "packages/identity/anonymous-user-id/README.md",
-      "sourceBlob": "fb9d8f8046f41aed7c0bc8aa8cede46f9bb8c93b",
-      "ruBlob": "a402eedda692656e72ca02b19e0457a15c1d3fa2"
+      "sourceBlob": "3c97780db0c29fb9f5050c471101e65ab59770c6",
+      "ruBlob": "641a99a1fbf2aea507e59e350a4ab88a5a9c6f53"
     },
     "packages/interaction/tool-ask-user/README.ru.md": {
       "source": "packages/interaction/tool-ask-user/README.md",
-      "sourceBlob": "bf2ba369fca36c462c6155ed2354ab3d0e930dd0",
-      "ruBlob": "df02997adecbc53e7fa4b01919874dca527beb7b"
       "sourceBlob": "013980a1db8790694e266a66f321ccfb9f5761e2",
-      "ruBlob": "03fcc4d9a50cdde7088944df6a48a32dc6c12b46"
+      "ruBlob": "48426a82376b4f63a4c5e3537cb37248a7c9e454"
     },
     "packages/interaction/README.ru.md": {
       "source": "packages/interaction/README.md",
-      "sourceBlob": "a7842e40aa708ee9ec159dd51b8a94a6b2b18539",
-      "ruBlob": "3e1ec0a921be722ec782f7c17d04b71cad55a956"
+      "sourceBlob": "b50061f1584cbf019e09091bc2180abaeeb48c0a",
+      "ruBlob": "44557eed880e6b53c6344bb1c42e70c9d89b1d0b"
     },
     "packages/jobs/README.ru.md": {
       "source": "packages/jobs/README.md",
@@ -1915,23 +1732,23 @@
     },
     "packages/llm/README.ru.md": {
       "source": "packages/llm/README.md",
-      "sourceBlob": "15f90024abf3256560d67099af79be7d4e0ee310",
-      "ruBlob": "f6ecbf33e6e6b484922adfa7c8756f3e5b97276f"
+      "sourceBlob": "e7548746b5134609e592a302e9cb08f6a8210bc1",
+      "ruBlob": "30658373d76e235debb95d28e380a03dd9ed53a1"
     },
     "packages/lsp/README.ru.md": {
       "source": "packages/lsp/README.md",
-      "sourceBlob": "414311fd3f537634651daf6f313baf33daede26b",
-      "ruBlob": "9c3c892c0a125497db60f5c14404e5c7f299bd9b"
+      "sourceBlob": "4393d7485da43da466fdc868066d99c11f9c66a2",
+      "ruBlob": "d8340f993e1226a8888e1ec16863a74a38b603ed"
     },
     "packages/plan/README.ru.md": {
       "source": "packages/plan/README.md",
-      "sourceBlob": "535a2b02e297d7c3bc68538fa1d03226089372e0",
-      "ruBlob": "f6a8b079c9e25ce578b2f91ceeb8121269fc36d4"
+      "sourceBlob": "ace87399f5880050626f37fedd684ad6ef14d3bc",
+      "ruBlob": "e1ad3d9310ab525d5624563e3ef6b9bcb8e5dd41"
     },
     "packages/preset/README.ru.md": {
       "source": "packages/preset/README.md",
-      "sourceBlob": "5e7805eaa303b78c4d8a1a8972e1d031ee304fae",
-      "ruBlob": "24871df60b8efa4c8cbf5c6d8ae8a914455c62cd"
+      "sourceBlob": "4973fa15826e926820f41c927d357a3fbb9afc20",
+      "ruBlob": "da6c1ab74ae2d683bdef5bfbe37d24f1b2ad6933"
     },
     "packages/sandbox/README.ru.md": {
       "source": "packages/sandbox/README.md",
@@ -1945,8 +1762,8 @@
     },
     "packages/sdk/README.ru.md": {
       "source": "packages/sdk/README.md",
-      "sourceBlob": "052ac933defae8766e99d79b79bc4cdc6c6d74db",
-      "ruBlob": "bdc41ae683578491f209e2bf497c754b9efa4374"
+      "sourceBlob": "bf05fd9177d1bcc2ea1b6dbfd5ae92f2481f5004",
+      "ruBlob": "65f7456be271bb68087c0c6d706004c9d07c4b80"
     },
     "packages/session-query/README.ru.md": {
       "source": "packages/session-query/README.md",
@@ -1955,63 +1772,63 @@
     },
     "packages/settings/README.ru.md": {
       "source": "packages/settings/README.md",
-      "sourceBlob": "9aad9391160ba6232d2de5005010ea99d8760abe",
-      "ruBlob": "4443c7fa64d8b93e5a980a1bff52b7e991d10b4f"
+      "sourceBlob": "ad80b76a97a0ad3470f909c397e6cfb4e5581bcc",
+      "ruBlob": "3c139d108ee82ab0af05df9fb5bf811ff79e7b07"
     },
     "packages/shell/README.ru.md": {
       "source": "packages/shell/README.md",
-      "sourceBlob": "f075db4fbe57c6052fea89b30e35126117f75a7c",
-      "ruBlob": "a10220a830aa477a8690bc41238ff1211835fd61"
+      "sourceBlob": "840065634951961c96375e9583513743fa69fbd5",
+      "ruBlob": "2f8505704bb22f67230f18f0217777e28896bbed"
     },
     "packages/typert/README.ru.md": {
       "source": "packages/typert/README.md",
-      "sourceBlob": "ad9f843e48be0e3be85921ed8fd3ca4e2c327160",
-      "ruBlob": "ed14726fa3e31670f1f06526d02d2c369af77387"
+      "sourceBlob": "7f55dc88fc58bc7c5019fbfedbd5e32294c70a06",
+      "ruBlob": "0cb8d36aec6129dbf848dffd2d01231998ae9bbf"
     },
     "packages/typert/loader/README.ru.md": {
       "source": "packages/typert/loader/README.md",
-      "sourceBlob": "ab9293de1630fdbe8c560bb9e6d00c272cc34161",
-      "ruBlob": "b717d3a8a70b37bbc3d58e979c901417ba7848e3"
+      "sourceBlob": "bb9dfd5176b8794186f0c84f21b773ebf16fd037",
+      "ruBlob": "1e9f2e2bf6db16c5316f77aa9274b2578c7cb770"
     },
     "packages/typert/registry/README.ru.md": {
       "source": "packages/typert/registry/README.md",
-      "sourceBlob": "fa227b1c8faf1abd5a6492d4b8fe7d0c51ceeef1",
-      "ruBlob": "87c789a14711a74e50d5b22f663cecb080e80fe9"
+      "sourceBlob": "a61fa045d98175f08730ca1a325676bb0a1b7e61",
+      "ruBlob": "0e76bebc3f0e6a941245df905638d9e42690821d"
     },
     "packages/util/README.ru.md": {
       "source": "packages/util/README.md",
-      "sourceBlob": "7867f6c235dfd3cb063214381ac2f40ed0f26ce3",
-      "ruBlob": "d38ffc54a5522a42f5d3d2ea129c17842ca26a7a"
+      "sourceBlob": "ef58b5255d3c3954400b6032ce89f04a9b95103b",
+      "ruBlob": "e1cf1221eecb167f672c7f4bbcc5c056c5b40552"
     },
     "packages/util/brand/README.ru.md": {
       "source": "packages/util/brand/README.md",
-      "sourceBlob": "ce05a652e2f863f737bf71fc473224fc16e25ab9",
-      "ruBlob": "372b65a35c0a7e69d4420beba03aef2866e42718"
+      "sourceBlob": "f3e386fd96353036988155de8515bf64f07dbc7c",
+      "ruBlob": "dd8e39299a2228a648e328d88b3714af12ff6fc6"
     },
     "packages/util/home-paths/README.ru.md": {
       "source": "packages/util/home-paths/README.md",
-      "sourceBlob": "edcab2dcab6fa8957cde965ab8221df71dbe69f7",
-      "ruBlob": "39be24859f3a4b649e975675d9b0cc1511e6929b"
+      "sourceBlob": "952232d76a6d6979e584828f50e5760a4d791bc7",
+      "ruBlob": "33b1f0a7417910b5745c2377905a39c3cf77ac37"
     },
     "packages/util/launch-environment/README.ru.md": {
       "source": "packages/util/launch-environment/README.md",
-      "sourceBlob": "80ec4d59c38ee296e836f8cff52e3a89b0700ff5",
-      "ruBlob": "835ae1bea3537902f6b43615afaab8ba8c590af8"
+      "sourceBlob": "0f66e5842b6a09d015fda1e305477cbfdc11d426",
+      "ruBlob": "8c5a210dbfff76b63e3a9f4f2a61b34a4e8ae4c8"
     },
     "packages/util/native-command/README.ru.md": {
       "source": "packages/util/native-command/README.md",
-      "sourceBlob": "8a552ac36fac150ae18b2a8adaab1dd489ecb476",
-      "ruBlob": "e49030d82b3038546e0eda9f4ce89fb409a8ee89"
+      "sourceBlob": "9397a401da285035a963112aaa5ce5e69588f41a",
+      "ruBlob": "eb9746c979d9f7e1fa9ec33e09084ea7f198bece"
     },
     "packages/web/README.ru.md": {
       "source": "packages/web/README.md",
-      "sourceBlob": "fc37d7cdead59138db149b5a86f0a0c031d40037",
-      "ruBlob": "2cc0e04d84fe02ceef597a67d3ba0714ad2842e8"
+      "sourceBlob": "b1759111ac2605744ce52bdcc261f78faecddf4a",
+      "ruBlob": "c2ddc6243876e57422567937c8e14f973332bf0d"
     },
     "packages/workflow/README.ru.md": {
       "source": "packages/workflow/README.md",
-      "sourceBlob": "156e9f0d84ced4eab8c25da91d29d239d18b0629",
-      "ruBlob": "12430cf9fc1135a8977607983947c8842a1fee0a"
+      "sourceBlob": "c9603bae02c93ed161134041e8bc4328a8ec5484",
+      "ruBlob": "1d3c632bf3164b6f816e82b8898bf4d5345aee4f"
     },
     "packages/workspace/README.ru.md": {
       "source": "packages/workspace/README.md",
@@ -2030,23 +1847,23 @@
     },
     "native/README.ru.md": {
       "source": "native/README.md",
-      "sourceBlob": "2b2a407aed430daa40c5e805048197cad23888ad",
-      "ruBlob": "a5c69dd1d79c4ec922e4d33e477c14fd6e297ec3"
+      "sourceBlob": "51c8da7b57df15e65b8e431ee18ce6cebb89d54b",
+      "ruBlob": "2ac3050b6da80083199fbc104c796a9ca5c6929e"
     },
     "native/landlock-run/packages/entry/README.ru.md": {
       "source": "native/landlock-run/packages/entry/README.md",
-      "sourceBlob": "d4186e1924bad342c68bb4209330a0356f10d11d",
-      "ruBlob": "4b991724c60c30a44e43d128ef63904cbd48ceb2"
+      "sourceBlob": "fff722428c5d213d9fcce0ee87a1d48cdc189884",
+      "ruBlob": "6e3626daf4795663a150039d82c39c57e6477cdb"
     },
     "packages/session/session-title-all-prompts-llm/README.ru.md": {
       "source": "packages/session/session-title-all-prompts-llm/README.md",
-      "sourceBlob": "cdda77f4bd92b927a156db093d690062ea10d531",
-      "ruBlob": "ffb98fe17e03b5b1ed331ba162e1b1dcc82de5b8"
+      "sourceBlob": "f15869d97360bce47c87e798e8495f5261595d13",
+      "ruBlob": "81ab9061dca7d7e00135d8bc99acb7a6abe99723"
     },
     "packages/session/session-title-first-prompt-llm/README.ru.md": {
       "source": "packages/session/session-title-first-prompt-llm/README.md",
-      "sourceBlob": "fef0651e1c4ba0032e6a1854590d5ac023bd71d8",
-      "ruBlob": "ce3797ceafec72bcda6f5f05863252ec81663704"
+      "sourceBlob": "e8e577c48b37b1d54afcdd3148030fb8f781bbf2",
+      "ruBlob": "38f2b3e49e45fff793626009c1b9f8510ca8b681"
     },
     "python/README.ru.md": {
       "source": "python/README.md",
@@ -2055,13 +1872,13 @@
     },
     "python/development.ru.md": {
       "source": "python/development.md",
-      "sourceBlob": "620614e4a964bff5d085d38bfcdc18b53816e632",
-      "ruBlob": "db3a20cd678089993d4d3927da0b972c891605a0"
+      "sourceBlob": "617d030294dafa51aea513adb811bb5f377431c9",
+      "ruBlob": "0b2872db12d475877502fd41b2ce6436cb655bc0"
     },
     "python/sdk/README.ru.md": {
       "source": "python/sdk/README.md",
-      "sourceBlob": "37fb83ddd487347bc590cd3f5fb1f27ac266d78e",
-      "ruBlob": "c7b041efcacd7fbe8b478c0cfb28b1c133a5a53b"
+      "sourceBlob": "9de0791f1394640ccdf757ecc170a9e803d49969",
+      "ruBlob": "9e563ec72649d2f5d0d1d9a84e938b7a4a021659"
     },
     "python/sdk-runtime/README.ru.md": {
       "source": "python/sdk-runtime/README.md",
@@ -2096,12 +1913,12 @@
     "native/landlock-run/docs/architecture.ru.md": {
       "source": "native/landlock-run/docs/architecture.md",
       "sourceBlob": "72d2f85cff7e3b6951795d7e210d04f2e5c59438",
-      "ruBlob": "64047615615fe88674164325327a95caf56d6aed"
+      "ruBlob": "8d881964effe6f06613991b3b9d78a8ac55b218d"
     },
     "native/landlock-run/docs/cli-contract.ru.md": {
       "source": "native/landlock-run/docs/cli-contract.md",
       "sourceBlob": "ad9a002d8fd79ceebe6558ec21e0bd229c286b65",
-      "ruBlob": "3c739f7b0464892da4f9515592e9146506de20be"
+      "ruBlob": "2917b216ff7f23eaceb7c88a76b64300fc9d8897"
     },
     "BENCHMARK.ru.md": {
       "source": "BENCHMARK.md",
@@ -2121,7 +1938,7 @@
     "docs/cordis-tutorial/02-lifecycle-and-effects.ru.md": {
       "source": "docs/cordis-tutorial/02-lifecycle-and-effects.md",
       "sourceBlob": "fee998796be13f993ca5b3eb9f0f13423a2bd147",
-      "ruBlob": "53c89e1aec586bff4624f0cf1747691bd0f304eb"
+      "ruBlob": "68693c5be831e5401a48730abbf65a74bfdf18a1"
     },
     "docs/cordis-tutorial/03-services.ru.md": {
       "source": "docs/cordis-tutorial/03-services.md",
@@ -2136,7 +1953,7 @@
     "docs/cordis-tutorial/05-config.ru.md": {
       "source": "docs/cordis-tutorial/05-config.md",
       "sourceBlob": "41a658630ce4d7df6138be4d7c18a97d1e3f4c86",
-      "ruBlob": "f60e2ac4b78a1db4f581958a79c716052df7c315"
+      "ruBlob": "fe44c1b094156518e1561514c8d62911097d5ee7"
     },
     "examples/README.ru.md": {
       "source": "examples/README.md",
@@ -2176,12 +1993,12 @@
     "native/landlock-run/docs/naming.ru.md": {
       "source": "native/landlock-run/docs/naming.md",
       "sourceBlob": "a1f2665654a2acbc0ba6dc9ceeaafb52ff4c1e95",
-      "ruBlob": "01a32a122f6dd8fd6f397500e3a37b1f2d9d5c6c"
+      "ruBlob": "36912250ba33b214406c612f7253a1f714ddb3ae"
     },
     "native/landlock-run/docs/packaging.ru.md": {
       "source": "native/landlock-run/docs/packaging.md",
       "sourceBlob": "16ee74de97f784e02488dc6db6ecc57fc498da2a",
-      "ruBlob": "b07b7d25b0d5b71b2524e8828921007cc180f1d6"
+      "ruBlob": "906ee48bad6d08452fd292800861c4f654f1bf88"
     },
     "native/landlock-run/docs/release.ru.md": {
       "source": "native/landlock-run/docs/release.md",
@@ -2191,7 +2008,7 @@
     "native/landlock-run/docs/support-matrix.ru.md": {
       "source": "native/landlock-run/docs/support-matrix.md",
       "sourceBlob": "e60ad201c19d5d0eea487776b4284c1a8b58136f",
-      "ruBlob": "12d4a9a5b1dc22f08ee3d274e10176e29c2ecb8e"
+      "ruBlob": "837a676fa134f0cede7436bd76920ac6686df2cf"
     },
     "docs/cordis-tutorial/06-composition-and-hmr.ru.md": {
       "source": "docs/cordis-tutorial/06-composition-and-hmr.md",
@@ -2222,57 +2039,6 @@
       "source": "packages/skill/skill-badge/assets/dsh-badge.md",
       "sourceBlob": "9f15ed4d544c0bb3015b92fbfd6c0f59978a66ce",
       "ruBlob": "726267d8d4872766f34beeb67ded2f3096cc3b7c"
-    },
-    "docs/capability-seams.ru.md": {
-      "source": "docs/capability-seams.md",
-      "sourceBlob": "9e99ebbdc0e3af22f9939c690ead479d4d20b00c",
-      "ruBlob": "479f0f4ff1f11c066dc61eeb74e4487dca9b57b2"
-    },
-    "docs/event-producer-consumer.ru.md": {
-      "source": "docs/event-producer-consumer.md",
-      "sourceBlob": "1fb65d55f5a0d8121f4f171c956196fde746103f",
-      "ruBlob": "4d18b39f30559fcc20e8180538cabb4a23364239"
-      "sourceBlob": "7ea6efe74c4f969c4e03bbe98b4340a35fc0cb3f",
-      "ruBlob": "6b8a3a3649b7291e1a01f681b3861b6ca1ee2d4f"
-    },
-    "docs/graph-atlas.ru.md": {
-      "source": "docs/graph-atlas.md",
-      "sourceBlob": "1da995e8ff6b47e0a83f0308342c5f45ccbd3835",
-      "ruBlob": "940b05359805474e8b1a2832a70e9cda594a5ac4"
-      "ruBlob": "bd108c18393441d3aa3eefa5a43d67e39e9f87de"
-    },
-    "packages/llm/llm-key-rotation/README.ru.md": {
-      "source": "packages/llm/llm-key-rotation/README.md",
-      "sourceBlob": "b0ca224a35a7266d0b6546b4f2418b5df9ebb5f9",
-      "ruBlob": "ecb7f39b27f9cd17bcd317eb18abf4993c992369"
-    },
-    "docs/module-graph.ru.md": {
-      "source": "docs/module-graph.md",
-      "sourceBlob": "531def00118795d3d8c6812baa215e71ca499bc0",
-      "ruBlob": "fe2b202d24db1ba1ccd93a938becb4f88b040f94"
-    },
-    "docs/persistence-catalog.ru.md": {
-      "source": "docs/persistence-catalog.md",
-      "sourceBlob": "aaedabf93db497dc3e760ea5609497151569a3a4",
-      "ruBlob": "cbcd6a7b1ab752be7e12a177347f843529bce2cf"
-    },
-    "docs/tool-catalog.ru.md": {
-      "source": "docs/tool-catalog.md",
-      "sourceBlob": "1fa650f1e4e025274d069f27a6522abff46af2e2",
-      "ruBlob": "ba8802a20c57c0600b5761adc0b2603330400d9c"
-    },
-    "docs/config-catalog.ru.md": {
-      "source": "docs/config-catalog.md",
-      "sourceBlob": "de340b7ffade528301b4538b0553bc11ec969985",
-      "ruBlob": "2fc0f487cc86cf32047d2240f9302d830bcc86a9"
-      "ruBlob": "1cd36c0666cce56dfecd4558e73f9b09ca847b24"
-      "sourceBlob": "d47325af5d6d100d60d23c7d14d7a4f8610bc965",
-      "ruBlob": "513406e224f1610259d885ea08356887343ff834"
-    },
-    "packages/client/ui-settings-key-rotation/README.ru.md": {
-      "source": "packages/client/ui-settings-key-rotation/README.md",
-      "sourceBlob": "81ed3b167073cc785dddba9aaa374bcf87ed56a4",
-      "ruBlob": "d1b301c01b79029f0a41d4891d844067c6859c72"
     }
   }
 }

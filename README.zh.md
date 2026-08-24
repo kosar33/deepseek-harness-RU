@@ -69,6 +69,8 @@ pnpm dsh web
 
 ## 开发
 
+在本地浏览文档站点：`pnpm run docs:dev` 在 http://localhost:5173 提供服务；`pnpm run docs:build && pnpm run docs:preview` 构建并在 http://localhost:4173 提供生产构建。
+
 请先阅读[开发指南](docs/development.zh.md)与[架构文档](docs/architecture.zh.md)。
 
 面向 agent：请遵循 [AGENTS.md](AGENTS.md)。

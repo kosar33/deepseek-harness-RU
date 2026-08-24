@@ -48,6 +48,8 @@ pnpm dsh web
 
 ## Разработка
 
+Руководство можно смотреть локально: `pnpm run docs:dev` поднимает сайт на http://localhost:5173, а `pnpm run docs:build && pnpm run docs:preview` собирает и показывает продакшен-сборку на http://localhost:4173.
+
 Начните с [руководства по разработке](docs/development.ru.md) и [документации по архитектуре](docs/architecture.ru.md).
 
 Для агентов — следуйте [AGENTS.md](AGENTS.md).

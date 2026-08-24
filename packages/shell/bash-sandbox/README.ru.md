@@ -42,7 +42,7 @@ Service Provider поверх песочницы для executor seam'а [`@deep
 
 #### Что видит модель
 
-Сгенерированные схемы [`dsh-tool-bash`](../../../docs/tool-catalog.md#deepseek-aidsh-tool-bash) — базовая линия. Объявляя изолирующий `sandboxMode`, этот бэкенд дополняет `bash` полем `sandbox_permissions` с enum `workspace-write` | `danger-full-access` и полем `justification`. Владелец политики отдельно добавляет нейтральный к возможностям контекст `sandbox:policy` с текущим состоянием.
+Сгенерированные схемы [`dsh-tool-bash`](../../../docs/tool-catalog.ru.md#deepseek-aidsh-tool-bash) — базовая линия. Объявляя изолирующий `sandboxMode`, этот бэкенд дополняет `bash` полем `sandbox_permissions` с enum `workspace-write` | `danger-full-access` и полем `justification`. Владелец политики отдельно добавляет нейтральный к возможностям контекст `sandbox:policy` с текущим состоянием.
 
 #### Влияние на токены
 

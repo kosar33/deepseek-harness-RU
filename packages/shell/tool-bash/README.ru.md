@@ -80,7 +80,7 @@ Check the [exit code: N] marker on every bash result; investigate failures befor
 
 #### What the model sees
 
-Модель видит сгенерированную [схему `bash`](../../../docs/tool-catalog.md#deepseek-aidsh-tool-bash). `run_in_background` появляется, только когда этот производитель его включает; `sandbox_permissions` и `justification` появляются, только когда смонтированный исполнитель объявляет песочницу. Ограничения инструментов на уровне агента могут убрать определение для такого агента.
+Модель видит сгенерированную [схему `bash`](../../../docs/tool-catalog.ru.md#deepseek-aidsh-tool-bash). `run_in_background` появляется, только когда этот производитель его включает; `sandbox_permissions` и `justification` появляются, только когда смонтированный исполнитель объявляет песочницу. Ограничения инструментов на уровне агента могут убрать определение для такого агента.
 
 #### Token effect
 

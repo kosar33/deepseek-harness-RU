@@ -46,7 +46,7 @@ Use search/read for ordinary navigation. Use lsp when textual matches are ambigu
 
 #### Что видит модель
 
-Модель видит сгенерированную [схему `lsp`](../../../docs/tool-catalog.md#deepseek-aidsh-tool-lsp).
+Модель видит сгенерированную [схему `lsp`](../../../docs/tool-catalog.ru.md#deepseek-aidsh-tool-lsp).
 
 #### Эффект на токены
 

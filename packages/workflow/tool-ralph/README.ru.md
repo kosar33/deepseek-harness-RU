@@ -59,7 +59,7 @@ Use the ralph tool ONLY when the direct human explicitly asks for a Ralph loop o
 
 #### What the model sees
 
-Сгенерированная [схема `ralph`](../../../docs/tool-catalog.md#deepseek-aidsh-tool-ralph) раскрывает одну обязательную строку `objective` и одно необязательное число `maxRounds`. Выбор провайдера, размер передачи состояния, схема отчёта, скрипт воркфлоу и поведение оркестрации принадлежат развёртыванию и в схеме вызова отсутствуют.
+Сгенерированная [схема `ralph`](../../../docs/tool-catalog.ru.md#deepseek-aidsh-tool-ralph) раскрывает одну обязательную строку `objective` и одно необязательное число `maxRounds`. Выбор провайдера, размер передачи состояния, схема отчёта, скрипт воркфлоу и поведение оркестрации принадлежат развёртыванию и в схеме вызова отсутствуют.
 
 #### Token effect
 

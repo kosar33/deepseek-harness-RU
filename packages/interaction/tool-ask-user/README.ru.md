@@ -27,7 +27,7 @@
 
 #### What the model sees
 
-Модель видит сгенерированную [`схему ask_user_question`](../../../docs/tool-catalog.md#deepseek-aidsh-tool-ask-user), включая id вопросов, тексты, заголовки, варианты и флаги множественного выбора.
+Модель видит сгенерированную [`схему ask_user_question`](../../../docs/tool-catalog.ru.md#deepseek-aidsh-tool-ask-user), включая id вопросов, тексты, заголовки, варианты и флаги множественного выбора.
 
 #### Token effect
 

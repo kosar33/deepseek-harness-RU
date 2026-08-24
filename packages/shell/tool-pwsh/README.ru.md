@@ -66,7 +66,7 @@ Non-zero exits are reported as `[exit code: N]` markers; investigate failures be
 
 #### What the model sees
 
-Модель видит генерируемую схему [`pwsh`](../../../docs/tool-catalog.md#deepseek-aidsh-tool-pwsh). Ограничения инструментов, скоупированные агентом, могут убрать определение для этого агента.
+Модель видит генерируемую схему [`pwsh`](../../../docs/tool-catalog.ru.md#deepseek-aidsh-tool-pwsh). Ограничения инструментов, скоупированные агентом, могут убрать определение для этого агента.
 
 #### Token effect
 

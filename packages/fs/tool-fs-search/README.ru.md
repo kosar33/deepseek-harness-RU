@@ -88,7 +88,7 @@ Use the grep tool — not shell grep or rg — to search file contents. Use read
 
 #### What the model sees
 
-Описание glob сообщает настроенный порядок сверх лимита. Сгенерированные [схемы `glob` и `grep`](../../../docs/tool-catalog.md#deepseek-aidsh-tool-fs-search) используют `sampleOverCapGlobResults: true`; инструменты регистрируются безусловно.
+Описание glob сообщает настроенный порядок сверх лимита. Сгенерированные [схемы `glob` и `grep`](../../../docs/tool-catalog.ru.md#deepseek-aidsh-tool-fs-search) используют `sampleOverCapGlobResults: true`; инструменты регистрируются безусловно.
 
 #### Token effect
 

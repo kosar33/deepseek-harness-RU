@@ -66,7 +66,7 @@
 
 #### Что видит модель
 
-Структурированный запуск добавляет приведённую ниже инструкцию структурированного вывода. Он также добавляет определение `structured_output` в области ребёнка с точным описанием `Report your final structured result. Call this exactly once, when your answer is complete; the arguments must match this tool's parameter schema exactly.` и запрошенной схемой. Это определение существует только в рантайме и находится вне сгенерированной поставляемой [карты пакетов инструментов](../../../docs/tool-catalog.md#tool-package-map). Его каноническое подтверждение — `{ recorded: true }`, отображаемое как `Structured output recorded.`; повторный вызов даёт ``Error: structured output already recorded: the run is complete, so `<tool>` is not executed``.
+Структурированный запуск добавляет приведённую ниже инструкцию структурированного вывода. Он также добавляет определение `structured_output` в области ребёнка с точным описанием `Report your final structured result. Call this exactly once, when your answer is complete; the arguments must match this tool's parameter schema exactly.` и запрошенной схемой. Это определение существует только в рантайме и находится вне сгенерированной поставляемой [карты пакетов инструментов](../../../docs/tool-catalog.ru.md#карта-пакетов-инструментов). Его каноническое подтверждение — `{ recorded: true }`, отображаемое как `Structured output recorded.`; повторный вызов даёт ``Error: structured output already recorded: the run is complete, so `<tool>` is not executed``.
 
 ##### Инструкция структурированного вывода
 

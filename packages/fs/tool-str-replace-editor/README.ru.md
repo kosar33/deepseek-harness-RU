@@ -21,7 +21,7 @@
 
 #### Что видит модель
 
-Сгенерированная [схема `str_replace_editor`](../../../docs/tool-catalog.md#deepseek-aidsh-tool-str-replace-editor), включая настроенное `description`. Плагин не добавляет отдельного раздела системного промпта.
+Сгенерированная [схема `str_replace_editor`](../../../docs/tool-catalog.ru.md#deepseek-aidsh-tool-str-replace-editor), включая настроенное `description`. Плагин не добавляет отдельного раздела системного промпта.
 
 #### Влияние на токены
 

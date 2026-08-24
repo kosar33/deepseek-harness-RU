@@ -61,7 +61,7 @@ Use goal tools for one long-running completion objective in the current session.
 
 #### Что видит модель
 
-Сгенерированные схемы [`get_goal`, `create_goal` и `update_goal`](../../../docs/tool-catalog.md#deepseek-aidsh-tool-goal). Успешные результаты — компактный JSON. Мутация добавляет долговечное событие `goal/change` домена целей, не ставя контекст модели в очередь. `activation` в результате — живое наблюдение и никогда не становится полномочием воспроизведения.
+Сгенерированные схемы [`get_goal`, `create_goal` и `update_goal`](../../../docs/tool-catalog.ru.md#deepseek-aidsh-tool-goal). Успешные результаты — компактный JSON. Мутация добавляет долговечное событие `goal/change` домена целей, не ставя контекст модели в очередь. `activation` в результате — живое наблюдение и никогда не становится полномочием воспроизведения.
 
 #### Влияние на токены
 

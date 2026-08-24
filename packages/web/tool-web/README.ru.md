@@ -80,7 +80,7 @@ Use the web_fetch tool to retrieve the content of a specific HTTP(S) URL (for ex
 
 #### Что видит модель
 
-Модель видит сгенерированные [схемы `web_search` и `web_fetch`](../../../docs/tool-catalog.md#deepseek-aidsh-tool-web). Границы числа результатов и таймаутов — настройки развёртывания, а не аргументы модели.
+Модель видит сгенерированные [схемы `web_search` и `web_fetch`](../../../docs/tool-catalog.ru.md#deepseek-aidsh-tool-web). Границы числа результатов и таймаутов — настройки развёртывания, а не аргументы модели.
 
 #### Эффект на токены
 

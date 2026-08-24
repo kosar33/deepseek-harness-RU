@@ -65,7 +65,7 @@ A user may also invoke a skill directly; its <skill_content> block then appears 
 
 #### What the model sees
 
-Модель видит сгенерированную [схему `skill`](../../../docs/tool-catalog.md#deepseek-aidsh-tool-skill).
+Модель видит сгенерированную [схему `skill`](../../../docs/tool-catalog.ru.md#deepseek-aidsh-tool-skill).
 
 #### Token effect
 

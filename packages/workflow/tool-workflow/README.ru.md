@@ -53,7 +53,7 @@ Use the <toolName> tool ONLY when the user explicitly asks for a workflow or for
 
 #### Что видит модель
 
-Когда видима, сгенерированная по умолчанию [схема `workflow`](../../../docs/tool-catalog.md#deepseek-aidsh-tool-workflow) несёт полный контракт хуков и метаданных JavaScript; `toolName` может переименовать определение, а модель отправляет скрипт, метаданные и необязательные `args`.
+Когда видима, сгенерированная по умолчанию [схема `workflow`](../../../docs/tool-catalog.ru.md#deepseek-aidsh-tool-workflow) несёт полный контракт хуков и метаданных JavaScript; `toolName` может переименовать определение, а модель отправляет скрипт, метаданные и необязательные `args`.
 
 #### Влияние на токены
 

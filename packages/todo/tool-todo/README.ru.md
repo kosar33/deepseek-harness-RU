@@ -42,7 +42,7 @@
 
 #### What the model sees
 
-Модель видит сгенерированную [схему `todo_write`](../../../docs/tool-catalog.md#deepseek-aidsh-tool-todo).
+Модель видит сгенерированную [схему `todo_write`](../../../docs/tool-catalog.ru.md#deepseek-aidsh-tool-todo).
 
 #### Token effect
 

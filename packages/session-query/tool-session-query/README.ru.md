@@ -45,7 +45,7 @@ Use session_search to find relevant work from prior sessions, or session_event_s
 
 #### Что видит модель
 
-Модель видит сгенерированные [схемы `session_search`, `session_event_search`, `session_trace`, `session_event_trace` и `session_event_read`](../../../docs/tool-catalog.md#deepseek-aidsh-tool-session-query). Фильтры поиска добавляют фиксированные токены схемы, тогда как курсоры, пути рабочей области, пагинация вывода и управляемый моделью лимит результатов остаются отсутствующими.
+Модель видит сгенерированные [схемы `session_search`, `session_event_search`, `session_trace`, `session_event_trace` и `session_event_read`](../../../docs/tool-catalog.ru.md#deepseek-aidsh-tool-session-query). Фильтры поиска добавляют фиксированные токены схемы, тогда как курсоры, пути рабочей области, пагинация вывода и управляемый моделью лимит результатов остаются отсутствующими.
 
 #### Эффект на токены
 

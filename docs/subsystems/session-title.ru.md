@@ -2,7 +2,7 @@
 
 [English](session-title.md) | [中文](session-title.zh.md) | Русский
 
-Долговечное состояние заголовка «побеждает последний» и необязательный асинхронный набор провайдерских типов, которыми владеет [`@deepseek-ai/dsh-session-title`](../../packages/session/session-title). Общий LLM-помощник владеет точной записью вспомогательного запроса. README пакетов владеют таймингом, fallback, обработкой сбоев и поведением fork; сгенерированный [каталог персистентности](../persistence-catalog.md) владеет полными объявлениями событий.
+Долговечное состояние заголовка «побеждает последний» и необязательный асинхронный набор провайдерских типов, которыми владеет [`@deepseek-ai/dsh-session-title`](../../packages/session/session-title). Общий LLM-помощник владеет точной записью вспомогательного запроса. README пакетов владеют таймингом, fallback, обработкой сбоев и поведением fork; сгенерированный [каталог персистентности](../persistence-catalog.ru.md) владеет полными объявлениями событий.
 
 Источники: [`packages/session/session-title/src/index.ts`](../../packages/session/session-title/src/index.ts), [`packages/session/session-title-llm/src/index.ts`](../../packages/session/session-title-llm/src/index.ts)
 

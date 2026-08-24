@@ -27,7 +27,7 @@ Codex сознательно заново реализует *подмножес
 
 ## События сессии `hook/*`
 
-Добавляются в `SessionEventMap` слиянием деклараций (только журнал, как `compaction/*` — НЕ `SurfaceEventType`, без `surfaceOp`): `hook/invoked` (выполнилась команда хука) и `hook/result` (её исход, сопоставленный по `handlerId`, где правилом решения владеет `appendHookResult`). Полезные нагрузки и JSDoc каждого события — в сгенерированном [каталоге событий журнала персистентности](../../../docs/persistence-catalog.md); `stderrSummary` усекается до `stderrSummaryMaxChars` записи (конфигурация моста, справочное значение по умолчанию `DEFAULT_STDERR_SUMMARY_MAX_CHARS` = 500; опускается, когда пусто).
+Добавляются в `SessionEventMap` слиянием деклараций (только журнал, как `compaction/*` — НЕ `SurfaceEventType`, без `surfaceOp`): `hook/invoked` (выполнилась команда хука) и `hook/result` (её исход, сопоставленный по `handlerId`, где правилом решения владеет `appendHookResult`). Полезные нагрузки и JSDoc каждого события — в сгенерированном [каталоге событий журнала персистентности](../../../docs/persistence-catalog.ru.md); `stderrSummary` усекается до `stderrSummaryMaxChars` записи (конфигурация моста, справочное значение по умолчанию `DEFAULT_STDERR_SUMMARY_MAX_CHARS` = 500; опускается, когда пусто).
 
 Записи вызова/результата хука ДОЛЖНЫ находиться внутри открытого хода. `UserPromptSubmit`, `PreToolUse`, `PostToolUse` и `Stop` удовлетворяют это заданное владельцем отношение по построению. `SessionStart` выполняется до хода 1 и не получает записи `hook/*`; его разрешённый контекст остаётся ожидающим в inbox, пока будящая доставка не откроет ход — см. Agent Note о хуках.
 

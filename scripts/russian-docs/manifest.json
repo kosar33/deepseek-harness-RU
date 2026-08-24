@@ -2173,6 +2173,11 @@
       "source": "docs/persistence-catalog.md",
       "sourceBlob": "aaedabf93db497dc3e760ea5609497151569a3a4",
       "ruBlob": "cbcd6a7b1ab752be7e12a177347f843529bce2cf"
+    },
+    "docs/tool-catalog.ru.md": {
+      "source": "docs/tool-catalog.md",
+      "sourceBlob": "1fa650f1e4e025274d069f27a6522abff46af2e2",
+      "ruBlob": "ba8802a20c57c0600b5761adc0b2603330400d9c"
     }
   }
 }

@@ -13,7 +13,7 @@ Service Definition пользовательского взаимодействи
 
 ### Основные типы
 
-- `AskUserQuestionRequest` — `{ questions: [{ id, question, detail?, header?, options?, multiSelect?, intent? }], agent?, signal? }`; `detail` задаёт поясняющий текст, который провайдеры показывают вместе с вопросом, не превращая его в подпись варианта. Если `agent` присутствует, он **ДОЛЖЕН** быть точным живым корнем рантайма из реестра.
+- `AskUserQuestionRequest` — `{ questions: [{ id, question, detail?, header?, options?, multiSelect?, intent? }], agent?, signal? }`; `detail` задаёт поясняющий текст, который провайдеры показывают вместе с вопросом, не превращая его в подпись варианта. Если `agent` присутствует, он ДОЛЖЕН быть точным живым корнем рантайма из реестра.
 - `AskUserQuestionOption` — `{ label, description? }`.
 - `AskUserQuestionIntent` — `{ kind: 'plan-review', approve }`; тегированное намерение представления, описанное ниже.
 - `AskUserQuestionAnswer` — `{ answers: [{ id, selected, custom? }] }`.

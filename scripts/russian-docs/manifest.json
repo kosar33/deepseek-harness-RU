@@ -2178,6 +2178,11 @@
       "source": "docs/tool-catalog.md",
       "sourceBlob": "1fa650f1e4e025274d069f27a6522abff46af2e2",
       "ruBlob": "ba8802a20c57c0600b5761adc0b2603330400d9c"
+    },
+    "docs/config-catalog.ru.md": {
+      "source": "docs/config-catalog.md",
+      "sourceBlob": "de340b7ffade528301b4538b0553bc11ec969985",
+      "ruBlob": "2fc0f487cc86cf32047d2240f9302d830bcc86a9"
     }
   }
 }

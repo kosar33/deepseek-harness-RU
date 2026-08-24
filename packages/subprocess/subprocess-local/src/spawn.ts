@@ -10,7 +10,7 @@
 import { type ChildProcess, spawn, spawnSync } from 'node:child_process'
 import type { Readable } from 'node:stream'
 import { randomBytes } from 'node:crypto'
-import { closeSync, mkdtempSync, openSync, unlinkSync, writeSync } from 'node:fs'
+import { closeSync, lstatSync, mkdirSync, mkdtempSync, openSync, unlinkSync, writeSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { setTimeout as sleepMs } from 'node:timers/promises'
@@ -162,14 +162,29 @@ export class OutputCollector {
       // Random suffix + O_EXCL + no-follow-equivalent ('wx' fails on any
       // existing path, symlink or not) + owner-only mode: defeats spill-path
       // prediction and symlink planting in shared tmp dirs.
-      this.spillFile = join(
-        this.spillDir,
-        `dsh-subprocess-${process.pid}-${++spillCounter}-${randomBytes(6).toString('hex')}-${this.label}.log`,
-      )
-      this.spillFd = openSync(this.spillFile, 'wx', 0o600)
-      for (const prior of this.chunks) writeSync(this.spillFd, prior)
+      const name = `dsh-subprocess-${process.pid}-${++spillCounter}-${randomBytes(6).toString('hex')}-${this.label}.log`
+      try {
+        this.openSpill(join(this.spillDir, name))
+      } catch (error) {
+        // External temp cleaners can delete the lazily-created per-process
+        // dir mid-run; recreate it in place and retry once rather than
+        // crashing the host over a diagnostic spill.
+        if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
+        mkdirSync(this.spillDir, { recursive: true, mode: 0o700 })
+        const stats = lstatSync(this.spillDir)
+        if (!stats.isDirectory() || stats.isSymbolicLink()) {
+          throw new Error(`spill directory ${this.spillDir} was replaced by a non-directory`)
+        }
+        this.openSpill(join(this.spillDir, name))
+      }
     }
-    writeSync(this.spillFd, chunk)
+    writeSync((this.spillFd as number), chunk)
+  }
+
+  private openSpill(file: string): void {
+    this.spillFile = file
+    this.spillFd = openSync(file, 'wx', 0o600)
+    for (const prior of this.chunks) writeSync(this.spillFd, prior)
   }
 
   /** Stop spilling and remove the file once it can no longer hold the complete stream. */

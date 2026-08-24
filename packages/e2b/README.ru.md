@@ -6,10 +6,10 @@
 
 | Package | ctx key | Role |
 |---|---|---|
-| [`e2b`](e2b/README.ru.md) (`@deepseek-ai/dsh-e2b`) | `ctx.e2b` | Создаёт одну песочницу, готовит её рабочие/исполнительные каталоги, выставляет общий дескриптор SDK и удаляет песочницу по таймауту или при освобождении ресурсов |
+| [`e2b`](e2b/README.ru.md) (`@deepseek-ai/dsh-e2b`) | `ctx.e2b` | Создаёт одну песочницу, готовит её рабочие каталоги и каталоги runtime, предоставляет общий дескриптор SDK и удаляет песочницу по таймауту или при освобождении ресурсов |
 | [`fs-e2b`](fs-e2b/README.ru.md) (`@deepseek-ai/dsh-fs-e2b`) | `ctx.fs` | Реализует seam файловой системы поверх Filesystem API E2B |
 | [`subprocess-e2b`](subprocess-e2b/README.ru.md) (`@deepseek-ai/dsh-subprocess-e2b`) | `ctx.subprocess` | Реализует поиск исполняемых файлов, управляемые группы процессов и stdio, удалённые spill-файлы и терминальные сессии поверх Commands и PTY API E2B |
 
-Существующим [`dsh-bash-local`](../shell/bash-local/README.ru.md), [`dsh-terminal-bash`](../terminal/terminal-bash/README.ru.md) и [`dsh-lsp-stdio`](../lsp/lsp-stdio/README.ru.md) не нужны ответвления под E2B. Они делегируют каждую операцию мира исполнения в `ctx.fs` и `ctx.subprocess`, поэтому подключение двух адаптеров E2B помещает их изменяющую работу в ту же песочницу.
+Существующим [`dsh-bash-local`](../shell/bash-local/README.ru.md), [`dsh-terminal-bash`](../terminal/terminal-bash/README.ru.md) и [`dsh-lsp-stdio`](../lsp/lsp-stdio/README.ru.md) не нужны форки под E2B. Они делегируют каждую операцию мира исполнения `ctx.fs` и `ctx.subprocess`, поэтому подключение двух адаптеров E2B помещает их изменяющие состояние операции в ту же песочницу.
 
-Эта граница не перемещает процесс harness'а, объекты Cordis, вызовы модели, состояние агента/сессии, персистентность сессии, скиллы, протокольное состояние верхних уровней или буферы SDK E2B. [Решение о переносимом мире исполнения](../../.agents/notes/implemented/architecture/2026-07-28-portable-execution-world-consumers.md) владеет как общей композицией, так и этой границей POC.
+Эта граница не перемещает процесс harness'а, объекты Cordis, вызовы модели, состояние агента/сессии, персистентность сессии, скиллы, протокольное состояние верхних уровней или буферы SDK E2B. [Решение о переносимом мире исполнения](../../.agents/notes/implemented/architecture/2026-07-28-portable-execution-world-consumers.md) описывает как общую композицию, так и границу этого POC.

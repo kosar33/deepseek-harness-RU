@@ -9,4 +9,4 @@
 | [`settings/`](settings/README.ru.md) | Определяет регистрацию пространств имён, многослойное разрешение и фиксацию изменений | `ctx.settings` |
 | [`settings-file/`](settings-file/README.ru.md) | Хранит настройки в локальном файле и наблюдает за внешними правками | регистрируется на `ctx.settings` |
 
-Справочник подсистем — пространства имён, скоупы владельцев, порядок разрешения, горячие фиксации — это [docs/subsystems/settings.md](../../docs/subsystems/settings.ru.md).
+Справочник подсистем — пространства имён, скоупы владельцев, порядок разрешения, горячие фиксации — это [docs/subsystems/settings.ru.md](../../docs/subsystems/settings.ru.md).

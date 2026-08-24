@@ -4,9 +4,9 @@
 
 Продуктовые плагины, добавляющие видимый модели контекст запроса без определения инструмента. `agent-instructions` входит в состав дефолтного бандла `dsh-agent-spine-demo` и может быть отключён через конфигурацию бандла; `time-context`, `tmux-context`, `session-reference`, `file-reference` и `file-reference-local` подключаются по выбору.
 
-| Package | Role | ctx key |
+| Пакет | Роль | ctx-ключ |
 |---|---|---|
-| [`session-reference/`](session-reference/README.ru.md) | Ограниченные по объёму снимки других сессий | `ctx.sessionReferenceResolver` |
+| [`session-reference/`](session-reference/README.ru.md) | Ограниченные по объёму снапшоты других сессий | `ctx.sessionReferenceResolver` |
 | [`file-reference/`](file-reference/README.ru.md) | Seam обнаружения файловых ссылок и грамматика `@file` | `ctx.fileReferences` |
 | [`file-reference-local/`](file-reference-local/README.ru.md) | Провайдер файловых ссылок на локальной файловой системе | — |
 | [`time-context/`](time-context/README.ru.md) | Контекст текущего и прошедшего времени | — |

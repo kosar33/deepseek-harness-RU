@@ -3,17 +3,17 @@
 
 # Каталог схем инструментов
 
-Каждый обращённый к модели инструмент, который плагин из поставки вносит в `ctx.tools`: `name`, `description` и `parameters` по JSON-Schema, которые модель получает при сборке системного промпта. Страница дополняет [страницы подсистем](subsystems/core.md) (типы плюс сгенерированный регион Cordis API на каждой странице) — здесь собраны именно *инструменты*, которые предлагают агенту.
+Каждый обращённый к модели инструмент, который плагин из поставки вносит в `ctx.tools`: `name`, `description` и `parameters` по JSON-Schema, которые модель получает при сборке системного промпта. Страница дополняет [страницы подсистем](subsystems/core.ru.md) (типы плюс сгенерированный регион Cordis API на каждой странице) — здесь собраны именно *инструменты*, которые предлагают агенту.
 
-Этот файл СГЕНЕРИРОВАН и проверяется на свежесть командой `pnpm run verify-tool-catalog` (часть `doc-sync`) — не редактируйте его вручную. В отличие от каталога cordis (чистый проход по AST исходников), этот генератор ЗАПУСКАЕТ каждый плагин инструментов на реальном контексте и читает `ctx.tools.schemas()`, потому что схема инструмента не выводится статически (энумы, раскрываемые в рантайме, склеенные описания, имена из конфигурации, MCP-инструменты с сырой JSON-Schema). Контроль полноты проходит по glob `packages/*/tool-*` и падает, если какого-то пакета нет в boot-манифесте генератора, — новый инструмент не может молча остаться незадокументированным. См. [Agent Note о каталоге схем инструментов](../.agents/notes/implemented/process/2026-07-02-tool-schema-catalog.md).
+Этот файл СГЕНЕРИРОВАН и проверяется на актуальность командой `pnpm run verify-tool-catalog` (часть `doc-sync`) — не редактируйте его вручную. В отличие от каталога cordis (чистый проход по AST исходников), этот генератор ЗАПУСКАЕТ каждый плагин инструментов на реальном контексте и читает `ctx.tools.schemas()`, потому что схема инструмента не выводится статически (энумы, раскрываемые в рантайме, склеенные описания, имена из конфигурации, MCP-инструменты с сырой JSON-Schema). Контроль полноты проходит по glob `packages/*/tool-*` и падает, если какого-то пакета нет в boot-манифесте генератора, — новый инструмент не может молча остаться незадокументированным. См. [Agent Note о каталоге схем инструментов](../.agents/notes/implemented/process/2026-07-02-tool-schema-catalog.md).
 
-Охват: продуктовые инструменты из поставки под `packages/*/tool-*`, каждый запускается с конфигурацией ПО УМОЛЧАНИЮ, кроме случаев, когда поле Config ОБЯЗАТЕЛЬНО и не имеет значения по умолчанию, — там генератор обязан выбрать, и примечание к пакету фиксирует, какую ветку показывает эта страница. Зарегистрированное ИМЯ инструмента может быть конфигом времени загрузки (например, `toolName` у `tool-subagent`), поэтому развёртывание может выставить пакет под другим или дополнительным именем — такие alias'ы из поставки примечание к пакету фиксирует там, где они есть. Демонстрационные инструменты `examples/` (например, `echo`) исключены — в духе packages-only охвата каталога cordis.
+Охват: продуктовые инструменты из поставки под `packages/*/tool-*`, каждый запускается с конфигурацией ПО УМОЛЧАНИЮ, кроме случаев, когда поле Config ОБЯЗАТЕЛЬНО и не имеет значения по умолчанию, — там генератор обязан выбрать, и примечание к пакету фиксирует, какую ветку показывает эта страница. Зарегистрированное ИМЯ инструмента может быть конфигом времени загрузки (например, `toolName` у `tool-subagent`), поэтому развёртывание может выставить пакет под другим или дополнительным именем — такие алиасы из поставки примечание к пакету фиксирует там, где они есть. Демонстрационные инструменты `examples/` (например, `echo`) исключены — в духе packages-only охвата каталога cordis.
 
 ## Карта пакетов инструментов
 
 Таблица связывает обращённые к модели имена инструментов с пакетами-плагинами и сервисными seam'ами за ними. Точные JSON-Schema — в разделах пакетов ниже.
 
-| Пакет инструментов | Имена, видимые модели | Requires | Пишет / затрагивает | Алиасы в поставке | Примечание о развёртывании |
+| Пакет инструментов | Имена, видимые модели | Требует | Пишет / затрагивает | Алиасы в поставке | Примечание о развёртывании |
 | --- | --- | --- | --- | --- | --- |
 | `@deepseek-ai/dsh-tool-ask-user` | `ask_user_question` | `ctx.tools`, `ctx.userQuestions` | `tool/call`, `tool/result after a UI/provider answers the question` | - | ask_user_question приостанавливает вызов инструмента, пока активный UI-провайдер не вернёт ответ человека. |
 | `@deepseek-ai/dsh-tools` | `run_code` | `ctx.tools`, `ctx.codeRuntime (execution time)`, `ctx.systemPrompt` | `tool/call`, `one tool/code-dispatch-start + tool/code-dispatch pair per bridged sub-call`, `tool/result` | - | Принадлежит реестру инструментов как зарезервированный транспорт вне фильтруемых capability-слоёв при `mode: code` / `mode: both` (см. Agent Note о Code Mode). При `code` это единственный вклад реестра в протокол; остальные видимые возможности объявляются в сгенерированном разделе SDK на языке загруженного рантайма, и программа вызывает их через биндинги, планируемые по нативному контракту конкурентности (старты в порядке отправки и политика; concurrency-safe тела перекрываются до `maxParallelSubCalls`); эти биндинги заново входят в полный защищённый пайплайн инструментов и связывают каждое вложенное выполнение с этим внешним результатом. |
@@ -26,7 +26,7 @@
 | `@deepseek-ai/dsh-tool-str-replace-editor` | `str_replace_editor` | `ctx.tools`, `ctx.fs` | `tool/call`, `fs/observed after view presence/absence, edit absence, or successful mutation`, `tool/result` | - | Автономный инструмент просмотра/создания/уникальной литеральной замены/вставки строк поверх файлового seam; компонуется с любым shell- или терминальным API. |
 | `@deepseek-ai/dsh-tool-fs` | `edit`, `read`, `read_image`, `write` | `ctx.tools`, `ctx.fs`, `ctx.systemPrompt`, `ctx.attachments (image-tool registration)`, `ctx.llm + an image-capable route (image-tool execution)` | `tool/call`, `fs/write-intent or fs/edit-intent for mutations`, `fs/observed after read presence/absence or successful file operation`, `durable attachment (read_image)`, `tool/result` | - | Политику «сперва чтение — потом запись/правка» добавляет `@deepseek-ai/dsh-fs-observation-policy` (плагин event-гейта `fs/*`, без изменения схемы); ожидается, что развёртывание, загружающее эти инструменты, загрузит и его. Инструмент изображений не регистрируется без `ctx.attachments`; его схема не зависит от маршрута, и выполнение отказывает, если конкретная промаршрутизированная модель не заявляет приём изображений. |
 | `@deepseek-ai/dsh-tool-fs-search` | `glob`, `grep` | `ctx.tools`, `ctx.subprocess`, `ctx.systemPrompt` | `tool/call`, `tool/result` | - | glob и grep — безусловные инструменты обнаружения: они порождают упакованный бинарник ripgrep (`@vscode/ripgrep`) через ctx.subprocess как обычные вызовы на переднем плане (никогда — фоновые задачи), без хостовой установки `rg` и без shell-слоя. Каталог использует `sampleOverCapGlobResults: true`; развёртывания должны выбирать такое поведение явно. Ограниченные результаты сохраняют полный форматированный список через опциональный бэкенд ctx.spillStore; возвращённые локаторы доступны для последующего чтения/поиска, когда бэкенд раскрывает локальные пути в co-located развёртываниях. |
-| `@deepseek-ai/dsh-tool-terminal` | `terminal_close`, `terminal_list`, `terminal_open`, `terminal_read`, `terminal_send`, `terminal_signal` | `ctx.tools`, `ctx.terminals`, `ctx.systemPrompt`, `ctx.jobs at call time for run_in_background` | `tool/call`, `tool/result` | - | Шесть терминальных инструментов — opt-in и дополняют одноразовые shell/файловые инструменты. `terminal_send(run_in_background: true)` регистрируется в `ctx.jobs`; TUI, именованные клавиатурные последовательности, BEL, resize, автостарт и межагентный шеринг в схеме отсутствуют. |
+| `@deepseek-ai/dsh-tool-terminal` | `terminal_close`, `terminal_list`, `terminal_open`, `terminal_read`, `terminal_send`, `terminal_signal` | `ctx.tools`, `ctx.terminals`, `ctx.systemPrompt`, `ctx.jobs at call time for run_in_background` | `tool/call`, `tool/result` | - | Шесть терминальных инструментов — opt-in и дополняют одноразовые shell/файловые инструменты. `terminal_send(run_in_background: true)` регистрируется в `ctx.jobs`; TUI, именованные клавиатурные последовательности, BEL, resize, автостарт и совместное использование между агентами в схеме отсутствуют. |
 | `@deepseek-ai/dsh-tool-goal` | `create_goal`, `get_goal`, `update_goal` | `ctx.tools`, `ctx.agents`, `ctx.goals`, `ctx.systemPrompt`, `a calling Agent in an authorized open turn` | `tool/call`, `goal/change for mutations`, `tool/result` | - | create, edit, pause и resume требуют корневых полномочий прямого человека; complete и blocked принимают также точный текущий goal round. Граница снизу для blocked по умолчанию — три зачтённых раунда. |
 | `@deepseek-ai/dsh-schedule` | `schedule_create`, `schedule_delete`, `schedule_list` | `ctx.tools`, `ctx.sessions`, `Session persistence`, `a future live root Agent` | `tool/call`, `schedule/change create or delete`, `tool/result` | - | Регистрируется только внутри скоупов живого корневого Agent, созданных после загрузки opt-in плагина Schedule. Версия 1 принимает after_seconds, явное абсолютное at и ограниченный fixed-rate every_seconds и раскрывает доставку в пределах сессии; управляющие чтения и мутации требуют общего барьера Session persistence. |
 | `@deepseek-ai/dsh-tool-lsp` | `lsp` | `ctx.tools`, `ctx.lsp`, `ctx.systemPrompt` | `tool/call`, `tool/result` | - | Инструмент lsp удерживает выбор провайдера и субпроцессы языковых серверов за ctx.lsp, поэтому его обращённая к модели схема стабильна между провайдерами. В рантайме требует зарегистрированного провайдера (например, `@deepseek-ai/dsh-lsp-stdio`); без него запрос возвращает структурную ошибку `LSP_UNAVAILABLE`, а не меняет схему. |
@@ -37,7 +37,7 @@
 | `@deepseek-ai/dsh-tool-subagent-control` | `interrupt_agent`, `list_agents`, `send_message` | `ctx.tools`, `ctx.subagents`, `ctx.agents and ctx.sessionProjections (list_agents only)` | `tool/call`, `tool/result`, `child session events through ctx.subagents` | - | Глобально именованные управляющие инструменты над continuable фоновыми субагентами: привязанные к провайдеру экземпляры `tool-subagent` регистрируют отдельные инструменты делегирования, а этот пакет регистрирует `send_message` и `interrupt_agent` однократно, плюс `list_agents` из отдельно загружаемого плагина `/list-agents` (его строки каталога используют реестры sessionProjections и живых Agent). |
 | `@deepseek-ai/dsh-tool-subagent-report` | `report` | `ctx.subagents`, `ctx.systemPrompt`, `a live continuable in-process child Agent` | `tool/call`, `tool/result`, `a user-role message in the direct parent session` | - | Регистрируется на каждый continuable внутрипроцессный дочерний агент, а не глобально, поэтому эта схема видна только внутри такого потомка и переживает его глобальный `toolFilter`. Тот же вклад устанавливает секцию промпта `tool:report` со скоупом потомка, которую этот каталог не рендерит. Обращённый к родителю инструмент `send_message` устанавливается независимо. |
 | `@deepseek-ai/dsh-tool-jobs` | `job_kill`, `job_list`, `job_output` | `ctx.tools`, `ctx.jobs`, `ctx.systemPrompt` | `tool/call`, `tool/result`, `user/message via agent.inject() for background completion notices` | - | Контроллер фоновых задач, безразличный к их виду: фоновые bash-команды, PTY-отправки и субагенты читаются, перечисляются и снимаются через одни и те же три инструмента. Загрузка плагина подключает контроллер, взводящий `ctx.jobs.start()` у продюсеров. |
-| `@deepseek-ai/dsh-experimental-tool-agent-team` | `followup_task`, `interrupt_agent`, `list_agents`, `send_message`, `spawn_teammate`, `team_task_create`, `team_task_get`, `team_task_list`, `team_task_update`, `wait_agent` | `ctx.tools`, `ctx.systemPrompt`, `ctx.agentTeams`, `an exact live Team member Agent` | `tool/call`, `team/member`, `team/message/queued`, `team/message/delivered`, `team/task`, `tool/result` | - | Все десять инструментов имеют скоуп неявных Team Lead'ов и долговечных тиммейтов. Бандл dsh-base в поставке держит пакет отключённым; документированный profile-патч Agent Teams включает его, отключая прежние имена управления continuable-потомками. |
+| `@deepseek-ai/dsh-experimental-tool-agent-team` | `followup_task`, `interrupt_agent`, `list_agents`, `send_message`, `spawn_teammate`, `team_task_create`, `team_task_get`, `team_task_list`, `team_task_update`, `wait_agent` | `ctx.tools`, `ctx.systemPrompt`, `ctx.agentTeams`, `an exact live Team member Agent` | `tool/call`, `team/member`, `team/message/queued`, `team/message/delivered`, `team/task`, `tool/result` | - | Все десять инструментов имеют скоуп неявных Team Lead'ов и долговечных участников команды. Бандл dsh-base в поставке держит пакет отключённым; документированный profile-патч Agent Teams включает его, отключая прежние имена управления continuable-потомками. |
 | `@deepseek-ai/dsh-tool-todo` | `todo_write` | `ctx.tools`, `owning Agent session` | `tool/call`, `todo/write`, `tool/result` | - | todo_write — состояние во владении сессии; UI рендерят последнее событие todo/write как чек-лист. `allowParallelInProgress` обязателен без значения по умолчанию, поэтому каталог фиксирует свой выбор: `true` — описание приглашает несколько пунктов `in_progress`. Развёртывание, выбирающее `false`, получает тот же инструмент с описанием, просящим ровно одну активную задачу. |
 | `@deepseek-ai/dsh-tool-workflow` | `workflow` | `ctx.tools`, `ctx.workflowEngine`, `ctx.systemPrompt`, `a calling Agent (exec.agent parents the script children)` | `tool/call`, `tool/result` | - | - |
 | `@deepseek-ai/dsh-tool-web` | `web_fetch`, `web_search` | `ctx.tools`, `ctx.web`, `ctx.systemPrompt` | `tool/call`, `tool/result` | - | web_search и web_fetch удерживают выбор провайдера за ctx.web, поэтому обращённые к модели схемы остаются стабильными при замене бэкендов. |
@@ -965,7 +965,7 @@ Source: [`packages/terminal/tool-terminal/src/index.ts`](../packages/terminal/to
 
 Source: [`packages/terminal/tool-terminal/src/index.ts`](../packages/terminal/tool-terminal/src/index.ts)
 
-Шесть терминальных инструментов — opt-in и дополняют одноразовые shell/файловые инструменты. `terminal_send(run_in_background: true)` регистрируется в `ctx.jobs`; TUI, именованные клавиатурные последовательности, BEL, resize, автостарт и межагентный шеринг в схеме отсутствуют.
+Шесть терминальных инструментов — opt-in и дополняют одноразовые shell/файловые инструменты. `terminal_send(run_in_background: true)` регистрируется в `ctx.jobs`; TUI, именованные клавиатурные последовательности, BEL, resize, автостарт и совместное использование между агентами в схеме отсутствуют.
 
 <a id="deepseek-aidsh-tool-goal"></a>
 
@@ -1164,7 +1164,7 @@ Source: [`packages/schedule/schedule/src/tools.ts`](../packages/schedule/schedul
 
 ### `lsp`
 
-Запросите сервер языка для точной навигации по коду. operation — одно из goToDefinition, findReferences, goToImplementation, hover. line и character — координаты курсора UTF-16, считаемые с единицы. findReferences включает объявление.
+Запросите языковой сервер для точной навигации по коду. operation — одно из goToDefinition, findReferences, goToImplementation, hover. line и character — координаты курсора UTF-16, считаемые с единицы. findReferences включает объявление.
 
 ```json
 {
@@ -1740,7 +1740,7 @@ Source: [`packages/experimental/tool-agent-team/src/index.ts`](../packages/exper
 
 ### `interrupt_agent`
 
-Прервите текущий ход одного тиммейта с сохранением его ожидающего инбокса. Только Team Lead.
+Прервите текущий ход одного участника команды с сохранением его ожидающего инбокса. Только Team Lead.
 
 ```json
 {
@@ -1761,7 +1761,7 @@ Source: [`packages/experimental/tool-agent-team/src/index.ts`](../packages/exper
 
 ### `list_agents`
 
-Перечислите Lead'а и каждого долговечного тиммейта с текущим рантайм-статусом.
+Перечислите Lead'а и каждого долговечного участника команды с текущим рантайм-статусом.
 
 ```json
 {
@@ -1800,7 +1800,7 @@ Source: [`packages/experimental/tool-agent-team/src/index.ts`](../packages/exper
 
 ### `spawn_teammate`
 
-Создайте одного именованного долговечного тиммейта. Вызывать этот инструмент может только Team Lead.
+Создайте одного именованного долговечного участника команды. Вызывать этот инструмент может только Team Lead.
 
 ```json
 {
@@ -2006,7 +2006,7 @@ Source: [`packages/experimental/tool-agent-team/src/index.ts`](../packages/exper
 
 ### `wait_agent`
 
-Дождитесь следующей смены статуса тиммейта, почтового ящика или общей задачи после старта этого вызова. Это никогда не будит неактивных участников и немедленно возвращает noProgress, когда никакой другой участник не работает и не поднимается. После пробуждения или таймаута перечитайте список вместо опроса.
+Дождитесь следующей смены статуса участника команды, почтового ящика или общей задачи после старта этого вызова. Это никогда не будит неактивных участников и немедленно возвращает noProgress, когда никакой другой участник не работает и не поднимается. После пробуждения или таймаута перечитайте список вместо опроса.
 
 ```json
 {
@@ -2022,7 +2022,7 @@ Source: [`packages/experimental/tool-agent-team/src/index.ts`](../packages/exper
 
 Source: [`packages/experimental/tool-agent-team/src/index.ts`](../packages/experimental/tool-agent-team/src/index.ts)
 
-Все десять инструментов имеют скоуп неявных Team Lead'ов и долговечных тиммейтов. Бандл dsh-base в поставке держит пакет отключённым; документированный profile-патч Agent Teams включает его, отключая прежние имена управления continuable-потомками.
+Все десять инструментов имеют скоуп неявных Team Lead'ов и долговечных участников команды. Бандл dsh-base в поставке держит пакет отключённым; документированный profile-патч Agent Teams включает его, отключая прежние имена управления continuable-потомками.
 
 <a id="deepseek-aidsh-tool-todo"></a>
 
@@ -2080,7 +2080,7 @@ todo_write — состояние во владении сессии; UI рен�
 
 ### `workflow`
 
-Запустите скрипт-воркфлоу на JavaScript, оркестрирующий субагентов в масштабе. Используйте для работы, расходящейся веером по многим независимым кускам, — аудит по многим файлам, миграция, многоугольное исследование, состязательная проверка находок, — когда оркестрацию удобнее записать скриптом, а не делегировать ход за ходом.
+Запустите скрипт-воркфлоу на JavaScript, оркестрирующий субагентов в масштабе. Используйте для работы, расходящейся веером по многим независимым кускам, — аудит по многим файлам, миграция, разноплановое исследование, состязательная проверка находок, — когда оркестрацию удобнее записать скриптом, а не делегировать ход за ходом.
 
 Идентичность воркфлоу едёт в параметре `meta` как JSON: обязательные строки `name` (короткий kebab-case) и `description`, опциональные строка `whenToUse` и массив `phases` (`{title, detail?, provider?, model?}`). Параметр `script` — ТОЛЬКО тело обычного JavaScript (НЕ TypeScript и БЕЗ инструкции `export const meta` — meta это параметр, а не код); исполняется с top-level await; завершайте `return <value>` — значение должно быть JSON-сериализуемым и является результатом этого инструмента.
 

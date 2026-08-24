@@ -2068,17 +2068,17 @@
     "docs/persistence-catalog.ru.md": {
       "source": "docs/persistence-catalog.md",
       "sourceBlob": "aaedabf93db497dc3e760ea5609497151569a3a4",
-      "ruBlob": "cbcd6a7b1ab752be7e12a177347f843529bce2cf"
+      "ruBlob": "37f0e6a5f86027999be105dad02d3cd388392cda"
     },
     "docs/tool-catalog.ru.md": {
       "source": "docs/tool-catalog.md",
       "sourceBlob": "1fa650f1e4e025274d069f27a6522abff46af2e2",
-      "ruBlob": "ba8802a20c57c0600b5761adc0b2603330400d9c"
+      "ruBlob": "55ce3d46a0f0a2e8767309d3fe63a6d7aa5d6570"
     },
     "docs/config-catalog.ru.md": {
       "source": "docs/config-catalog.md",
       "sourceBlob": "de340b7ffade528301b4538b0553bc11ec969985",
-      "ruBlob": "873553669e721a8d172c5bff3dad70e92c593587"
+      "ruBlob": "1cd36c0666cce56dfecd4558e73f9b09ca847b24"
     }
   }
 }

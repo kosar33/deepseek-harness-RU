@@ -241,6 +241,9 @@ describe('key pool chips', () => {
     vi.useFakeTimers({ now: NOW })
     try {
       await mountSeat({ routes: [THREE_KEYS] })
+      // State pills ride each key's own line, so a pill exists only for a
+      // rendered row: adding the third row surfaces its usable state.
+      fireEvent.click(screen.getByRole('button', { name: `+ ${en.addKey}` }))
       const active = screen.getByText(en.activeChip)
       expect(active.className).toContain('chipActive')
       const parked = screen.getByText(en.parkedChip)
@@ -274,6 +277,7 @@ describe('key pool chips', () => {
     const russian: SeatT = key => ru[key]
     try {
       await mountSeat({ routes: [THREE_KEYS], t: russian })
+      fireEvent.click(screen.getByRole('button', { name: `+ ${russian('addKey')}` }))
       expect(screen.getByText(russian('keys'))).toBeTruthy()
       expect(screen.getByText(russian('activeChip'))).toBeTruthy()
       expect(screen.getByText(russian('parkedChip'))).toBeTruthy()

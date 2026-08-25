@@ -2,8 +2,9 @@
  * The credential seat inside one provider card: the ordered rotating-key
  * editor the Models section dispatches to for `props.provider`, replacing
  * that card's single API-key input while this plugin is mounted. Pool health
- * renders as per-key chips — the sticky key highlighted, a parked one with
- * its «лимит откатится» countdown — above rows that write only through the
+ * rides each key's own line — a state pill (sticky key highlighted, a parked
+ * one with its «лимит откатится» countdown) sits between the value field and
+ * the move/remove affordances; rows write only through the
  * credential seam; typed values land in the credential store under derived
  * `<ROUTE>_KEYROTATION_<n>` references and the row order lands as one
  * whole-array `keys` set, so no secret ever reaches the settings document.
@@ -174,31 +175,27 @@ function Loaded(
     }
   }
 
-  // Live pool health above the rows: the sticky position highlighted, a
-  // parked chip carrying its reset countdown.
-  let chips: ReactNode = null
-  if (pool !== undefined) {
-    chips = (
-      <div className={styles['chips']}>
-        {pool.keys.map((key) => {
-          const active = key.label === pool.activeLabel
-          const parked = key.status.state === 'parked'
-          return (
-            <span
-              key={key.label}
-              className={clsx(styles['chip'], parked && styles['chipParked'], active && styles['chipActive'])}
-            >
-              <span className={styles['dot']} aria-hidden />
-              {active ? t('activeChip') : parked ? t('parkedChip') : t('usableChip')}
-              {key.status.state === 'parked' ? (
-                <span className={styles['countdown']}>
-                  {formatResetCountdown(key.status.resetAt, now, countdownCopy(t))}
-                </span>
-              ) : null}
-            </span>
-          )
-        })}
-      </div>
+  // Live pool health rides each row itself: dot plus state word, a parked
+  // row carrying its reset countdown, so every fact about one key sits on
+  // that key's single line.
+  const rowState = (index: number): ReactNode => {
+    const poolKey = pool?.keys[index]
+    if (pool === undefined || poolKey === undefined) return null
+    const active = poolKey.label === pool.activeLabel
+    const parked = poolKey.status.state === 'parked'
+    return (
+      <span
+        className={clsx(styles['chip'], styles['rowChip'], parked && styles['chipParked'], active && styles['chipActive'])}
+        title={poolKey.label}
+      >
+        <span className={styles['dot']} aria-hidden />
+        {active ? t('activeChip') : parked ? t('parkedChip') : t('usableChip')}
+        {parked && poolKey.status.state === 'parked' ? (
+          <span className={styles['countdown']}>
+            {formatResetCountdown(poolKey.status.resetAt, now, countdownCopy(t))}
+          </span>
+        ) : null}
+      </span>
     )
   }
 
@@ -206,12 +203,11 @@ function Loaded(
     <div className={styles['seat']}>
       <span className={styles['label']}>{t('keys')}</span>
       {!state.writable ? <p className={styles['hint']}>{t('readOnly')}</p> : null}
-      {chips}
       <div className={styles['rows']}>
         {draft.rows.map((row, index) => (
           <div key={`${row.ref}:${index}`} className={styles['row']}>
             <span className={styles['rowIndex']}>{String(index + 1)}</span>
-            <span className={styles['ref']}>{row.ref}</span>
+            <span className={styles['ref']} title={row.ref}>{row.ref}</span>
             <input
               className={styles['value']}
               type="password"
@@ -224,6 +220,7 @@ function Loaded(
                 setDraft({ ...draft, rows: withRowAt(draft.rows, index, { ...row, value: event.target.value }) })
               }}
             />
+            {rowState(index)}
             <button
               type="button"
               className={styles['rowAction']}

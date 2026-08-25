@@ -40,20 +40,22 @@
   color: var(--dsw-alias-label-tertiary);
 }
 
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 10px;
-  margin: 2px 0 0;
+/* The per-row state pill: one key's whole health on that key's single line,
+ * between the value field and the move/remove affordances. */
+.rowChip {
+  flex: none;
+  max-width: 34%;
 }
 
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  min-width: 0;
   font-size: 12px;
   line-height: 18px;
   color: var(--dsw-alias-label-secondary);
+  white-space: nowrap;
 }
 
 .dot {

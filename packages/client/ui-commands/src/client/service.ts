@@ -125,6 +125,8 @@ export class CommandUiRuntime extends Service implements CommandUiContract {
   private readonly live: LiveState = { contributions: new Map(), decorations: new Map(), popups: new Map() }
   /** `command`-namespace translator (composer refusal notices). */
   private readonly t: TranslateNS<'command'>
+  /** `command.description`-namespace translator (slash-menu rows). */
+  private readonly td: TranslateNS<'command.description'>
 
   /**
    * @param ctx - owning root context (plugin fiber; the service registers
@@ -135,6 +137,7 @@ export class CommandUiRuntime extends Service implements CommandUiContract {
     const locale = ctx.get('locale')
     if (locale === undefined) throw new Error('ui-commands: locale service unavailable')
     this.t = locale.bind('command')
+    this.td = locale.bind('command.description')
     this.directory = new CommandDirectory(async (sessionId) => {
       if (this.sessions().subagentAddress(sessionId) !== undefined) return []
       const result = await ctx.remote.commands.list(sessionId)
@@ -252,7 +255,17 @@ export class CommandUiRuntime extends Service implements CommandUiContract {
     const seen = new Set<string>()
     for (const c of list) {
       seen.add(c.name)
-      rows.push({ name: c.name, description: c.description, ...(c.input !== undefined ? { hint: c.input.hint } : {}) })
+      // A command without a localized row keeps the host catalog description:
+      // translate() echoes the requested key on a dictionary miss.
+      const key = `cmd.${c.name}`
+      // The seat's key union is the known-command set; cast keeps unknown host
+      // commands on the miss path instead of failing the candidate pass.
+      const localized = (this.td as (requested: string) => string)(key)
+      rows.push({
+        name: c.name,
+        description: localized === key ? c.description : localized,
+        ...(c.input !== undefined ? { hint: c.input.hint } : {}),
+      })
     }
     for (const contribution of this.live.contributions.values()) {
       if (!contribution.available(session)) continue

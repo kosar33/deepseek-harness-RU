@@ -39,6 +39,8 @@ interface BenchOptions {
   commands?: (payload: { sessionId: SessionId }) => Promise<{ commands: CommandDescriptor[] }>
   execute?: (payload: { sessionId: SessionId; line: string }) => Promise<ExecuteValue>
   addressed?: SessionId
+  /** Localized command-description rows; absent keys simulate a dictionary miss. */
+  descriptions?: Record<string, string>
 }
 
 /**
@@ -99,9 +101,13 @@ async function bench(opts: BenchOptions = {}) {
     },
   })
   // Deterministic key-echo translator: notice assertions read `key{json}`.
+  // The description namespace echoes a dictionary miss (bare key), so host
+  // catalog descriptions pass through unless `descriptions` supplies one.
   ctx.provide('locale', {
     bind: (ns: string) => (key: string, params?: Record<string, unknown>) =>
-      `${ns}:${key}${params === undefined ? '' : JSON.stringify(params)}`,
+      ns === 'command.description'
+        ? opts.descriptions?.[key] ?? key
+        : `${ns}:${key}${params === undefined ? '' : JSON.stringify(params)}`,
   })
   // Real scope tags behind a fake sessions face.
   const scopes = new Map<SessionId, { ctx: Context; fiber: { dispose(): Promise<void> } }>()
@@ -221,6 +227,21 @@ describe('candidates', () => {
     const list = await source.candidates(proj('s1'), req('g'))
     expect(listCalls).toEqual([{ sessionId: sid('s1') }])
     expect(list).toEqual([{ name: 'goal', description: 'leadingInput kind', hint: 'goal text' }])
+  })
+
+  it('localizes a known host command row and keeps the host description on a dictionary miss', async () => {
+    const localized = await bench({
+      descriptions: { 'cmd.goal': 'Задать или показать цель длительной задачи' },
+    })
+    const rows = await localized.source.candidates(proj('s1'), req('g'))
+    expect(rows).toEqual([{
+      name: 'goal',
+      description: 'Задать или показать цель длительной задачи',
+      hint: 'goal text',
+    }])
+    const missed = await bench()
+    const plain = await missed.source.candidates(proj('s1'), req('g'))
+    expect(plain[0]!.description).toBe('leadingInput kind')
   })
 
   it('matches case-insensitive subsequences and ranks prefixes, boundaries, adjacency, gaps, then source order', async () => {

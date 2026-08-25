@@ -346,6 +346,9 @@ describe('multi-key rotation through the real loop', () => {
     })
 
     const agent = context!.agentLoop.create(SessionId('vendor-relay-spent'), { provider: 'openrouter', model: 'mock-model' })
+    // Pool-health mutations push the registry refresh so open editors re-read.
+    let refreshed = 0
+    ctx.on('llm/adapters-updated', () => { refreshed += 1 })
     await sendAndWait(agent)
 
     // FAST_RETRY_POLICY allows three same-key retries (attempts k1 x4); once
@@ -353,6 +356,7 @@ describe('multi-key rotation through the real loop', () => {
     // attempt five — without parking anything.
     expect(adapter.servedKeys).toEqual(['k1', 'k1', 'k1', 'k1', 'k2'])
     expect(agent.session.events.filter(event => event.type === 'llm/retry')).toHaveLength(3)
+    expect(refreshed).toBeGreaterThanOrEqual(1)
     expect(agent.session.deriveMessages().at(-1)).toMatchObject({
       role: 'assistant',
       content: [{ type: 'text', text: MOCK_TEXT }],

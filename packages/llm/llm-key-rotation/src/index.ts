@@ -259,6 +259,10 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
       describeError(error),
     )
   }
+  // Every pool-health mutation (park, manual reset, sticky advance) pushes
+  // the LLM registry's generic refresh event, so open key editors and model
+  // lists re-read the face immediately instead of waiting for their next load.
+  const notifyPoolsChanged = (): void => { ctx.emit('llm/adapters-updated') }
   const recordsOf = (): ParkRecord[] =>
     [...state.pools.values()].flatMap(pool => parkRecordsOf(pool, Date.now()))
   let lastPersisted = renderParkState(recordsOf())
@@ -368,6 +372,7 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
       const nextMember = advanceAfter(pool, served.index, Date.now())
       if (nextMember === undefined) return next()
       pool.index = nextMember.index
+      notifyPoolsChanged()
       ctx.logger.warn(
         'llm-key-rotation: provider "%s" relayed an upstream vendor error on key "%s";'
           + ' same-key retries spent, retrying with "%s" without parking; reason: %s',
@@ -397,6 +402,7 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
     const nextMember = advanceAfter(pool, served.index, now)
     if (nextMember === undefined) throw poolExhaustedError(pool)
     pool.index = nextMember.index
+    notifyPoolsChanged()
 
     ctx.logger.warn(
       'llm-key-rotation: provider "%s" hit %s on key "%s"; parked until %s; retrying with "%s"; reason: %s',
@@ -471,6 +477,7 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
       ctx.logger.warn('llm-key-rotation: provider "%s": %d park(s) cleared manually', route, cleared)
       // The cleared state must survive a restart like any other park change.
       void persistParks().catch(reportWriteFailure)
+      notifyPoolsChanged()
       return true
     },
   }

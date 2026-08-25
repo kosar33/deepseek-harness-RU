@@ -2239,8 +2239,8 @@
     },
     "packages/llm/llm-key-rotation/README.ru.md": {
       "source": "packages/llm/llm-key-rotation/README.md",
-      "sourceBlob": "e386024105655fe2becc732a5575572a07ca6038",
-      "ruBlob": "bee90d90113352290778ecc6fcbee0f654b33efd"
+      "sourceBlob": "be6c2832e2cae50fd06059bec9cfe2f8da4dd373",
+      "ruBlob": "5ce1e0f513feb442a7f0d6af0eba73e768fad7e4"
     },
     "docs/module-graph.ru.md": {
       "source": "docs/module-graph.md",

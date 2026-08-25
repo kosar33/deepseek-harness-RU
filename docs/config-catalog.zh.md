@@ -991,6 +991,48 @@ export interface DeepSeekCatalogModel {
 
 来源：[`packages/llm/llm-deepseek/src/index.ts:106`](../packages/llm/llm-deepseek/src/index.ts)
 
+<a id="deepseek-aidsh-llm-key-rotation"></a>
+
+## `@deepseek-ai/dsh-llm-key-rotation`
+
+```ts config-catalog
+/** Plugin configuration: which existing routes rotate their keys, and how. */
+export interface Config {
+  /**
+   * Rotated routes keyed by an existing provider route id. An empty (or
+   * omitted) dict keeps the plugin dormant; every listed route must already
+   * be served by a plain adapter family, whose credentials this plugin then
+   * overrides.
+   */
+  providers?: Record<string, RotationProviderConfig>
+  /**
+   * Park-state document path; defaults to `.llm-key-rotation-parks.json`
+   * beside `.credentials.yaml` under the harness home.
+   */
+  parkFile?: string
+  /** Harness home used when `parkFile` is omitted; defaults to `$DSH_HOME` or `~/.dsh`. */
+  dshHome?: string
+}
+
+/** The ordered keys this plugin rotates across for one existing provider route. */
+export interface RotationProviderConfig {
+  /** The ordered keys to rotate across; at least one is required. */
+  keys?: RotationKeyConfig[]
+}
+
+/** One rotating key: a credential reference or a literal dev-only value, with an optional log label. */
+export interface RotationKeyConfig {
+  /** Credential reference (environment-variable name) resolved per request. */
+  apiKeyEnv?: string
+  /** Literal key; dev-only because it lands verbatim in the composition file. */
+  value?: string
+  /** Stable name used in rotation logs and exhaustion diagnostics; defaults to the reference or the position. */
+  label?: string
+}
+```
+
+来源：[`packages/llm/llm-key-rotation/src/config.ts:34`](../packages/llm/llm-key-rotation/src/config.ts)
+
 <a id="deepseek-aidsh-llm-pi-ai"></a>
 
 ## `@deepseek-ai/dsh-llm-pi-ai`
@@ -3252,6 +3294,7 @@ export interface Config {
 - `@deepseek-ai/dsh-client-ui-renderer`（[`packages/client/ui-renderer/src/index.ts`](../packages/client/ui-renderer/src/index.ts)）
 - `@deepseek-ai/dsh-client-ui-settings`（[`packages/client/ui-settings/src/index.ts`](../packages/client/ui-settings/src/index.ts)）
 - `@deepseek-ai/dsh-client-ui-settings-general`（[`packages/client/ui-settings-general/src/index.ts`](../packages/client/ui-settings-general/src/index.ts)）
+- `@deepseek-ai/dsh-client-ui-settings-key-rotation`（[`packages/client/ui-settings-key-rotation/src/index.ts`](../packages/client/ui-settings-key-rotation/src/index.ts)）
 - `@deepseek-ai/dsh-client-ui-settings-models`（[`packages/client/ui-settings-models/src/index.ts`](../packages/client/ui-settings-models/src/index.ts)）
 - `@deepseek-ai/dsh-client-ui-settings-plugin-inventory`（[`packages/client/ui-settings-plugin-inventory/src/index.ts`](../packages/client/ui-settings-plugin-inventory/src/index.ts)）
 - `@deepseek-ai/dsh-client-ui-settings-plugins`（[`packages/client/ui-settings-plugins/src/index.ts`](../packages/client/ui-settings-plugins/src/index.ts)）

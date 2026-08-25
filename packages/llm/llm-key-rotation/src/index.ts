@@ -1,9 +1,14 @@
 /**
- * Multi-key rotation for OpenRouter-style provider routes that rate-limit per
- * API key. The plugin owns the provider routes its configuration lists: it
- * builds each route's pi-ai adapter from dsh-llm-pi-ai's own resolution,
- * registers it on `ctx.llm`, and serves every request's credential from an
- * ordered key pool with one sticky position.
+ * Multi-key rotation for provider routes that rate-limit per API key. The
+ * plugin attaches to EXISTING routes — the ones dsh-llm-pi-ai and
+ * dsh-llm-deepseek already register from their own sections — and overrides
+ * only their credential resolution: each configured route's requests
+ * authenticate from an ordered key pool with one sticky position, while every
+ * other profile fact (endpoint, protocol, models, retry policy) stays owned
+ * by the route's home section. The override travels through the optional
+ * `llmApiKeyOverride` service, so adapter registration is untouched: without
+ * this plugin nothing changes, and a route listed here but served by no
+ * family is an inert pool rather than a second registration.
  *
  * On a `RATE_LIMIT` failure of a multi-key route, this plugin's listener —
  * registered ahead of ordinary recovery policies — parks the served key until
@@ -13,16 +18,13 @@
  * `{ kind: 'retry' }` so the loop re-issues the identical request immediately
  * under the next key. When no key is left, the thrown error names every key
  * and its reset instant. Single-key pools delegate untouched, so they behave
- * exactly like the plain adapter.
+ * exactly like the native resolution.
  *
- * Route configuration resolves through the optional `llm-key-rotation`
- * user-settings section over the composition entry (the same layering every
- * adapter family uses), so the web Settings editor can add routes and keys
- * without hand-editing `cordis.yml`: a committed section change rebuilds the
- * pools, restores their persisted parks, and swaps the registered route set in
- * place. A route the plain dsh-llm-pi-ai section also owns fails loud at the
- * registry — `DUPLICATE_ADAPTER` at load, or a logged refusal that keeps the
- * previous routes serving when the collision arrives through a settings write.
+ * Route keys resolve through the optional `llm-key-rotation` user-settings
+ * section over the composition entry (the same layering every adapter family
+ * uses), so the web Models page can edit a provider's rotating keys without
+ * hand-editing `cordis.yml`: a committed section change rebuilds the pools,
+ * restores their persisted parks, and swaps the overridden route set in place.
  *
  * Parks persist in `.llm-key-rotation-parks.json` beside `.credentials.yaml`
  * under the harness home (configurable through `parkFile`/`dshHome`), so an
@@ -44,8 +46,9 @@
  * dormant configuration snapshots as an empty list.
  *
  * ```yaml
+ * # The route itself lives in its home section, as any provider does:
  * - id: llm-openrouter
- *   name: '@deepseek-ai/dsh-llm-key-rotation'
+ *   name: '@deepseek-ai/dsh-llm-pi-ai'
  *   config:
  *     providers:
  *       openrouter:
@@ -56,6 +59,12 @@
  *           - id: anthropic/claude-sonnet-4.5
  *             name: Claude Sonnet 4.5
  *             contextWindow: 200000
+ * # This plugin adds only the rotating keys for that same route id:
+ * - id: llm-openrouter-keys
+ *   name: '@deepseek-ai/dsh-llm-key-rotation'
+ *   config:
+ *     providers:
+ *       openrouter:
  *         keys:
  *           - apiKeyEnv: OPENROUTER_KEY_1
  *           - apiKeyEnv: OPENROUTER_KEY_2
@@ -66,14 +75,13 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import type { RequestErrorAction } from '@deepseek-ai/dsh-agent'
+import type { LlmApiKeyOverride } from '@deepseek-ai/dsh-llm'
 import { launchEnvironmentOf } from '@deepseek-ai/dsh-launch-environment'
 import { assertUsableApiKey, LlmError } from '@deepseek-ai/dsh-llm'
 import type { LlmFailure } from '@deepseek-ai/dsh-llm'
-import type { AdapterRegistrationHandle } from '@deepseek-ai/dsh-llm'
-import { PiAiAdapter, authContextFrom, credentialStoreFrom } from '@deepseek-ai/dsh-llm-pi-ai'
 import { installSettingsSection, settingsNamespace } from '@deepseek-ai/dsh-settings'
 import { Config, resolvePools } from './config.ts'
-import type { Config as ConfigType, ResolvedPools, RotationProviderConfig } from './config.ts'
+import type { ResolvedPools, RotationProviderConfig } from './config.ts'
 import { readParkState, renderParkState, resolveParkSpec, writeParkState } from './park-store.ts'
 import type { ParkRecord } from './park-store.ts'
 import {
@@ -86,7 +94,7 @@ import {
   poolExhaustedError,
   resetFromFailure,
 } from './pool.ts'
-import type { KeyPool, ParkStamp, PoolMember } from './pool.ts'
+import type { ParkStamp, PoolMember } from './pool.ts'
 
 export { Config } from './config.ts'
 export type { RotationKeyConfig, RotationProviderConfig } from './config.ts'
@@ -107,9 +115,6 @@ export {
 
 /** Cordis plugin name. */
 export const name = 'llm-key-rotation'
-
-/** The hub must exist before the rotated routes can register. */
-export const inject = ['llm']
 
 /** The user-settings namespace this plugin reads its providers dict from. */
 const NS = settingsNamespace('llm-key-rotation')
@@ -156,7 +161,11 @@ export interface LlmKeyRotationState {
   readonly snapshot: () => readonly KeyRotationRouteSnapshot[]
 }
 
-/** Describe any thrown value for a log line, without assuming an Error. */
+/**
+ * Describe any thrown value for a log line, without assuming an Error.
+ * @param error - the caught value.
+ * @returns its message, or its string form for non-Error values.
+ */
 export function describeError(error: unknown): string {
   return error instanceof Error ? error.message : String(error)
 }
@@ -221,10 +230,10 @@ async function buildWithParks(
 }
 
 /** Register one rotated adapter, the recovery listener that rotates its keys, and the state face. */
-export async function apply(ctx: Context, config: ConfigType): Promise<void> {
+export async function apply(ctx: Context, config: Config): Promise<void> {
   // The settings scope installs below and repoints this thunk at the resolved
   // section; until then the composition entry is the whole configuration.
-  let current: () => ConfigType = () => config
+  let current: () => Config = () => config
   let state = await buildWithParks(config.providers, resolveParkSpec(config))
   let appliedFacts = providersFacts(config.providers)
 
@@ -247,15 +256,16 @@ export async function apply(ctx: Context, config: ConfigType): Promise<void> {
     lastPersisted = json
   }
 
-  const servePoolMember = async (provider: string, pool: KeyPool | undefined): Promise<string> => {
-    if (pool === undefined) {
-      // An in-flight dispatch started before a settings swap withdrew the
-      // route; there is no pool left to serve a credential from.
-      throw new LlmError(
-        `llm-key-rotation: provider route "${provider}" was withdrawn while a request was in flight`,
-        'MISSING_CREDENTIAL',
-      )
-    }
+  /**
+   * The override face's one method: the serving key for a rotated route, or
+   * `undefined` when the route has no pool and the calling family falls
+   * through to its native resolution. A configured key that fails to resolve
+   * throws rather than falling back — silently serving the native single key
+   * would quietly stop rotating exactly when a key is misconfigured.
+   */
+  const resolveOverride = async (provider: string): Promise<string | undefined> => {
+    const pool = state.pools.get(provider)
+    if (pool === undefined) return undefined
     const { member } = currentUsable(pool, Date.now())
     // Serving may lazily expire stamps; prune the file to match. The write is
     // fire-and-forget because memory already holds the authoritative state.
@@ -284,12 +294,6 @@ export async function apply(ctx: Context, config: ConfigType): Promise<void> {
       'MISSING_CREDENTIAL',
     )
   }
-
-  const adapter = new PiAiAdapter({
-    profiles: () => state.profiles,
-    resolveApiKey: async provider => servePoolMember(provider, state.pools.get(provider)),
-    auth: { credentials: credentialStoreFrom(ctx), authContext: authContextFrom(ctx) },
-  })
 
   async function recover(
     { provider, failure }: { provider: string; failure: LlmFailure },
@@ -329,56 +333,28 @@ export async function apply(ctx: Context, config: ConfigType): Promise<void> {
 
   const disposeListener = ctx.on('agent/request-error', recover, { prepend: true })
 
-  let registration: AdapterRegistrationHandle | undefined
-  /**
-   * Swap the registry onto `candidate`'s routes atomically, then commit
-   * `candidate` as the serving state. The registry validates the whole set
-   * before anything moves, so a conflicting candidate leaves the previous
-   * pools serving and this throw propagates to the loud refusal log.
-   * @param candidate - the rebuilt state to register and serve.
-   */
-  const swapRoutes = (candidate: ResolvedPools): void => {
-    const routes = [...candidate.pools.keys()]
-    if (registration === undefined) {
-      // Dormant bare mount: nothing is registered until a section supplies
-      // routes, and an empty section keeps it that way.
-      if (routes.length === 0) {
-        state = candidate
-        return
-      }
-      registration = ctx.llm.registerAdapter(routes, adapter)
-    } else {
-      registration.replace(routes)
-    }
-    state = candidate
-    lastPersisted = renderParkState(recordsOf())
-  }
-
   let rebuildTail: Promise<void> = Promise.resolve()
   /**
    * Queue one rebuild from the current resolved section. Rebuilds serialize on
    * one tail so two rapid writes apply in commit order; a refused candidate
-   * (malformed section, or a route a plain pi-ai section also owns) logs loud
-   * and leaves the previous routes serving, mirroring the pi-ai swap policy.
+   * (a malformed keys dict) logs loud and leaves the previous pools serving.
    */
   const scheduleRebuild = (): void => {
     rebuildTail = rebuildTail.then(async () => {
       const entry = current()
       const facts = providersFacts(entry.providers)
       if (facts === appliedFacts) return
-      const candidate = await buildWithParks(entry.providers, resolveParkSpec(entry))
-      swapRoutes(candidate)
+      state = await buildWithParks(entry.providers, resolveParkSpec(entry))
+      lastPersisted = renderParkState(recordsOf())
       appliedFacts = facts
     }).catch((error: unknown) => {
-      ctx.logger.error('llm-key-rotation: keeping the previously registered routes after a refused update')
+      ctx.logger.error('llm-key-rotation: keeping the previous pools after a refused update')
       ctx.logger.error(error)
     })
   }
 
-  // Initial posture: whatever the composition entry configures registers now,
-  // exactly as it did before the settings section existed; a dormant entry
-  // mounts bare and waits for a section to supply routes.
-  swapRoutes(state)
+  const overrideFace: LlmApiKeyOverride = { resolve: resolveOverride }
+  ctx.provide('llmApiKeyOverride', overrideFace)
 
   const stateFace: LlmKeyRotationState = {
     snapshot: () => {
@@ -406,13 +382,12 @@ export async function apply(ctx: Context, config: ConfigType): Promise<void> {
 
   ctx.effect(() => () => {
     disposeListener()
-    registration?.()
   }, 'llm-key-rotation: withdraw rotated routes')
 
-  installSettingsSection<ConfigType>(ctx, NS, Config, config, {
+  installSettingsSection<Config>(ctx, NS, Config, config, {
     // Refuse an unserviceable section where it is written: without this a
-    // schema-valid providers dict the resolver cannot serve would be stored
-    // and then silently disable every rotated route.
+    // schema-valid keys dict the resolver cannot serve would be stored and
+    // then silently disable every rotated route.
     validate: (value) => { resolvePools(value.providers) },
     setSource: (source) => { current = source },
     onChange: scheduleRebuild,

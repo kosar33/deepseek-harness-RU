@@ -406,9 +406,11 @@ describe('docsPages locale routes', () => {
   it('includes persistence event headings in every locale outline', () => {
     const pages = docsPages.filter(page => page.route.endsWith('reference/persistence-catalog.md'))
     expect(pages).toHaveLength(3)
+    // The reviewed RU twin publishes as the ru route's source; en stays the
+    // English source, and zh the root-locale one.
     expect(pages.map(page => page.source).sort()).toEqual([
       'docs/persistence-catalog.md',
-      'docs/persistence-catalog.md',
+      'docs/persistence-catalog.ru.md',
       'docs/persistence-catalog.zh.md',
     ])
     expect(pages.map(page => page.outline)).toEqual(['deep', 'deep', 'deep'])

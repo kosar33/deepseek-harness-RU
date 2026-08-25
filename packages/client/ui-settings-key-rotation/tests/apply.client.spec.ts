@@ -1,25 +1,38 @@
-/** Key-rotation section registration: slot declaration injection, the locale-following label thunk, and HMR recovery. */
+/** Credential-seat registration: host probe gating, locale-following copy, pushed invalidations, and HMR recovery. */
 import { Context } from '@deepseek-ai/cordis'
 import { describe, expect, it, vi } from 'vitest'
-import { resolveSlotLabel } from '@deepseek-ai/dsh-client-ui-slots'
 import { SlotRegistry } from '@deepseek-ai/dsh-client-runtime/client'
 import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
 import { TestRemote } from '@deepseek-ai/dsh-client-test-runtime'
 import type { RpcResponse, SettingsNamespaceView } from '@deepseek-ai/dsh-api-remotes/client'
 import { apply as settingsApply, inject as settingsInject } from '@deepseek-ai/dsh-client-ui-settings/client'
 import { apply, inject } from '@deepseek-ai/dsh-client-ui-settings-key-rotation/client'
-import { KeyRotationSection } from '../src/client/KeyRotationSection.tsx'
-
-let nextRpc = 0
-function ok<T>(value: T): RpcResponse<T> {
-  return { rpcId: `r-${nextRpc++}` as never, result: { ok: true, value } }
-}
+import { KeysEditor } from '../src/client/KeysEditor.tsx'
+import type { KeysEditorInjected } from '../src/client/KeysEditor.tsx'
 
 // These specs assert the shipped Chinese copy. The lane has no jsdom `window`,
 // so browser-language detection never runs and a fresh LocaleRuntime opens on
 // FALLBACK_LOCALE (en); bench stages zh explicitly on the locale instead.
 
-async function bench(isLoopback = true) {
+let nextRpc = 0
+function ok<T>(value: T): RpcResponse<T> {
+  return { rpcId: `r-${nextRpc++}` as never, result: { ok: true, value } }
+}
+function fail<T>(message: string): RpcResponse<T> {
+  return { rpcId: `r-${nextRpc++}` as never, result: { ok: false, error: { code: 'internal', message, details: {} } } }
+}
+
+interface BenchOptions {
+  rotationAnswer?: RpcResponse<{ configured: boolean; routes: [] }>
+  rejectProbe?: boolean
+}
+
+async function bench(options: BenchOptions = {}): Promise<{
+  ctx: Context
+  slots: SlotRegistry
+  locale: LocaleRuntime
+  reads: () => number
+}> {
   const ctx = new Context()
   await ctx.plugin(SlotRegistry).await()
   const locale = new LocaleRuntime(ctx)
@@ -36,26 +49,60 @@ async function bench(isLoopback = true) {
     secrets: [],
     revision: 0,
   }]
-  ctx.provide('connection', {
-    api: {
-      llm: { keyRotation: () => Promise.resolve(ok({ configured: true, routes: [] })) },
-      settings: { describe: () => Promise.resolve(ok({ writable: true, hasDocument: false, namespaces })) },
-      credentials: { describe: () => Promise.resolve(ok({ credentials: {} })) },
+  let reads = 0
+  const api = {
+    llm: {
+      keyRotation: () => {
+        reads += 1
+        if (options.rejectProbe === true) return Promise.reject(new Error('probe down'))
+        return Promise.resolve(options.rotationAnswer ?? ok({ configured: true, routes: [] }))
+      },
     },
-    isLoopback,
-  } as never)
+    settings: { describe: () => Promise.resolve(ok({ writable: true, hasDocument: false, namespaces })) },
+    credentials: {
+      set: () => Promise.resolve(ok({})),
+      unset: () => Promise.resolve(ok({})),
+    },
+  }
+  ctx.provide('connection', { api, isLoopback: true } as never)
   await ctx.plugin({ inject: [...settingsInject], apply: settingsApply }).await()
-  return { ctx, slots: ctx.get('slots') as SlotRegistry, locale }
+  return { ctx, slots: ctx.get('slots') as SlotRegistry, locale, reads: () => reads }
 }
 
 function declare(slots: SlotRegistry): () => void {
-  return slots.register(
+  const disposeRoot = slots.register(
     {
       name: 'root',
       children: { 'settings.section': { kind: 'list', scope: 'root' } },
     } as never,
     () => null,
   )
+  // The credential hole is declared by the Models section owner in production;
+  // this stub carries the same children declaration.
+  const disposeModels = slots.register(
+    {
+      name: 'settings.section',
+      id: 'models',
+      order: 10,
+      label: 'Models',
+      children: { 'settings.models.credential': { kind: 'single', scope: 'root' } },
+    } as never,
+    () => null,
+  )
+  return () => {
+    disposeModels()
+    disposeRoot()
+  }
+}
+
+/** Drain the microtask chain: the async probe settles, then the seat installs. */
+async function settled(): Promise<void> {
+  for (let tick = 0; tick < 6; tick++) await Promise.resolve()
+}
+
+function injectedOf(bench_: Awaited<ReturnType<typeof bench>>): KeysEditorInjected {
+  const entry = bench_.slots.entries('settings.models.credential')[0]!
+  return (entry.inject as unknown as () => KeysEditorInjected)()
 }
 
 describe('ui-settings-key-rotation apply', () => {
@@ -63,54 +110,90 @@ describe('ui-settings-key-rotation apply', () => {
     expect(inject).toEqual(['slots', 'locale', 'connection', 'remote', 'settingsScope'])
   })
 
-  it('registers the key-rotation nav entry for declarations before or after apply', async () => {
+  it('registers the credential seat for declarations before or after apply', async () => {
     const before = await bench()
     declare(before.slots)
     await before.ctx.plugin({ inject: [...inject], apply }).await()
-    const entry = before.slots.entries('settings.section')[0]!
-    expect(entry.component).toBe(KeyRotationSection)
-    expect(entry.options).toMatchObject({ id: 'key-rotation', order: 11 })
-    // The nav label is a locale-following thunk; owners resolve at read time.
-    expect(resolveSlotLabel(entry.options.label)).toBe('密钥轮换')
-    const injected = (entry.inject as unknown as () => import('../src/client/KeyRotationSection.tsx').KeyRotationSectionInjected)()
-    expect(injected.t('nav')).toBe('密钥轮换')
+    await vi.waitFor(() => { expect(before.slots.entries('settings.models.credential')).toHaveLength(1) })
+    const entry = before.slots.entries('settings.models.credential')[0]!
+    expect(entry.component).toBe(KeysEditor)
+    // The hole renders exactly one seat per card: no nav identity of its own,
+    // and the declared dictionary namespace backs the synthesized `t` seat.
+    expect(entry.options.id).toBeUndefined()
+    expect(entry.options.order).toBeUndefined()
+    expect(entry.locale).toBe('settings.key-rotation')
+    const injected = injectedOf(before)
+    expect(injected.t('title')).toBe('密钥轮换')
     expect(typeof injected.controller.load).toBe('function')
+    expect(typeof injected.controller.saveRoute).toBe('function')
     expect(injected.hooks.snapshot).toBe(injected.controller.store)
 
     const after = await bench()
     await after.ctx.plugin({ inject: [...inject], apply }).await()
-    expect(after.slots.entries('settings.section')).toHaveLength(0)
+    // The probe settles while the hole is undeclared: the injection waits.
+    await settled()
+    expect(after.slots.entries('settings.models.credential')).toHaveLength(0)
     declare(after.slots)
-    await Promise.resolve()
-    expect(after.slots.entries('settings.section')[0]!.component).toBe(KeyRotationSection)
-    // The self-inflicted ledger notifications hit the duplicate guard.
-    expect(after.slots.entries('settings.section')).toHaveLength(1)
+    await vi.waitFor(() => { expect(after.slots.entries('settings.models.credential')).toHaveLength(1) })
+    expect(after.slots.entries('settings.models.credential')[0]!.component).toBe(KeysEditor)
   })
 
-  it('the label thunk follows the active locale without re-registration', async () => {
+  it('keeps every card on its native field when the probe answers not-ok', async () => {
+    const b = await bench({ rotationAnswer: fail('rotation plugin is not mounted') })
+    declare(b.slots)
+    await b.ctx.plugin({ inject: [...inject], apply }).await()
+    await settled()
+    expect(b.reads()).toBe(1)
+    expect(b.slots.entries('settings.models.credential')).toHaveLength(0)
+  })
+
+  it('keeps every card on its native field when the wire answers ok but unconfigured', async () => {
+    // The envelope stays ok even with no mounted composition; only the
+    // `configured` flag separates that deployment from a serving one.
+    const b = await bench({ rotationAnswer: ok({ configured: false, routes: [] }) })
+    declare(b.slots)
+    await b.ctx.plugin({ inject: [...inject], apply }).await()
+    await settled()
+    expect(b.reads()).toBe(1)
+    expect(b.slots.entries('settings.models.credential')).toHaveLength(0)
+  })
+
+  it('keeps every card on its native field when the probe transport rejects', async () => {
+    const b = await bench({ rejectProbe: true })
+    declare(b.slots)
+    await b.ctx.plugin({ inject: [...inject], apply }).await()
+    await settled()
+    expect(b.reads()).toBe(1)
+    expect(b.slots.entries('settings.models.credential')).toHaveLength(0)
+  })
+
+  it('the seat copy follows the active locale without re-registration', async () => {
     const b = await bench()
     declare(b.slots)
     await b.ctx.plugin({ inject: [...inject], apply }).await()
+    await vi.waitFor(() => { expect(b.slots.entries('settings.models.credential')).toHaveLength(1) })
+    const factory = b.slots.entries('settings.models.credential')[0]!.inject as unknown as () => KeysEditorInjected
+    expect(factory().t('title')).toBe('密钥轮换')
     b.locale.setLocale('en')
-    expect(resolveSlotLabel(b.slots.entries('settings.section')[0]!.options.label)).toBe('Key rotation')
+    expect(factory().t('title')).toBe('Key rotation')
     b.locale.setLocale('zh')
-    expect(resolveSlotLabel(b.slots.entries('settings.section')[0]!.options.label)).toBe('密钥轮换')
+    expect(factory().t('title')).toBe('密钥轮换')
     b.locale.setLocale('ru')
-    expect(resolveSlotLabel(b.slots.entries('settings.section')[0]!.options.label)).toBe('Ротация ключей')
+    expect(factory().t('title')).toBe('Ротация ключей')
   })
 
   it('re-registers after an HMR collapse re-declares the slot (stale disposer must not block)', async () => {
     const b = await bench()
     const redeclare = declare(b.slots)
     await b.ctx.plugin({ inject: [...inject], apply }).await()
-    expect(b.slots.entries('settings.section')).toHaveLength(1)
+    await vi.waitFor(() => { expect(b.slots.entries('settings.models.credential')).toHaveLength(1) })
     // Declarer unload: the cascade removes our entry while our local
     // disposer variable goes stale.
     redeclare()
-    expect(b.slots.entries('settings.section')).toHaveLength(0)
+    expect(b.slots.entries('settings.models.credential')).toHaveLength(0)
     declare(b.slots)
-    await Promise.resolve()
-    expect(b.slots.entries('settings.section')[0]!.component).toBe(KeyRotationSection)
+    await vi.waitFor(() => { expect(b.slots.entries('settings.models.credential')).toHaveLength(1) })
+    expect(b.slots.entries('settings.models.credential')[0]!.component).toBe(KeysEditor)
   })
 
   it('registers the zh/en/ru dictionaries and disposes everything with the fiber', async () => {
@@ -118,9 +201,10 @@ describe('ui-settings-key-rotation apply', () => {
     declare(b.slots)
     const fiber = b.ctx.plugin({ inject: [...inject], apply })
     await fiber.await()
-    expect(b.locale.bind('settings.key-rotation')('nav')).toBe('密钥轮换')
+    await vi.waitFor(() => { expect(b.slots.entries('settings.models.credential')).toHaveLength(1) })
+    expect(b.locale.bind('settings.key-rotation')('title')).toBe('密钥轮换')
     await fiber.dispose()
-    expect(b.slots.entries('settings.section')).toHaveLength(0)
+    expect(b.slots.entries('settings.models.credential')).toHaveLength(0)
     // The (ns, locale) seats are free again — the dictionary disposers ran.
     expect(() => b.locale.register('settings.key-rotation', 'zh', {})).not.toThrow()
     expect(() => b.locale.register('settings.key-rotation', 'en', {})).not.toThrow()
@@ -129,25 +213,30 @@ describe('ui-settings-key-rotation apply', () => {
 })
 
 describe('pushed invalidations', () => {
-  it('ignores invalidations before the page ever loaded', async () => {
+  it('ignores invalidations before any card ever loaded', async () => {
     const b = await bench()
     declare(b.slots)
     await b.ctx.plugin({ inject: [...inject], apply }).await()
-    // The wire face has no mutate/set methods: a fetch attempt would throw.
+    await vi.waitFor(() => { expect(b.slots.entries('settings.models.credential')).toHaveLength(1) })
+    // Only the probe has read the wire so far; every channel fires while idle.
+    expect(b.reads()).toBe(1)
     b.ctx.remote.$dispatch('settings/document-updated', ['llm-key-rotation', 1])
     b.ctx.remote.$dispatch('credentials/reference-updated', ['OPENROUTER_KEYROTATION_1'])
     b.ctx.remote.$dispatch('llm/adapters-updated', [])
     b.ctx.emit('connection/reset')
+    expect(b.reads()).toBe(1)
+    expect(injectedOf(b).controller.store.getSnapshot().status).toBe('idle')
   })
 
-  it('refreshes a loaded page on every pushed invalidation channel', async () => {
+  it('refreshes a loaded store on every pushed invalidation channel', async () => {
     const b = await bench()
     declare(b.slots)
     await b.ctx.plugin({ inject: [...inject], apply }).await()
-    const entry = b.slots.entries('settings.section')[0]!
-    const injected = (entry.inject as unknown as () => import('../src/client/KeyRotationSection.tsx').KeyRotationSectionInjected)()
-    await injected.controller.load()
-    const load = vi.spyOn(injected.controller, 'load').mockResolvedValue()
+    await vi.waitFor(() => { expect(b.slots.entries('settings.models.credential')).toHaveLength(1) })
+    const controller = injectedOf(b).controller
+    await controller.load()
+    expect(b.reads()).toBe(2)
+    const load = vi.spyOn(controller, 'load').mockResolvedValue()
     b.ctx.remote.$dispatch('settings/document-updated', ['llm-key-rotation', 2])
     expect(load).toHaveBeenCalledTimes(1)
     b.ctx.remote.$dispatch('credentials/reference-updated', ['OPENROUTER_KEYROTATION_1'])

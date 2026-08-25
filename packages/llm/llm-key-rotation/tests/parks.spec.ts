@@ -3,16 +3,15 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import { createUserMessage } from '@deepseek-ai/dsh-llm'
+import { createUserMessage, LlmAdapter } from '@deepseek-ai/dsh-llm'
+import type { GenerateOptions, StreamChunk } from '@deepseek-ai/dsh-llm'
 import AgentLoop from '@deepseek-ai/dsh-agent-loop'
 import { mountAgentLoopTestDependencies } from '@deepseek-ai/dsh-agent-loop-testkit'
 import { LocalCredentialProvider } from '@deepseek-ai/dsh-credentials-local'
-import { startMockLlmServer } from '@deepseek-ai/dsh-llm-mock-server'
-import type { MockLlmServer } from '@deepseek-ai/dsh-llm-mock-server'
 import { SessionId } from '@deepseek-ai/dsh-session'
 import { resolveDshHome } from '@deepseek-ai/dsh-home-paths'
 import * as KeyRotation from '../src/index.ts'
-import type { LlmKeyRotationState } from '../src/index.ts'
+import type { Config as RotationConfig, LlmKeyRotationState } from '../src/index.ts'
 import {
   PARK_STATE_FILENAME,
   parseParkState,
@@ -52,12 +51,11 @@ describe('park-state location', () => {
 
 let home: string | undefined
 let context: Context | undefined
-const servers: MockLlmServer[] = []
 
 afterEach(async () => {
+  vi.useRealTimers()
   await context?.fiber.dispose()
   context = undefined
-  await Promise.all(servers.splice(0).map(server => server.close()))
   if (home !== undefined) await rm(home, { recursive: true, force: true })
   home = undefined
   vi.restoreAllMocks()
@@ -78,34 +76,64 @@ async function seedParks(records: unknown[]): Promise<void> {
   await writeFile(parkPath(), `${JSON.stringify({ version: 1, parks: records }, null, 2)}\n`, 'utf8')
 }
 
-function twoKeyRoute(serverURL: string): NonNullable<KeyRotation.Config['providers']> {
-  return {
-    openrouter: {
-      api: 'openai-completions',
-      baseURL: serverURL,
-      models: [{ id: 'mock-model', name: 'Mock Model', contextWindow: 8192 }],
-      keys: [{ apiKeyEnv: 'OPENROUTER_KEY_1' }, { apiKeyEnv: 'OPENROUTER_KEY_2' }],
-    },
+/**
+ * Test-registered adapter standing in for the plain adapter family that owns
+ * the route: it consults `llmApiKeyOverride` per attempt exactly as
+ * dsh-llm-pi-ai does and scripts one rate-limit strike before succeeding.
+ */
+class ScriptedAdapter extends LlmAdapter {
+  readonly servedKeys: string[] = []
+  /** Rate-limit strikes served before a success; adjustable per scenario. */
+  strikes = 0
+  private attempts = 0
+
+  constructor(private readonly ctx: Context) {
+    super()
+  }
+
+  override async * stream(options: GenerateOptions): AsyncIterable<StreamChunk> {
+    this.attempts += 1
+    const override = this.ctx.get('llmApiKeyOverride') as { resolve(provider: string): Promise<string | undefined> } | undefined
+    const key = await override?.resolve(options.provider)
+    if (key !== undefined) this.servedKeys.push(key)
+    if (this.attempts <= this.strikes) {
+      yield { type: 'finish', reason: { kind: 'error', failure: { message: 'limited', code: 'RATE_LIMIT' } } }
+      return
+    }
+    yield { type: 'block-start', index: 0, blockType: 'text' }
+    yield { type: 'text-delta', index: 0, text: 'recovered' }
+    yield { type: 'block-end', index: 0, block: { type: 'text', text: 'recovered' } }
+    yield { type: 'finish', reason: { kind: 'stop' } }
   }
 }
 
-async function boot(config: KeyRotation.Config): Promise<Context> {
+async function boot(config: RotationConfig): Promise<{ ctx: Context; adapter: ScriptedAdapter }> {
   const ctx = new Context()
   context = ctx
   await mountAgentLoopTestDependencies(ctx)
   await ctx.plugin(LocalCredentialProvider, { path: join(home!, '.credentials.yaml'), watch: false })
   await ctx.plugin(KeyRotation, config)
+  const adapter = new ScriptedAdapter(ctx)
+  ctx.llm.registerAdapter(['openrouter'], adapter)
   await ctx.plugin(AgentLoop, { agents: [] })
-  return ctx
+  return { ctx, adapter }
 }
 
 /** Boot with both refs stored and the park document under the temp home. */
 async function bootStandard(
-  sequence: readonly ('rate_limit' | 'success')[],
-): Promise<{ ctx: Context; server: MockLlmServer }> {
-  const server = await startMockLlmServer({ sequence })
-  servers.push(server)
-  return { server, ctx: await boot({ dshHome: home!, providers: twoKeyRoute(server.baseURL) }) }
+  strikes: number,
+): Promise<{ ctx: Context; adapter: ScriptedAdapter }> {
+  const { ctx, adapter } = await boot({ dshHome: home!, providers: twoKeyRoute() })
+  adapter.strikes = strikes
+  return { ctx, adapter }
+}
+
+function twoKeyRoute(): NonNullable<RotationConfig['providers']> {
+  return {
+    openrouter: {
+      keys: [{ apiKeyEnv: 'OPENROUTER_KEY_1' }, { apiKeyEnv: 'OPENROUTER_KEY_2' }],
+    },
+  }
 }
 
 async function sendOne(ctx: Context, session: string): Promise<void> {
@@ -116,10 +144,6 @@ async function sendOne(ctx: Context, session: string): Promise<void> {
     source: { kind: 'user' },
   }))
   await idle
-}
-
-function bearerTokens(server: MockLlmServer): Array<string | undefined> {
-  return server.requests.map(request => request.headers.authorization)
 }
 
 describe('park-state document', () => {
@@ -170,10 +194,10 @@ describe('persistent park records', () => {
     home = await mkdtemp(join(tmpdir(), 'dsh-key-parks-'))
     await writeCredentials()
     const credentialsBefore = await readFile(join(home, '.credentials.yaml'), 'utf8')
-    const { ctx, server } = await bootStandard(['rate_limit', 'success'])
+    const { ctx, adapter } = await bootStandard(1)
     await sendOne(ctx, 'persist-park')
 
-    expect(bearerTokens(server)).toEqual(['Bearer k1', 'Bearer k2'])
+    expect(adapter.servedKeys).toEqual(['k1', 'k2'])
     const persisted = JSON.parse(await readFile(parkPath(), 'utf8')) as {
       version: number
       parks: Array<{ route: string; label: string; parkedAt: number; resetAt: number }>
@@ -192,16 +216,33 @@ describe('persistent park records', () => {
   it('keeps an exhausted key parked across a restart so the next request starts on the spare', async () => {
     home = await mkdtemp(join(tmpdir(), 'dsh-key-parks-'))
     await writeCredentials()
-    const first = await bootStandard(['rate_limit', 'success'])
+    const first = await bootStandard(1)
     await sendOne(first.ctx, 'restart-before')
-    expect(bearerTokens(first.server)).toEqual(['Bearer k1', 'Bearer k2'])
+    expect(first.adapter.servedKeys).toEqual(['k1', 'k2'])
     await context!.fiber.dispose()
 
     context = undefined
-    const second = await bootStandard(['success'])
+    const second = await bootStandard(0)
     await sendOne(second.ctx, 'restart-after')
     // One successful request: it starts directly on the spare key.
-    expect(bearerTokens(second.server)).toEqual(['Bearer k2'])
+    expect(second.adapter.servedKeys).toEqual(['k2'])
+  })
+
+  it('starts on the held key when a restored park names only the spare member', async () => {
+    home = await mkdtemp(join(tmpdir(), 'dsh-key-parks-'))
+    await writeCredentials()
+    await seedParks([{
+      route: 'openrouter',
+      label: 'OPENROUTER_KEY_2',
+      parkedAt: Date.now(),
+      resetAt: Date.now() + 60_000,
+    }])
+    const { ctx, adapter } = await bootStandard(0)
+    await sendOne(ctx, 'spare-parked')
+
+    // The sticky position was never parked, so restoration leaves it alone.
+    expect(adapter.servedKeys).toEqual(['k1'])
+    expect(stateFace(ctx).snapshot()[0]!.activeLabel).toBe('OPENROUTER_KEY_1')
   })
 
   it('drops expired rows on mount and rewrites the document without them', async () => {
@@ -211,11 +252,11 @@ describe('persistent park records', () => {
       { route: 'openrouter', label: 'OPENROUTER_KEY_1', parkedAt: Date.now() - 5_000, resetAt: Date.now() - 1_000 },
       { route: 'openrouter', label: 'OPENROUTER_KEY_2', parkedAt: Date.now() - 500, resetAt: Date.now() + 60_000 },
     ])
-    const { ctx, server } = await bootStandard(['success'])
+    const { ctx, adapter } = await bootStandard(0)
     await sendOne(ctx, 'expired-row')
 
     // The expired park is gone, so the first key serves again...
-    expect(bearerTokens(server)).toEqual(['Bearer k1'])
+    expect(adapter.servedKeys).toEqual(['k1'])
     // ...and the document keeps only the live row for the second key.
     const persisted = JSON.parse(await readFile(parkPath(), 'utf8')) as {
       parks: Array<{ label: string }>
@@ -231,12 +272,47 @@ describe('persistent park records', () => {
       { route: 'ghost-route', label: 'gone-key', parkedAt: Date.now() - 100, resetAt: Date.now() + 60_000 },
       { route: 'openrouter', label: 'renamed-away', parkedAt: Date.now() - 100, resetAt: Date.now() + 60_000 },
     ])
-    const { ctx, server } = await bootStandard(['success'])
+    const { ctx, adapter } = await bootStandard(0)
     await sendOne(ctx, 'stale-rows')
 
-    expect(bearerTokens(server)).toEqual(['Bearer k1'])
+    expect(adapter.servedKeys).toEqual(['k1'])
     const persisted = JSON.parse(await readFile(parkPath(), 'utf8')) as { parks: unknown[] }
     expect(persisted.parks).toEqual([])
+  })
+
+  it('refuses to mount onto a live park when the pool shrank to the parked key alone', async () => {
+    home = await mkdtemp(join(tmpdir(), 'dsh-key-parks-'))
+    await writeCredentials()
+    await seedParks([
+      { route: 'solo', label: 'ONLY_KEY', parkedAt: Date.now(), resetAt: Date.now() + 60_000 },
+    ])
+    const ctx = new Context()
+    context = ctx
+    const agentErrors: unknown[] = []
+    await mountAgentLoopTestDependencies(ctx)
+    await ctx.plugin(LocalCredentialProvider, { path: join(home, '.credentials.yaml'), watch: false })
+    await ctx.plugin(KeyRotation, {
+      dshHome: home,
+      providers: { solo: { keys: [{ apiKeyEnv: 'OPENROUTER_KEY_1', label: 'ONLY_KEY' }] } },
+    })
+    const adapter = new ScriptedAdapter(ctx)
+    ctx.llm.registerAdapter(['solo'], adapter)
+    await ctx.plugin(AgentLoop, { agents: [] })
+    ctx.on('agent/error', ({ error }) => { agentErrors.push(error) })
+
+    const agent = ctx.agentLoop.create(SessionId('solo-exhausted'), { provider: 'solo', model: 'mock-model' })
+    const idle = agent.whenIdle()
+    agent.followup(createUserMessage({
+      content: [{ type: 'text', text: 'serve the only key' }],
+      source: { kind: 'user' },
+    }))
+    await idle
+
+    // The restored park holds the sole member, so serving refuses loud rather
+    // than authenticating with a rate-limited key.
+    expect(adapter.servedKeys).toEqual([])
+    expect(agentErrors).toHaveLength(1)
+    expect((agentErrors[0] as Error & { code?: string }).code).toBe('KEY_POOL_EXHAUSTED')
   })
 
   it('fails loud naming the file when it is not valid JSON or carries a wrong version', async () => {
@@ -244,19 +320,19 @@ describe('persistent park records', () => {
     await writeCredentials()
 
     await writeFile(parkPath(), '{ not json', 'utf8')
-    await expect(boot({ dshHome: home, providers: twoKeyRoute('https://openrouter.example/api/v1') }))
+    await expect(boot({ dshHome: home, providers: twoKeyRoute() }))
       .rejects.toThrow(/\.llm-key-rotation-parks\.json is not valid JSON/)
 
     await writeFile(parkPath(), `${JSON.stringify({ version: 2, parks: [] })}\n`, 'utf8')
-    await expect(boot({ dshHome: home, providers: twoKeyRoute('https://openrouter.example/api/v1') }))
+    await expect(boot({ dshHome: home, providers: twoKeyRoute() }))
       .rejects.toThrow(/declares version 2; this build reads version 1/)
   })
 
   it('fails loud on malformed rows and duplicate entries', async () => {
     home = await mkdtemp(join(tmpdir(), 'dsh-key-parks-'))
     await writeCredentials()
-    const mount = (): Promise<Context> =>
-      boot({ dshHome: home!, providers: twoKeyRoute('https://openrouter.example/api/v1') })
+    const mount = (): Promise<{ ctx: Context }> =>
+      boot({ dshHome: home!, providers: twoKeyRoute() })
 
     await seedParks([{ route: 'openrouter', label: 'OPENROUTER_KEY_1', parkedAt: Date.now() }])
     await expect(mount()).rejects.toThrow(/parks\[0\]\.resetAt in .* must be a finite non-negative epoch ms number/)
@@ -274,13 +350,13 @@ describe('persistent park records', () => {
   it('logs loudly and keeps rotating when the park document cannot be written', async () => {
     home = await mkdtemp(join(tmpdir(), 'dsh-key-parks-'))
     await writeCredentials()
-    const { ctx, server } = await bootStandard(['rate_limit', 'success'])
+    const { ctx, adapter } = await bootStandard(1)
     const errorSpy = vi.spyOn(ctx.logger, 'error').mockImplementation(() => undefined)
     // A directory where the document belongs makes every atomic replacement fail.
     await mkdir(parkPath())
     await sendOne(ctx, 'write-failure')
 
-    expect(bearerTokens(server)).toEqual(['Bearer k1', 'Bearer k2'])
+    expect(adapter.servedKeys).toEqual(['k1', 'k2'])
     expect(errorSpy).toHaveBeenCalledWith(
       expect.stringContaining('could not persist park state'),
       parkPath(),
@@ -293,7 +369,7 @@ describe('rotation state face', () => {
   it('exposes per-key status with ISO instants after a rotation, secrets excluded', async () => {
     home = await mkdtemp(join(tmpdir(), 'dsh-key-face-'))
     await writeCredentials()
-    const { ctx } = await bootStandard(['rate_limit', 'success'])
+    const { ctx } = await bootStandard(1)
     await sendOne(ctx, 'face-status')
 
     const snapshot = stateFace(ctx).snapshot()
@@ -323,20 +399,25 @@ describe('rotation state face', () => {
   it('treats expired parks as usable in snapshots without rewriting the document', async () => {
     home = await mkdtemp(join(tmpdir(), 'dsh-key-face-'))
     await writeCredentials()
+    // A live park on the first key: mount reattaches it and advances the
+    // sticky position onto the spare.
     await seedParks([{
       route: 'openrouter',
       label: 'OPENROUTER_KEY_1',
       parkedAt: Date.now(),
-      resetAt: Date.now() + 150,
+      resetAt: Date.now() + 60_000,
     }])
-    await bootStandard(['success'])
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await bootStandard(0)
     const before = await readFile(parkPath(), 'utf8')
+    // Lazy expiry is view-only here: advance the clock past the reset instant
+    // without touching the pool.
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(Date.now() + 61_000)
     const snapshot = stateFace(context!).snapshot()
 
-    // View-only usability: the expired stamp still sits in memory, so the
-    // sticky position (advanced at mount while the park was live) stays on
-    // the spare key until a real serve or park touches the pool.
+    // The expired stamp reports usable without mutating pool state or the
+    // persisted file, and the sticky position stays on the spare until a real
+    // serve or park touches the pool.
     expect(snapshot[0]!.keys[0]!.status.state).toBe('usable')
     expect(snapshot[0]!.activeLabel).toBe('OPENROUTER_KEY_2')
     expect(await readFile(parkPath(), 'utf8')).toBe(before)
@@ -349,13 +430,10 @@ describe('rotation state face', () => {
       { route: 'openrouter', label: 'dev-1', parkedAt: Date.now(), resetAt: Date.now() + 60_000 },
       { route: 'openrouter', label: 'dev-2', parkedAt: Date.now(), resetAt: Date.now() + 120_000 },
     ])
-    const ctx = await boot({
+    const { ctx } = await boot({
       dshHome: home,
       providers: {
         openrouter: {
-          api: 'openai-completions',
-          baseURL: 'https://openrouter.example/api/v1',
-          models: [{ id: 'mock-model', name: 'Mock Model', contextWindow: 8192 }],
           keys: [{ value: 'k1', label: 'dev-1' }, { value: 'k2', label: 'dev-2' }],
         },
       },
@@ -376,7 +454,7 @@ describe('rotation state face', () => {
   it('snapshots an empty list while dormant', async () => {
     home = await mkdtemp(join(tmpdir(), 'dsh-key-face-'))
     await writeCredentials()
-    const ctx = await boot({ dshHome: home })
+    const { ctx } = await boot({ dshHome: home })
     expect(stateFace(ctx).snapshot()).toEqual([])
   })
 })

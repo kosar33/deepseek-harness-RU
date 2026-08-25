@@ -15,7 +15,7 @@ export const name = 'client-ui-settings-key-rotation-invariant'
 export const inject = ['invariants']
 
 /**
- * No runtime invariant: a settings-section plugin that renders Host-reported
+ * No runtime invariant: a settings-seat contributor that renders Host-reported
  * state through its own wire reads — it emits no cordis events and owns no
  * cross-plugin mutable relation beyond the slot registration the slots system
  * already authorizes.

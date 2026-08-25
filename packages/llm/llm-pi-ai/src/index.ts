@@ -167,6 +167,13 @@ export function apply(ctx: Context, config: Config): void {
     provider: string,
     profile: ResolvedPiAiProviderProfile,
   ): Promise<string | undefined> => {
+    // A key-rotation pool serving this route answers before any native
+    // resolution; `undefined` falls through to the profile's own credential.
+    const override = ctx.get('llmApiKeyOverride')
+    if (override !== undefined) {
+      const rotated = await override.resolve(provider)
+      if (rotated !== undefined) return rotated
+    }
     const ref = profile.apiKeyEnv
     // Only a profile that names no credential at all defers to pi-ai's
     // provider-native discovery. Once one is named, a miss must fail loud:

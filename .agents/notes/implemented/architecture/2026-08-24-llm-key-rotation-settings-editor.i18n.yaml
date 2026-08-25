@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/architecture/2026-08-24-llm-key-rotation-settings-editor.md
-2026-08-24-llm-key-rotation-settings-editor.md: bb9767b8ea86c639a51f949d05f6752289ad6c99
-2026-08-24-llm-key-rotation-settings-editor.zh.md: 3cb2209cfd183027fba7556a6c2ce76ed0830dbc
+2026-08-24-llm-key-rotation-settings-editor.md: c0cf0b004480b70c2dc2559de16c7075d94a05ba
+2026-08-24-llm-key-rotation-settings-editor.zh.md: 27611423fc569f52080456782ae609f1581989f8

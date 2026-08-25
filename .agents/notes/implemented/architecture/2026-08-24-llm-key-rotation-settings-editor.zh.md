@@ -4,6 +4,8 @@ Status: implemented
 
 [English](2026-08-24-llm-key-rotation-settings-editor.md) | 中文
 
+> 被[密钥轮换附着到既有提供方路由](2026-08-24-llm-key-rotation-provider-key-overlay.zh.md)部分取代：下文的路由所有权、独立页面与冲突拒绝决策已替换；分区安装、wire 读取、信任模型与持久化原样延续。
+
 [按路由的密钥池轮换](2026-08-24-llm-key-pool-rotation.zh.md)当初刻意把配置留在了 GUI 之外：要轮换 OpenRouter 密钥的拥有者必须打开 `cordis.yml`、弄懂 profile 加 `keys` 的形状，并靠手工同时写对凭据引用及其顺序。插件自己的快照契约已经预见了渲染 «лимит откатится через Nч Mм» 的设置页组件，但当时没有任何 wire 方法暴露池的健康状态，也没有界面能写入该分区。本笔记补上这个 seam 的另一半：插件安装自己的用户设置分区，Host 通过一个特权 wire 读取提供池健康，一个新的浏览器包按 Models 页确立的同一信任模型编辑路由。
 
 ## 问题
@@ -22,7 +24,7 @@ Status: implemented
 
 ### 编辑器镜像 Models 页的信任模型，并带轮换自身的形状
 
-浏览器包注册一个 `settings.section` 条目，其 store 联结 `llm.keyRotation`、共享 describe 镜像的命名空间视图与 `credentials.describe`。输入的密钥值经 `credentials.set` 只写不读，存放在派生的 `<ROUTE>_KEYROTATION_<n>` 引用下——取已在用最大索引加一，因此调整行序绝不会让引用改指另一把机密；`settings.mutate` 只记录引用名，脱敏后的设置文档永不收到值。操作针对已存的用户层做最小化：未变字段留在原处、清空的字段执行 unset、调序作为一次整数组 `keys` set、首次保存把新路由作为一个完整 profile 落盘。删除某行会 unset 它的引用；删除整个用户层拥有的路由会 unset 它存储的每条引用。字段校验先于任何 wire 调用：空白的新密钥行或重复的模型 ID 在本地失败，不白花一次往返。基础层拥有的路由隐藏删除入口而非让写入失败——那里的删除意味着恢复组合基础。
+浏览器包向「模型」分区的 `settings.models.embed` 槽位嵌入一个区块（不再拥有自己的导航项）；其 store 联结 `llm.keyRotation`、共享 describe 镜像的命名空间视图与 `credentials.describe`。输入的密钥值经 `credentials.set` 只写不读，存放在派生的 `<ROUTE>_KEYROTATION_<n>` 引用下——取已在用最大索引加一，因此调整行序绝不会让引用改指另一把机密；`settings.mutate` 只记录引用名，脱敏后的设置文档永不收到值。操作针对已存的用户层做最小化：未变字段留在原处、清空的字段执行 unset、调序作为一次整数组 `keys` set、首次保存把新路由作为一个完整 profile 落盘。删除某行会 unset 它的引用；删除整个用户层拥有的路由会 unset 它存储的每条引用。字段校验先于任何 wire 调用：空白的新密钥行或重复的模型 ID 在本地失败，不白花一次往返。基础层拥有的路由隐藏删除入口而非让写入失败——那里的删除意味着恢复组合基础。
 
 状态面板根据快照渲染标签——粘滞位置为使用中、可用、已停用——并在客户端由 `resetAt` 计算倒计时，随墙钟推进；与快照的只读可用性一致，渲染从不改动池状态。姿态跟随组合事实：未挂载显示提示、已挂载为空显示休眠引导；推送的失效通知（settings、credentials、适配器拓扑、重连）让已打开页面免轮询刷新。
 
@@ -43,7 +45,7 @@ Status: implemented
 
 - 插件套件经 Loader 启动真实组合：编辑器的精确回路（先经凭据存储写入密钥值，再 mutate 分区）激活路由并无重启地处理请求；在请求进行途中撤下路由会响亮失败；不可服务的写入带着解析器消息被拒绝；休眠挂载不注册任何东西。
 - apiproxy 规格钉住快照映射、缺席 face 的应答（`configured: false`）、handler 路由与 fetch 客户端的 schema 校验；connection 套件钉住 fixture 世界中含停用键的应答与特权平面分类。
-- 浏览器包的套件钉住纯函数助手（引用派生、倒计时向上取整、最小 path 操作）、store 联结（含“settings 载荷永不携带机密”断言）、全部姿态下的组件行为（英文与俄文文案）、跟随语言的导航标签、HMR 恢复以及不变量伴生注册；`verify-client-packages` 与 `verify-package-invariants` 通过。
+- 浏览器包的套件钉住纯函数助手（引用派生、倒计时向上取整、最小 path 操作）、store 联结（含“settings 载荷永不携带机密”断言）、全部姿态下的组件行为（英文与俄文文案）、跟随语言的嵌入文案、HMR 恢复以及不变量伴生注册；`verify-client-packages` 与 `verify-package-invariants` 通过。
 
 ## 相关
 

@@ -411,6 +411,13 @@ export function apply(ctx: Context, config: Config): void {
   const resolveApiKey = async (connection: ResolvedDeepSeekOptions): Promise<string> => {
     // Every credential fact comes from the caller's snapshot, so a rejected
     // settings generation cannot leak its key onto the previous endpoint.
+    // A key-rotation pool for this route answers before the native seam;
+    // `undefined` falls through to the configured credential reference.
+    const override = ctx.get('llmApiKeyOverride')
+    if (override !== undefined) {
+      const rotated = await override.resolve(PROVIDER)
+      if (rotated !== undefined) return rotated
+    }
     const ref = connection.apiKeyEnv
     const credentials = ctx.get('credentials')
     if (credentials !== undefined) {

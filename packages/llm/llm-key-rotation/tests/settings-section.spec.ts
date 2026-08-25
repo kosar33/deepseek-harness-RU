@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
 import { createUserMessage, LlmAdapter } from '@deepseek-ai/dsh-llm'
-import type { GenerateOptions, StreamChunk } from '@deepseek-ai/dsh-llm'
+import type { GenerateOptions, LlmApiKeyOverride, StreamChunk } from '@deepseek-ai/dsh-llm'
 import AgentLoop from '@deepseek-ai/dsh-agent-loop'
 import { mountAgentLoopTestDependencies } from '@deepseek-ai/dsh-agent-loop-testkit'
 import { CredentialProvider } from '@deepseek-ai/dsh-credentials'
@@ -13,28 +13,26 @@ import type {
   CredentialRef, ResolvedCredential,
 } from '@deepseek-ai/dsh-credentials'
 import { LocalCredentialProvider } from '@deepseek-ai/dsh-credentials-local'
-import { startMockLlmServer } from '@deepseek-ai/dsh-llm-mock-server'
-import type { MockLlmServer } from '@deepseek-ai/dsh-llm-mock-server'
 import { SessionId } from '@deepseek-ai/dsh-session'
 import { SettingsProvider, settingsNamespace } from '@deepseek-ai/dsh-settings'
 import type { SettingsNamespace } from '@deepseek-ai/dsh-settings'
 import * as KeyRotation from '../src/index.ts'
-import type { Config as RotationConfig } from '../src/config.ts'
+import type { Config as RotationConfig, LlmKeyRotationState } from '../src/index.ts'
+import { PARK_STATE_FILENAME } from '../src/park-store.ts'
 
 const NS = settingsNamespace('llm-key-rotation')
 
 let home: string | undefined
 let context: Context | undefined
-const servers: MockLlmServer[] = []
 const agentErrors: unknown[] = []
 
 afterEach(async () => {
   await context?.fiber.dispose()
   context = undefined
-  await Promise.all(servers.splice(0).map(server => server.close()))
   if (home !== undefined) await rm(home, { recursive: true, force: true })
   home = undefined
   agentErrors.length = 0
+  vi.unstubAllEnvs()
 })
 
 /** In-memory settings provider carrying the user document the editor writes. */
@@ -57,7 +55,7 @@ class MemorySettings extends SettingsProvider {
 
 /**
  * Credential seam whose resolution can be held mid-flight, so a route
- * withdrawal racing a dispatched request can be staged deterministically.
+ * withdrawal racing an override resolve can be staged deterministically.
  */
 class GatedCredentialProvider extends CredentialProvider {
   private readonly values = new Map<string, string>()
@@ -124,45 +122,72 @@ class GatedCredentialProvider extends CredentialProvider {
   }
 }
 
-async function writeCredentials(entries: Record<string, string>): Promise<string> {
-  home ??= await mkdtemp(join(tmpdir(), 'dsh-key-rotation-settings-'))
-  const path = join(home, '.credentials.yaml')
-  const refs = Object.entries(entries).map(([name, value]) => `  ${name}: ${value}`)
-  await writeFile(path, ['version: 1', 'refs:', ...refs, ''].join('\n'), { mode: 0o600 })
-  return path
+/** Test-registered adapter honoring the consumer half of the override contract. */
+class ScriptedAdapter extends LlmAdapter {
+  readonly servedKeys: string[] = []
+
+  constructor(
+    private readonly ctx: Context,
+    private readonly nativeEnv?: string,
+  ) {
+    super()
+  }
+
+  override async * stream(options: GenerateOptions): AsyncIterable<StreamChunk> {
+    const override = this.ctx.get('llmApiKeyOverride') as LlmApiKeyOverride | undefined
+    const rotated = await override?.resolve(options.provider)
+    const key = rotated ?? (this.nativeEnv === undefined ? undefined : process.env[this.nativeEnv])
+    if (key !== undefined) this.servedKeys.push(key)
+    yield { type: 'block-start', index: 0, blockType: 'text' }
+    yield { type: 'text-delta', index: 0, text: 'served' }
+    yield { type: 'block-end', index: 0, block: { type: 'text', text: 'served' } }
+    yield { type: 'finish', reason: { kind: 'stop' } }
+  }
 }
 
 async function boot(options: {
-  config: RotationConfig
-  credentialPath?: string
+  composition?: RotationConfig['providers']
+  credentialEntries?: Record<string, string>
   credentialsPlugin?: typeof LocalCredentialProvider | typeof GatedCredentialProvider
-}): Promise<Context> {
+  nativeEnv?: string
+}): Promise<{ ctx: Context; adapter: ScriptedAdapter }> {
   home ??= await mkdtemp(join(tmpdir(), 'dsh-key-rotation-settings-'))
   const ctx = new Context()
   context = ctx
   await mountAgentLoopTestDependencies(ctx)
   await ctx.plugin(MemorySettings)
+  if (options.credentialEntries !== undefined) {
+    const path = join(home, '.credentials.yaml')
+    const refs = Object.entries(options.credentialEntries).map(([name, value]) => `  ${name}: ${value}`)
+    await writeFile(path, ['version: 1', 'refs:', ...refs, ''].join('\n'), { mode: 0o600 })
+  }
   const credentialPlugin = options.credentialsPlugin ?? LocalCredentialProvider
-  await ctx.plugin(credentialPlugin, { path: options.credentialPath ?? join(home, '.credentials.yaml'), watch: false })
+  await ctx.plugin(credentialPlugin, { path: join(home, '.credentials.yaml'), watch: false })
   await ctx.plugin(KeyRotation, {
-    ...(options.config.providers === undefined ? {} : { providers: options.config.providers }),
-    ...(options.config.dshHome === undefined ? {} : { dshHome: options.config.dshHome }),
-    parkFile: join(home, '.llm-key-rotation-parks.json'),
+    ...(options.composition === undefined ? {} : { providers: options.composition }),
+    parkFile: join(home, PARK_STATE_FILENAME),
   })
+  const adapter = new ScriptedAdapter(ctx, options.nativeEnv)
+  ctx.llm.registerAdapter(['openrouter'], adapter)
   await ctx.plugin(AgentLoop, { agents: [] })
   ctx.on('agent/error', ({ error }) => { agentErrors.push(error) })
-  return ctx
+  return { ctx, adapter }
 }
 
-function route(serverURL: string, refs: string[]): NonNullable<RotationConfig['providers']> {
+function keysRoute(refs: string[]): NonNullable<RotationConfig['providers']> {
   return {
     openrouter: {
-      api: 'openai-completions',
-      baseURL: serverURL,
-      models: [{ id: 'mock-model', name: 'Mock Model', contextWindow: 8192 }],
       keys: refs.map(apiKeyEnv => ({ apiKeyEnv })),
     },
   }
+}
+
+function stateFace(ctx: Context): LlmKeyRotationState {
+  return ctx.get('llmKeyRotation') as LlmKeyRotationState
+}
+
+function overrideFace(ctx: Context): LlmApiKeyOverride {
+  return ctx.get('llmApiKeyOverride') as LlmApiKeyOverride
 }
 
 async function sendAndWait(ctx: Context, name: string): Promise<void> {
@@ -176,47 +201,30 @@ async function sendAndWait(ctx: Context, name: string): Promise<void> {
 }
 
 describe('settings-section configuration', () => {
-  it('activates a route the moment the section commits and serves a request through it', { timeout: 20_000 }, async () => {
-    const server = await startMockLlmServer({ sequence: ['success'] })
-    servers.push(server)
-    const path = await writeCredentials({ OPENROUTER_KEYROTATION_1: 'stored-k1' })
-    const ctx = await boot({ credentialPath: path, config: {} })
+  it('activates a pool the moment the section commits and serves requests through it', async () => {
+    const { ctx, adapter } = await boot({ credentialEntries: { OPENROUTER_KEYROTATION_1: 'stored-k1' } })
 
-    expect(ctx.llm.listProviders()).toEqual([])
     // Exactly what the web editor writes: credential values land in the
     // credential store, and the settings section records references only.
-    await ctx.settings.update(NS, { providers: route(server.baseURL, ['OPENROUTER_KEYROTATION_1']) })
+    await ctx.settings.update(NS, { providers: keysRoute(['OPENROUTER_KEYROTATION_1']) })
     await vi.waitFor(() => {
-      expect(ctx.llm.listProviders().map(entry => entry.id)).toEqual(['openrouter'])
+      expect(stateFace(ctx).snapshot().map(routeSnapshot => routeSnapshot.activeLabel))
+        .toEqual(['OPENROUTER_KEYROTATION_1'])
     })
+    await expect(overrideFace(ctx).resolve('openrouter')).resolves.toBe('stored-k1')
 
-    const face = ctx.get('llmKeyRotation') as KeyRotation.LlmKeyRotationState
-    expect(face.snapshot()).toEqual([{
-      provider: 'openrouter',
-      activeLabel: 'OPENROUTER_KEYROTATION_1',
-      keys: [{
-        provider: 'openrouter',
-        label: 'OPENROUTER_KEYROTATION_1',
-        source: 'reference',
-        reference: 'OPENROUTER_KEYROTATION_1',
-        status: { state: 'usable' },
-      }],
-    }])
     await sendAndWait(ctx, 'activated-by-section')
-    expect(server.requests.map(request => request.headers.authorization)).toEqual(['Bearer stored-k1'])
+    expect(adapter.servedKeys).toEqual(['stored-k1'])
   })
 
-  it('reattaches persisted parks across a reorder rebuild and keeps the spare sticky', { timeout: 20_000 }, async () => {
-    const server = await startMockLlmServer({ sequence: ['success'] })
-    servers.push(server)
-    const path = await writeCredentials({ OPENROUTER_A: 'a', OPENROUTER_B: 'b' })
-    const ctx = await boot({
-      credentialPath: path,
-      config: { providers: route(server.baseURL, ['OPENROUTER_A', 'OPENROUTER_B']) },
+  it('reattaches persisted parks across a reorder rebuild and keeps the spare sticky', async () => {
+    const { ctx } = await boot({
+      credentialEntries: { OPENROUTER_A: 'a', OPENROUTER_B: 'b' },
+      composition: keysRoute(['OPENROUTER_A', 'OPENROUTER_B']),
     })
     // A live park from an earlier session: OPENROUTER_A is out until reset.
     await writeFile(
-      join(home!, '.llm-key-rotation-parks.json'),
+      join(home!, PARK_STATE_FILENAME),
       `${JSON.stringify({ version: 1, parks: [{
         route: 'openrouter',
         label: 'OPENROUTER_A',
@@ -228,143 +236,120 @@ describe('settings-section configuration', () => {
 
     // The editor's reorder write: B moves ahead of A. The rebuilt pool keeps
     // A parked, so serving starts past it even though B now sits at index 0.
-    await ctx.settings.update(NS, {
-      providers: route(server.baseURL, ['OPENROUTER_B', 'OPENROUTER_A']),
-    })
+    await ctx.settings.update(NS, { providers: keysRoute(['OPENROUTER_B', 'OPENROUTER_A']) })
     await vi.waitFor(() => {
-      const face = ctx.get('llmKeyRotation') as KeyRotation.LlmKeyRotationState
-      expect(face.snapshot()[0]?.activeLabel).toBe('OPENROUTER_B')
+      expect(stateFace(ctx).snapshot()[0]?.activeLabel).toBe('OPENROUTER_B')
     })
-    const face = ctx.get('llmKeyRotation') as KeyRotation.LlmKeyRotationState
-    const statuses = face.snapshot()[0]!.keys.map(key => key.status.state)
+    const statuses = stateFace(ctx).snapshot()[0]!.keys.map(key => key.status.state)
     expect(statuses).toEqual(['usable', 'parked'])
   })
 
-  it('refuses an unserviceable section at write time and logs a loud refusal on a route conflict', async () => {
-    const ctx = await boot({ config: {} })
+  it('refuses an unserviceable section at write time and keeps unserved routes inert', async () => {
+    const { ctx } = await boot({})
 
-    // Schema-valid but unserviceable: the write itself rejects.
+    // Schema-invalid key list: the write itself rejects.
     await expect(ctx.settings.update(NS, { providers: { openrouter: { keys: [] } } }))
       .rejects.toThrow(/must list at least one key/)
 
-    // A live route another adapter owns cannot be taken over: the candidate is
-    // refused loud and nothing registers.
-    class Foreign extends LlmAdapter {
-      override async * stream(_options: GenerateOptions): AsyncIterable<StreamChunk> {
-        yield { type: 'block-start', index: 0, blockType: 'text' }
-        yield { type: 'text-delta', index: 0, text: 'foreign' }
-        yield { type: 'block-end', index: 0, block: { type: 'text', text: 'foreign' } }
-        yield { type: 'finish', reason: { kind: 'stop' } }
-      }
-    }
-    ctx.llm.registerAdapter(['taken'], new Foreign())
-    const errorSpy = vi.spyOn(ctx.logger, 'error')
-    await ctx.settings.update(NS, {
-      providers: {
-        taken: {
-          api: 'openai-completions',
-          baseURL: 'https://taken.example/api/v1',
-          models: [{ id: 'm', name: 'M', contextWindow: 8192 }],
-          keys: [{ value: 'k' }],
-        },
-      },
-    })
+    // A pool for a route NO family serves is accepted — rotation registers
+    // nothing, so there is no conflict to refuse — but stays inert. The
+    // registry keeps exactly the route the test-registered family owns.
+    await ctx.settings.update(NS, { providers: { ghost: { keys: [{ value: 'k' }] } } })
     await vi.waitFor(() => {
-      expect(errorSpy).toHaveBeenCalledWith('llm-key-rotation: keeping the previously registered routes after a refused update')
+      expect(stateFace(ctx).snapshot().map(routeSnapshot => routeSnapshot.provider)).toEqual(['ghost'])
     })
-    expect(ctx.llm.listProviders().map(entry => entry.id)).toEqual(['taken'])
-    expect((ctx.get('llmKeyRotation') as KeyRotation.LlmKeyRotationState).snapshot()).toEqual([])
+    expect(ctx.llm.listProviders().map(entry => entry.id)).toEqual(['openrouter'])
+    await expect(overrideFace(ctx).resolve('ghost')).resolves.toBe('k')
+    // The served route keeps no pool: its consumer falls through natively.
+    await expect(overrideFace(ctx).resolve('openrouter')).resolves.toBeUndefined()
   })
 
-  it('fails a request already dispatched across a route-withdrawing rebuild', { timeout: 20_000 }, async () => {
-    const server = await startMockLlmServer({ sequence: ['success'] })
-    servers.push(server)
-    const path = await writeCredentials({ OPENROUTER_KEYROTATION_1: 'k1' })
-    // The route lives in the settings user layer, exactly as after a first
-    // save from the web editor: only user-layer routes can be withdrawn,
-    // because removal restores the composition base.
-    const ctx = await boot({
-      credentialPath: path,
-      config: {},
+  it('fails a resolve already in flight across a route-withdrawing rebuild', async () => {
+    const { ctx } = await boot({
+      credentialEntries: { OPENROUTER_KEYROTATION_1: 'k1' },
       credentialsPlugin: GatedCredentialProvider,
     })
-    await ctx.settings.update(NS, { providers: route(server.baseURL, ['OPENROUTER_KEYROTATION_1']) })
+    await ctx.settings.update(NS, { providers: keysRoute(['OPENROUTER_KEYROTATION_1']) })
     await vi.waitFor(() => {
-      expect(ctx.llm.listProviders().map(entry => entry.id)).toEqual(['openrouter'])
+      expect(stateFace(ctx).snapshot()).toHaveLength(1)
     })
 
-    // Hold credential resolution mid-request, withdraw the route behind it,
-    // then release: the in-flight dispatch finds no pool left and fails loud.
+    // Hold credential resolution mid-resolve, withdraw the route behind it,
+    // then release: the in-flight resolve refuses loud instead of serving a
+    // configuration that no longer exists.
     const { entered, release } = GatedCredentialProvider.arm()
-    const pending = sendAndWait(ctx, 'withdrawn-mid-flight')
+    const pending = overrideFace(ctx).resolve('openrouter')
     await entered
     await ctx.settings.mutate(NS, [{ op: 'unset', path: ['providers', 'openrouter'] }])
     await vi.waitFor(() => {
-      expect(ctx.llm.listProviders()).toEqual([])
+      expect(stateFace(ctx).snapshot()).toEqual([])
     })
     release()
-    await pending
-
-    expect(agentErrors).toHaveLength(1)
-    expect((agentErrors[0] as Error).message).toContain('changed while a request was in flight')
+    await expect(pending).rejects.toThrow(/changed while a request was in flight/)
   })
 
-  it('rebuilds a two-route section with names sorted for change detection', async () => {
-    const ctx = await boot({ config: {} })
-    expect(ctx.llm.listProviders()).toEqual([])
+  it('commits a two-route section and treats reordered-but-equal writes as no-ops', async () => {
+    const { ctx } = await boot({})
 
     // Dict order deliberately reversed relative to the names: change
     // detection sorts provider names, so this write exercises the comparator.
     const providers: NonNullable<RotationConfig['providers']> = {
-      zulu: {
-        api: 'openai-completions',
-        baseURL: 'https://zulu.example/api/v1',
-        models: [{ id: 'mock-model', name: 'Mock Model', contextWindow: 8192 }],
-        keys: [{ value: 'k-z' }],
-      },
-      alpha: {
-        api: 'openai-completions',
-        baseURL: 'https://alpha.example/api/v1',
-        models: [{ id: 'mock-model', name: 'Mock Model', contextWindow: 8192 }],
-        keys: [{ value: 'k-a' }],
-      },
+      zulu: { keys: [{ value: 'k-z', label: 'zulu-key' }] },
+      alpha: { keys: [{ value: 'k-a', label: 'alpha-key' }] },
     }
     await ctx.settings.update(NS, { providers })
     await vi.waitFor(() => {
-      expect(ctx.llm.listProviders().map(entry => entry.id).sort()).toEqual(['alpha', 'zulu'])
+      expect(stateFace(ctx).snapshot().map(routeSnapshot => routeSnapshot.provider).sort())
+        .toEqual(['alpha', 'zulu'])
     })
-    const face = ctx.get('llmKeyRotation') as KeyRotation.LlmKeyRotationState
-    expect(face.snapshot().map(routeSnapshot => routeSnapshot.provider).sort()).toEqual(['alpha', 'zulu'])
+    await expect(overrideFace(ctx).resolve('alpha')).resolves.toBe('k-a')
+    await expect(overrideFace(ctx).resolve('zulu')).resolves.toBe('k-z')
+
+    // The same facts written back in sorted order must not disturb the pools:
+    // change detection canonicalizes by sorted name before comparing.
+    await ctx.settings.update(NS, { providers: { alpha: providers.alpha!, zulu: providers.zulu! } })
+    expect(stateFace(ctx).snapshot().map(routeSnapshot => routeSnapshot.activeLabel).sort())
+      .toEqual(['alpha-key', 'zulu-key'])
   })
 
-  it('fails a prepared call dispatched after its route was withdrawn', async () => {
-    const path = await writeCredentials({ OPENROUTER_KEYROTATION_1: 'k1' })
-    // No mock server: serving must refuse before any credential is resolved.
-    const ctx = await boot({ credentialPath: path, config: {} })
-    // The route lives in the settings user layer, exactly as after a first
-    // save from the web editor.
-    await ctx.settings.update(NS, {
-      providers: route('https://openrouter.example/api/v1', ['OPENROUTER_KEYROTATION_1']),
+  it('falls through to the family\'s native resolution once the section withdraws the pool', async () => {
+    vi.stubEnv('OPENROUTER_NATIVE', 'native-k')
+    const { ctx, adapter } = await boot({
+      credentialEntries: { UNUSED: 'x' },
+      nativeEnv: 'OPENROUTER_NATIVE',
     })
+    await ctx.settings.update(NS, { providers: { openrouter: { keys: [{ value: 'lit-k1' }] } } })
+    // The rebuild swaps pools asynchronously; wait until the face reflects it.
     await vi.waitFor(() => {
-      expect(ctx.llm.listProviders().map(entry => entry.id)).toEqual(['openrouter'])
+      expect(stateFace(ctx).snapshot()).toHaveLength(1)
     })
+    await sendAndWait(ctx, 'rotated-then-native')
+    expect(adapter.servedKeys).toEqual(['lit-k1'])
 
-    // Bind one dispatch to the pre-withdrawal registration...
-    const prepared = await ctx.llm.prepareCall({ provider: 'openrouter', model: 'mock-model' })
-    // ...withdraw the route behind the held dispatch...
     await ctx.settings.mutate(NS, [{ op: 'unset', path: ['providers', 'openrouter'] }])
     await vi.waitFor(() => {
-      expect(ctx.llm.listProviders()).toEqual([])
+      expect(stateFace(ctx).snapshot()).toEqual([])
     })
-    // ...and dispatch: serving refuses loud instead of authenticating against
-    // a configuration that no longer exists.
-    const chunks: StreamChunk[] = []
-    for await (const chunk of prepared.stream({ ...prepared.config, messages: [] })) chunks.push(chunk)
-    const finish = chunks.at(-1)
-    expect(finish?.type).toBe('finish')
-    expect(finish !== undefined && finish.type === 'finish' && finish.reason.kind === 'error'
-      && finish.reason.failure.message.includes('was withdrawn while a request was in flight')).toBe(true)
-    expect(agentErrors).toEqual([])
+    await sendAndWait(ctx, 'after-withdrawal')
+    expect(adapter.servedKeys).toEqual(['lit-k1', 'native-k'])
+  })
+
+  it('keeps the previous pools after a rebuild candidate fails on its park document', async () => {
+    const { ctx } = await boot({
+      credentialEntries: { OPENROUTER_KEY_1: 'k1', OPENROUTER_KEY_2: 'k2' },
+      composition: keysRoute(['OPENROUTER_KEY_1']),
+    })
+    const errorSpy = vi.spyOn(ctx.logger, 'error').mockImplementation(() => undefined)
+    // A corrupt document passes the section validator (which sees only the
+    // providers dict) and fails the rebuild's park restore.
+    await writeFile(join(home!, PARK_STATE_FILENAME), '{ not json', 'utf8')
+    await ctx.settings.update(NS, { providers: keysRoute(['OPENROUTER_KEY_1', 'OPENROUTER_KEY_2']) })
+
+    await vi.waitFor(() => {
+      expect(errorSpy).toHaveBeenCalledWith('llm-key-rotation: keeping the previous pools after a refused update')
+    })
+    // The previous single-key pool still serves.
+    await expect(overrideFace(ctx).resolve('openrouter')).resolves.toBe('k1')
+    expect(stateFace(ctx).snapshot()[0]!.keys).toHaveLength(1)
   })
 })

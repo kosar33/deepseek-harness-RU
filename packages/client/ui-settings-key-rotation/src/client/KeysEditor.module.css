@@ -1,0 +1,148 @@
+/* Provider-card credential seat: semantic aliases only, no literal colors. */
+
+.seat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.label {
+  color: var(--dsw-alias-label-secondary);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.error {
+  margin: 0;
+  color: var(--dsw-alias-state-error-primary);
+  font-size: 13px;
+}
+
+.hint {
+  margin: 0;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 13px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin: 2px 0 0;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dsw-alias-state-success-primary);
+  flex: none;
+}
+
+.chipParked .dot {
+  background: var(--dsw-alias-state-warning-primary);
+}
+
+.chipActive {
+  color: var(--dsw-alias-text-primary);
+  font-weight: 600;
+}
+
+.countdown {
+  color: var(--dsw-alias-label-secondary);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 2px 0 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rowIndex {
+  flex: none;
+  width: 18px;
+  text-align: right;
+  font-size: 12px;
+  color: var(--dsw-alias-label-secondary);
+  font-family: var(--dsw-font-family-code);
+}
+
+.ref {
+  flex: none;
+  max-width: 45%;
+  font-size: 12px;
+  color: var(--dsw-alias-label-secondary);
+  font-family: var(--dsw-font-family-code);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.value {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.rowAction {
+  flex: none;
+  padding: 4px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--dsw-alias-label-secondary);
+  border-radius: 6px;
+}
+
+.rowAction:hover:not(:disabled) {
+  color: var(--dsw-alias-text-primary);
+}
+
+.rowAction:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.addButton {
+  composes: rowAction;
+  padding: 4px 8px;
+  font-size: 13px;
+}
+
+.saveButton {
+  margin-left: auto;
+  padding: 6px 14px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  background: var(--dsw-alias-bg-module-platform);
+  color: var(--dsw-alias-text-primary);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.saveButton:disabled {
+  cursor: default;
+  opacity: 0.5;
+}

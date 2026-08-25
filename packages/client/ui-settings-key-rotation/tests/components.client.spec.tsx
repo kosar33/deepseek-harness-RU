@@ -1,15 +1,16 @@
 // @vitest-environment jsdom
-/** Key-rotation section behavior over a scripted wire face: status panel, countdown, editor, deletion. */
-import { cleanup, fireEvent, render, screen, waitFor, act } from '@testing-library/react'
+/** Provider-card credential seat behavior over a scripted wire face: chips, rows, writes, failures. */
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type {
-  CredentialView, KeyRotationRouteView, RpcResponse, SettingsNamespaceView,
+  KeyRotationRouteView, RpcResponse, SettingsNamespaceView,
 } from '@deepseek-ai/dsh-api-remotes/client'
 import { bindSnapshotSelector } from '@deepseek-ai/dsh-client-test-runtime'
 import { SettingsDescribeMirror } from '@deepseek-ai/dsh-client-ui-settings/src/client/settings-mirror.ts'
-import { KeyRotationSection } from '../src/client/KeyRotationSection.tsx'
-import type { KeyRotationSectionInjected, KeyRotationSectionProps } from '../src/client/KeyRotationSection.tsx'
+import { KeysEditor } from '../src/client/KeysEditor.tsx'
+import type { KeysEditorInjected, KeysEditorProps } from '../src/client/KeysEditor.tsx'
 import { createKeyRotationStore } from '../src/client/store.ts'
+import type { KeyRotationStore } from '../src/client/store.ts'
 import { en, ru } from '../src/client/locales.ts'
 
 afterEach(cleanup)
@@ -23,6 +24,7 @@ function fail<T>(message: string): RpcResponse<T> {
 }
 
 const RESET_AT = '2026-08-25T00:00:00.000Z'
+const NOW = Date.parse('2026-08-24T12:00:00.000Z')
 
 const ROUTES: KeyRotationRouteView[] = [{
   provider: 'openrouter',
@@ -38,46 +40,61 @@ const ROUTES: KeyRotationRouteView[] = [{
   ],
 }]
 
-function namespace(overrides: Partial<SettingsNamespaceView> = {}): SettingsNamespaceView {
+/** A pool where the sticky key, a spare, and a parked key are three distinct rows. */
+const THREE_KEYS: KeyRotationRouteView = {
+  provider: 'openrouter',
+  activeLabel: 'K2',
+  keys: [
+    {
+      label: 'K1', source: 'reference', reference: 'K1',
+      status: { state: 'parked', parkedAt: '2026-08-24T10:00:00.000Z', resetAt: RESET_AT },
+    },
+    { label: 'K2', source: 'reference', reference: 'K2', status: { state: 'usable' } },
+    { label: 'K3', source: 'reference', reference: 'K3', status: { state: 'usable' } },
+  ],
+}
+
+const STORED: Record<string, string[]> = {
+  openrouter: ['OPENROUTER_KEYROTATION_1', 'OPENROUTER_KEYROTATION_2'],
+  other: ['OTHER_KEY_1'],
+}
+
+function namespace(): SettingsNamespaceView {
   return {
     ns: 'llm-key-rotation',
     schema: {},
     value: {
-      providers: {
-        openrouter: {
-          displayName: 'OpenRouter',
-          baseURL: 'https://openrouter.example/api/v1',
-          api: 'openai-completions',
-          models: [{ id: 'm-1', name: 'Model One', contextWindow: 8192 }],
-          keys: [{ apiKeyEnv: 'OPENROUTER_KEYROTATION_1' }, { apiKeyEnv: 'OPENROUTER_KEYROTATION_2' }],
-        },
-      },
+      providers: Object.fromEntries(Object.entries(STORED).map(([route, refs]) => [
+        route,
+        { keys: refs.map(apiKeyEnv => ({ apiKeyEnv })) },
+      ])),
     },
     base: { providers: {} },
     applies: 'live' as const,
     secrets: [],
     revision: 0,
-    ...overrides,
   }
 }
 
 interface ScriptedOptions {
-  configured?: boolean
   routes?: KeyRotationRouteView[]
   namespaces?: SettingsNamespaceView[]
   writable?: boolean
+  mutateAnswer?: RpcResponse<SettingsNamespaceView>
 }
 
-function scripted(options: ScriptedOptions = {}) {
+function scripted(options: ScriptedOptions = {}): {
+  controller: KeyRotationStore
+  mutations: Array<{ ns: string; ops: unknown }>
+  sets: Array<{ ref: string; value: string }>
+  unsets: Array<{ ref: string }>
+} {
   const mutations: Array<{ ns: string; ops: unknown }> = []
   const sets: Array<{ ref: string; value: string }> = []
   const unsets: Array<{ ref: string }> = []
   const face = {
     llm: {
-      keyRotation: () => Promise.resolve(ok({
-        configured: options.configured ?? true,
-        routes: options.routes ?? ROUTES,
-      })),
+      keyRotation: () => Promise.resolve(ok({ configured: true, routes: options.routes ?? ROUTES })),
     },
     settings: {
       describe: () => Promise.resolve(ok({
@@ -87,16 +104,10 @@ function scripted(options: ScriptedOptions = {}) {
       })),
       mutate: (payload: { ns: string; ops: unknown }) => {
         mutations.push(payload)
-        return Promise.resolve(ok(namespace()))
+        return Promise.resolve(options.mutateAnswer ?? ok(namespace()))
       },
     },
     credentials: {
-      describe: (payload: { refs: string[] }) => Promise.resolve(ok({
-        credentials: Object.fromEntries(payload.refs.map((ref): [string, CredentialView] => [ref, {
-          configured: ref !== 'OPENROUTER_KEYROTATION_2',
-          writable: true,
-        }])),
-      })),
       set: (payload: { ref: string; value: string }) => {
         sets.push(payload)
         return Promise.resolve(ok({}))
@@ -112,79 +123,76 @@ function scripted(options: ScriptedOptions = {}) {
   return { controller, mutations, sets, unsets }
 }
 
-type SectionPropsOf = (injected: {
-  controller: ReturnType<typeof createKeyRotationStore>
-  t: KeyRotationSectionInjected['t']
-}) => KeyRotationSectionProps
+type SeatT = KeysEditorInjected['t']
 
-const propsOf: SectionPropsOf = ({ controller, t }) => ({
-  controller,
-  useSnapshot: bindSnapshotSelector(controller.store),
-  t,
-})
-
-async function mountSection(options: ScriptedOptions & { t?: KeyRotationSectionInjected['t'] } = {}) {
-  const wired = scripted(options)
-  await wired.controller.load()
-  const view = render(<KeyRotationSection {...propsOf({ controller: wired.controller, t: options.t ?? (key => en[key]) })} />)
-  return { view, ...wired }
+/** Framework standard-kit hooks the seat never reads. */
+const runtime = {
+  useSessions: (() => { throw new Error('unused') }) as never,
+  useWorkspaces: (() => { throw new Error('unused') }) as never,
 }
 
-describe('KeyRotationSection posture', () => {
+interface MountOptions extends ScriptedOptions {
+  provider?: string
+  t?: SeatT
+  /** Skip the pre-mount controller.load(); the seat itself loads from idle. */
+  preload?: boolean
+}
+
+async function mountSeat(options: MountOptions = {}) {
+  const wired = scripted(options)
+  if (options.preload !== false) await wired.controller.load()
+  const props: KeysEditorProps = {
+    ...runtime,
+    provider: options.provider ?? 'openrouter',
+    controller: wired.controller,
+    useSnapshot: bindSnapshotSelector(wired.controller.store),
+    t: options.t ?? (key => en[key]),
+  }
+  const view = render(<KeysEditor {...props} />)
+  return { view, props, ...wired }
+}
+
+/** The password input of one row, addressed by its displayed position. */
+function valueInput(index: number): HTMLInputElement {
+  return screen.getByLabelText(`${en.keyValue} ${index + 1}`) as HTMLInputElement
+}
+
+/** The reference labels currently shown, in row order. */
+function shownRefs(): string[] {
+  return [...document.querySelectorAll('span[class*="ref"]')].map(node => node.textContent ?? '')
+}
+
+describe('KeysEditor posture', () => {
   it('renders nothing before the slot injects its dependencies', () => {
-    render(<KeyRotationSection />)
+    render(<KeysEditor {...runtime} provider="openrouter" />)
     expect(document.body.textContent).toBe('')
   })
 
-  it('renders the load failure with a working retry', async () => {
-    const face = {
-      llm: { keyRotation: () => Promise.resolve(fail('host exploded')) },
-      settings: { describe: () => Promise.resolve(fail('unavailable')), mutate: () => Promise.resolve(fail('unused')) },
-      credentials: { describe: () => Promise.resolve(fail('unused')), set: () => Promise.resolve(ok({})), unset: () => Promise.resolve(ok({})) },
-    }
-    const mirror = new SettingsDescribeMirror(face as never)
-    const controller = createKeyRotationStore(face as never, mirror)
-    await controller.load()
-    render(<KeyRotationSection {...propsOf({ controller, t: key => en[key] })} />)
-    expect(screen.getByText(`${en.loadFailed}: host exploded`)).toBeTruthy()
-    // Retrying re-enters load: the failure view yields to the pending title.
-    fireEvent.click(screen.getByRole('button', { name: en.retry }))
-    expect(screen.queryByText(`${en.loadFailed}: host exploded`)).toBeNull()
-    expect(screen.getByText(en.title)).toBeTruthy()
-  })
-
-  it('shows the loading title only while the first answer is pending', () => {
+  it('loads the shared store on first render and reaches the ready seat', async () => {
     const wired = scripted()
-    render(<KeyRotationSection {...propsOf({ controller: wired.controller, t: key => en[key] })} />)
-    expect(screen.getByText(en.title)).toBeTruthy()
-    expect(screen.queryByText(en.routesTitle)).toBeNull()
+    // Idle store: the seat itself enters the first load, with no pre-mount fetch.
+    expect(wired.controller.store.getSnapshot().status).toBe('idle')
+    render(
+      <KeysEditor
+        {...runtime}
+        provider="openrouter"
+        controller={wired.controller}
+        useSnapshot={bindSnapshotSelector(wired.controller.store)}
+        t={key => en[key]}
+      />,
+    )
+    await screen.findByText(en.keys)
+    expect(wired.controller.store.getSnapshot().status).toBe('ready')
+    // Stored rows materialize from the namespace once the answer lands.
+    expect(shownRefs()).toEqual(['OPENROUTER_KEYROTATION_1', 'OPENROUTER_KEYROTATION_2'])
   })
 
-  it('renders the not-composed notice when no composition mounts the plugin', async () => {
-    await mountSection({ configured: false, routes: [], namespaces: [] })
-    expect(screen.getByText(en.notComposed)).toBeTruthy()
-    expect(screen.queryByText(en.dormant)).toBeNull()
-  })
-
-  it('renders the dormant invitation with the add-route card when composed but empty', async () => {
-    await mountSection({ configured: true, routes: [], namespaces: [namespace({
-      value: { providers: {} },
-    })] })
-    expect(screen.getByText(en.dormant)).toBeTruthy()
-    expect(screen.getByRole('button', { name: en.addRoute })).toBeTruthy()
-    expect(screen.queryByText(en.routesTitle)).toBeNull()
-  })
-
-  it('refetches the live status when the header refresh is pressed', async () => {
+  it('renders the load failure with a working retry', async () => {
     let reads = 0
     const face = {
-      llm: { keyRotation: () => { reads += 1; return Promise.resolve(ok({ configured: true, routes: ROUTES })) } },
-      settings: {
-        describe: () => Promise.resolve(ok({ writable: true, hasDocument: false, namespaces: [namespace()] })),
-        mutate: () => Promise.resolve(ok(namespace())),
-      },
+      llm: { keyRotation: () => { reads += 1; return Promise.resolve(fail('host exploded')) } },
+      settings: { describe: () => Promise.resolve(fail('unused')) },
       credentials: {
-        describe: () => Promise.resolve(ok({ credentials: {} })),
         set: () => Promise.resolve(ok({})),
         unset: () => Promise.resolve(ok({})),
       },
@@ -192,41 +200,77 @@ describe('KeyRotationSection posture', () => {
     const mirror = new SettingsDescribeMirror(face as never)
     const controller = createKeyRotationStore(face as never, mirror)
     await controller.load()
-    render(<KeyRotationSection {...propsOf({ controller, t: key => en[key] })} />)
-    expect(reads).toBe(1)
-    fireEvent.click(screen.getByRole('button', { name: en.refresh }))
+    render(
+      <KeysEditor
+        {...runtime}
+        provider="openrouter"
+        controller={controller}
+        useSnapshot={bindSnapshotSelector(controller.store)}
+        t={key => en[key]}
+      />,
+    )
+    expect(screen.getByText(`${en.loadFailed}: host exploded`)).toBeTruthy()
+    // Retrying re-enters the load through the same controller.
+    fireEvent.click(screen.getByRole('button', { name: en.retry }))
     await waitFor(() => { expect(reads).toBe(2) })
+    expect(screen.getByText(`${en.loadFailed}: host exploded`)).toBeTruthy()
   })
 
-  it('labels a stored card by the route id when no display name is stored', async () => {
-    await mountSection({ namespaces: [namespace({
-      value: { providers: { openrouter: {
-        baseURL: 'https://openrouter.example/api/v1',
-        api: 'openai-completions',
-        models: [{ id: 'm-1', name: 'Model One', contextWindow: 8192 }],
-        keys: [{ apiKeyEnv: 'OPENROUTER_KEYROTATION_1' }],
-      } } },
-    })] })
-    // The heading and the edit affordance fall back to the route id itself.
-    expect(screen.getByRole('heading', { name: 'openrouter' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: `${en.edit} openrouter` })).toBeTruthy()
+  it('keeps the seat hidden while a stale draft waits out a refresh', async () => {
+    const mounted = await mountSeat()
+    // A pushed invalidation flips the shared store into a reload while the card
+    // is simultaneously re-pointed at another route: no draft can render yet.
+    act(() => { mounted.controller.store.update((state) => { state.status = 'loading' }) })
+    mounted.view.rerender(<KeysEditor {...mounted.props} provider="other" />)
+    expect(document.body.textContent).toBe('')
+    // The reload settles and rebuilds the draft for the new route only.
+    await act(async () => { await mounted.controller.load() })
+    expect(shownRefs()).toEqual(['OTHER_KEY_1'])
   })
 })
 
-describe('live key status', () => {
-  it('renders per-key chips and the localized reset countdown for parked keys', async () => {
-    // Pinned against the fixture's reset instant: the hours template is a
-    // function of (resetAt, now), not of the host clock.
-    vi.useFakeTimers({ now: Date.parse('2026-08-24T10:00:00.000Z') })
+describe('key pool chips', () => {
+  it('highlights the sticky key, marks the parked one, and ages its countdown', async () => {
+    vi.useFakeTimers({ now: NOW })
     try {
-      const russian: KeyRotationSectionInjected['t'] = key => ru[key]
-      await mountSection({ t: russian })
-      expect(screen.getByText(russian('routesTitle'))).toBeTruthy()
-      // The active key is the usable one at the sticky position.
+      await mountSeat({ routes: [THREE_KEYS] })
+      const active = screen.getByText(en.activeChip)
+      expect(active.className).toContain('chipActive')
+      const parked = screen.getByText(en.parkedChip)
+      expect(parked.className).toContain('chipParked')
+      expect(parked.className).not.toContain('chipActive')
+      const usable = screen.getByText(en.usableChip)
+      expect(usable.className).not.toContain('chipActive')
+      expect(usable.className).not.toContain('chipParked')
+      // «лимит откатится через Nч Mм» — computed from resetAt against now.
+      expect(screen.getByText(/Limit resets in/).textContent).toBe('Limit resets in 12 h 0 min')
+      // The wall-clock tick re-renders the countdown from the same resetAt.
+      act(() => { vi.advanceTimersByTime(30 * 60_000) })
+      expect(screen.getByText(/Limit resets in/).textContent).toBe('Limit resets in 11 h 30 min')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('reads sub-hour resets in minutes only', async () => {
+    vi.useFakeTimers({ now: Date.parse(RESET_AT) - 30 * 60_000 })
+    try {
+      await mountSeat()
+      expect(screen.getByText(/Limit resets in/).textContent).toBe('Limit resets in 30 min')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('renders the localized russian copy including the countdown template', async () => {
+    vi.useFakeTimers({ now: NOW })
+    const russian: SeatT = key => ru[key]
+    try {
+      await mountSeat({ routes: [THREE_KEYS], t: russian })
+      expect(screen.getByText(russian('keys'))).toBeTruthy()
       expect(screen.getByText(russian('activeChip'))).toBeTruthy()
       expect(screen.getByText(russian('parkedChip'))).toBeTruthy()
-      expect(screen.getByText('OPENROUTER_KEYROTATION_1')).toBeTruthy()
-      // «лимит откатится через Nч Mм» — computed from resetAt against now.
+      expect(screen.getByText(russian('usableChip'))).toBeTruthy()
       const countdown = screen.getByText(/Лимит откатится через/)
       expect(countdown.textContent).toMatch(/^Лимит откатится через \d+ ч \d+ мин$/)
     } finally {
@@ -234,467 +278,201 @@ describe('live key status', () => {
     }
   })
 
-  it('ages the countdown as the wall clock advances', async () => {
-    vi.useFakeTimers({ now: Date.parse('2026-08-24T12:00:00.000Z') })
-    try {
-      const wired = scripted()
-      await wired.controller.load()
-      render(<KeyRotationSection {...propsOf({ controller: wired.controller, t: key => en[key] })} />)
-      // 12 h out, the reset reads exactly on the hour.
-      expect(screen.getByText(/Limit resets in/).textContent).toBe('Limit resets in 12 h 0 min')
-      act(() => { vi.advanceTimersByTime(30 * 60_000) })
-      // The component-local tick re-renders the countdown from the same resetAt.
-      expect(screen.getByText(/Limit resets in/).textContent).toBe('Limit resets in 11 h 30 min')
-    } finally {
-      vi.useRealTimers()
-    }
-  })
-
-  it('keeps every chip off a fully parked pool', async () => {
-    const onlyParked: KeyRotationRouteView = {
-      provider: 'openrouter',
-      activeLabel: 'OPENROUTER_KEYROTATION_1',
-      keys: [ROUTES[0]!.keys[0]!],
-    }
-    await mountSection({ routes: [onlyParked] })
-    // The whole pool is parked: no active or usable chip may render.
+  it('renders no chips while the route reports no pool', async () => {
+    await mountSeat({ routes: [] })
     expect(screen.queryByText(en.activeChip)).toBeNull()
-    expect(screen.queryByText(en.usableChip)).toBeNull()
-    expect(screen.getByText(en.parkedChip)).toBeTruthy()
-  })
-
-  it('marks exactly the sticky key active and renders spare keys as usable', async () => {
-    const threeKeys: KeyRotationRouteView = {
-      provider: 'openrouter',
-      activeLabel: 'K2',
-      keys: [
-        {
-          label: 'K1', source: 'reference', reference: 'K1',
-          status: { state: 'parked', parkedAt: '2026-08-24T10:00:00.000Z', resetAt: RESET_AT },
-        },
-        { label: 'K2', source: 'reference', reference: 'K2', status: { state: 'usable' } },
-        { label: 'K3', source: 'reference', reference: 'K3', status: { state: 'usable' } },
-      ],
-    }
-    await mountSection({ routes: [threeKeys] })
-    expect(screen.getByText(en.activeChip)).toBeTruthy()
-    expect(screen.getByText(en.usableChip)).toBeTruthy()
-    expect(screen.getByText(en.parkedChip)).toBeTruthy()
-  })
-
-  it('reads sub-hour resets in minutes only', async () => {
-    vi.useFakeTimers({ now: Date.parse(RESET_AT) - 30 * 60_000 })
-    try {
-      const wired = scripted()
-      await wired.controller.load()
-      render(<KeyRotationSection {...propsOf({ controller: wired.controller, t: key => en[key] })} />)
-      expect(screen.getByText(/Limit resets in/).textContent).toBe('Limit resets in 30 min')
-    } finally {
-      vi.useRealTimers()
-    }
+    expect(screen.queryByText(en.parkedChip)).toBeNull()
+    // The editor itself still serves the stored references.
+    expect(shownRefs()).toHaveLength(2)
   })
 })
 
-describe('stored-route editor', () => {
-  it('opens prefilled, saves typed keys through the seam, and hides secrets from settings writes', async () => {
-    const mounted = await mountSection()
-    fireEvent.click(screen.getByRole('button', { name: `${en.edit} OpenRouter` }))
-    const keyInput = screen.getAllByLabelText(en.keyValue)[0] as HTMLInputElement
-    expect(keyInput.type).toBe('password')
-    // Row 1's reference is configured: its hint carries the stored marker
-    // once the editor's credential read lands.
-    expect(await screen.findByText(new RegExp(en.keyStored))).toBeTruthy()
-    fireEvent.change(keyInput, { target: { value: 'typed-secret' } })
-    fireEvent.click(screen.getByRole('button', { name: en.save }))
-    await waitFor(() => { expect(mounted.sets).toEqual([{ ref: 'OPENROUTER_KEYROTATION_1', value: 'typed-secret' }]) })
-    // A pure key-value change writes NO settings op: the stored profile's
-    // reference list did not move. Whatever the deployment writes through
-    // this card, secret material never appears in any settings payload.
-    expect(mounted.unsets).toHaveLength(0)
-    for (const mutation of mounted.mutations) {
-      expect(JSON.stringify(mutation)).not.toContain('typed-secret')
-    }
-    // The editor closed after the committed save.
-    await waitFor(() => { expect(screen.queryByLabelText(en.keyValue)).toBeNull() })
+describe('row editing', () => {
+  it('initializes rows from the stored references with stored placeholders', async () => {
+    await mountSeat()
+    expect(shownRefs()).toEqual(['OPENROUTER_KEYROTATION_1', 'OPENROUTER_KEYROTATION_2'])
+    expect(valueInput(0).type).toBe('password')
+    expect(valueInput(0).placeholder).toBe(en.keyStored)
+    expect(valueInput(1).placeholder).toBe(en.keyStored)
   })
 
-  it('blocks the save on an invalid draft and names the field', async () => {
-    const mounted = await mountSection()
-    fireEvent.click(screen.getByRole('button', { name: `${en.edit} OpenRouter` }))
-    fireEvent.click(screen.getByRole('button', { name: en.addModel }))
-    fireEvent.click(screen.getByRole('button', { name: en.save }))
-    expect(await screen.findByRole('alert')).toBeTruthy()
-    expect(screen.getByRole('alert').textContent).toBe(en.modelIdRequired)
-    expect(mounted.mutations).toHaveLength(0)
-    expect(mounted.sets).toHaveLength(0)
+  it('rebuilds the draft when the owner re-points the card at another route', async () => {
+    const mounted = await mountSeat()
+    fireEvent.change(valueInput(0), { target: { value: 'typed-and-doomed' } })
+    mounted.view.rerender(<KeysEditor {...mounted.props} provider="other" />)
+    expect(shownRefs()).toEqual(['OTHER_KEY_1'])
+    // The typed value belonged to the previous route's draft and is gone.
+    expect(valueInput(0).value).toBe('')
   })
 
-  it('derives the next reference when a key row is added and reorders without moving refs', async () => {
-    const mounted = await mountSection()
-    fireEvent.click(screen.getByRole('button', { name: `${en.edit} OpenRouter` }))
-    fireEvent.click(screen.getByRole('button', { name: en.addKey }))
-    expect(screen.getByText(`${en.keyReference}: OPENROUTER_KEYROTATION_3`)).toBeTruthy()
-    // Move row 2 up: the reference order flips while each ref keeps its input.
-    const moveUpButtons = screen.getAllByLabelText(en.moveUp)
-    fireEvent.click(moveUpButtons[1]!)
-    // Every row needs a value (or stored history) to pass validation.
-    const keyInputs = screen.getAllByLabelText(en.keyValue)
-    fireEvent.change(keyInputs[0]!, { target: { value: 'reordered-secret' } })
-    fireEvent.change(keyInputs[2]!, { target: { value: 'new-secret' } })
-    fireEvent.click(screen.getByRole('button', { name: en.save }))
-    await waitFor(() => {
-      expect(mounted.sets).toEqual([
-        { ref: 'OPENROUTER_KEYROTATION_2', value: 'reordered-secret' },
-        { ref: 'OPENROUTER_KEYROTATION_3', value: 'new-secret' },
-      ])
-    })
-    // The reorder landed as one keys-array write over reference names only.
-    expect(JSON.stringify(mounted.mutations[0])).toContain('OPENROUTER_KEYROTATION_2')
-    expect(JSON.stringify(mounted.mutations[0])).not.toContain('secret')
+  it('derives the next reference when a key row is added', async () => {
+    await mountSeat()
+    expect(screen.queryByText('OPENROUTER_KEYROTATION_3')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: `+ ${en.addKey}` }))
+    expect(shownRefs()).toEqual([
+      'OPENROUTER_KEYROTATION_1', 'OPENROUTER_KEYROTATION_2', 'OPENROUTER_KEYROTATION_3',
+    ])
+    // The brand-new row addresses nothing stored yet: its placeholder invites a value.
+    const added = valueInput(2)
+    expect(added.placeholder).toBe(en.keyValuePlaceholder)
+    expect(added.value).toBe('')
   })
 
-  it('moves a key row down on request and keeps the order unchanged past either end of the list', async () => {
-    const mounted = await mountSection()
-    fireEvent.click(screen.getByRole('button', { name: `${en.edit} OpenRouter` }))
-    // Row 1 moves down: the reference order flips.
-    fireEvent.click(screen.getAllByLabelText(en.moveDown)[0]!)
-    // The end rows refuse to move past the list: their arrows sit clamped.
+  it('derives the first reference on a route with nothing stored', async () => {
+    await mountSeat({ routes: [], namespaces: [{ ...namespace(), value: { providers: {} } }] })
+    expect(shownRefs()).toEqual([])
+    fireEvent.click(screen.getByRole('button', { name: `+ ${en.addKey}` }))
+    expect(shownRefs()).toEqual(['OPENROUTER_KEYROTATION_1'])
+  })
+
+  it('moves rows within the list and keeps the end arrows clamped', async () => {
+    await mountSeat()
+    // Row 1 sits at the top: its up arrow is clamped; the last row's down arrow too.
     expect(screen.getAllByLabelText(en.moveUp)[0]).toHaveProperty('disabled', true)
-    const moveDownButtons = screen.getAllByLabelText(en.moveDown)
-    expect(moveDownButtons[moveDownButtons.length - 1]).toHaveProperty('disabled', true)
-    fireEvent.click(moveDownButtons[moveDownButtons.length - 1]!)
-    fireEvent.click(screen.getAllByLabelText(en.moveUp)[0]!)
-    // Every row needs a value (or stored history) to pass validation.
-    const keyInputs = screen.getAllByLabelText(en.keyValue)
-    fireEvent.change(keyInputs[0]!, { target: { value: 'now-second' } })
-    fireEvent.change(keyInputs[1]!, { target: { value: 'now-first' } })
-    fireEvent.click(screen.getByRole('button', { name: en.save }))
-    await waitFor(() => {
-      // The one enabled down-move reordered the references; neither clamped click did.
-      expect(mounted.sets).toEqual([
-        { ref: 'OPENROUTER_KEYROTATION_2', value: 'now-second' },
-        { ref: 'OPENROUTER_KEYROTATION_1', value: 'now-first' },
-      ])
-    })
-    expect(JSON.stringify(mounted.mutations[0])).toContain('"apiKeyEnv":"OPENROUTER_KEYROTATION_2"')
-    expect(JSON.stringify(mounted.mutations[0])).not.toContain('secret')
-  })
-
-  it('removes a key row and unsets its reference on save', async () => {
-    const mounted = await mountSection()
-    fireEvent.click(screen.getByRole('button', { name: `${en.edit} OpenRouter` }))
-    fireEvent.click(screen.getAllByLabelText(en.removeKey)[1]!)
-    fireEvent.click(screen.getByRole('button', { name: en.save }))
-    await waitFor(() => { expect(mounted.unsets).toEqual([{ ref: 'OPENROUTER_KEYROTATION_2' }]) })
-  })
-
-  it('closes the editor without writing anything', async () => {
-    const mounted = await mountSection()
-    fireEvent.click(screen.getByRole('button', { name: `${en.edit} OpenRouter` }))
-    fireEvent.click(screen.getByRole('button', { name: en.cancel }))
-    expect(screen.queryByLabelText(en.keyValue)).toBeNull()
-    expect(mounted.mutations).toHaveLength(0)
-    expect(mounted.sets).toHaveLength(0)
-  })
-
-  it('closes an open editor from its card header', async () => {
-    await mountSection()
-    fireEvent.click(screen.getByRole('button', { name: `${en.edit} OpenRouter` }))
-    expect(screen.getAllByLabelText(en.keyValue).length).toBeGreaterThan(0)
-    // The same header button toggles into a close affordance while open.
-    fireEvent.click(screen.getByRole('button', { name: en.close }))
-    expect(screen.queryAllByLabelText(en.keyValue)).toHaveLength(0)
-  })
-
-  it('writes one op per edited field and drops model columns that inherit defaults', async () => {
-    const mounted = await mountSection()
-    fireEvent.click(screen.getByRole('button', { name: `${en.edit} OpenRouter` }))
-    // A second row proves edits rewrite exactly one row of the models column.
-    fireEvent.click(screen.getByRole('button', { name: en.addModel }))
-    fireEvent.change(screen.getAllByLabelText(en.modelId)[1]!, { target: { value: 'm-9' } })
-    fireEvent.change(screen.getAllByLabelText(en.displayName)[0]!, { target: { value: '  Renamed  ' } })
-    fireEvent.change(screen.getByLabelText(en.baseUrl), { target: { value: 'https://changed.example/api/v1' } })
-    fireEvent.change(screen.getByLabelText(en.api), { target: { value: 'anthropic' } })
-    // The profile display name and the model-row name share one label string;
-    // DOM order puts the card field first and the model row second.
-    fireEvent.change(screen.getAllByLabelText(en.modelId)[0]!, { target: { value: 'm-2' } })
-    fireEvent.change(screen.getAllByLabelText(en.displayName)[1]!, { target: { value: 'Model Two' } })
-    fireEvent.change(screen.getAllByLabelText(en.contextWindow)[0]!, { target: { value: '4096' } })
-    // Key rows kept their stored references with blank values: nothing moves
-    // through the credential seam.
-    fireEvent.click(screen.getByRole('button', { name: en.save }))
-    await waitFor(() => { expect(mounted.mutations).toHaveLength(1) })
-    expect(mounted.sets).toHaveLength(0)
-    expect(mounted.mutations[0]!.ops).toEqual([
-      { op: 'set', path: ['providers', 'openrouter', 'displayName'], value: 'Renamed' },
-      { op: 'set', path: ['providers', 'openrouter', 'baseURL'], value: 'https://changed.example/api/v1' },
-      { op: 'set', path: ['providers', 'openrouter', 'api'], value: 'anthropic' },
-      {
-        op: 'set',
-        path: ['providers', 'openrouter', 'models'],
-        value: [{ id: 'm-2', name: 'Model Two', contextWindow: 4096 }, { id: 'm-9' }],
-      },
+    const downs = screen.getAllByLabelText(en.moveDown)
+    expect(downs[downs.length - 1]).toHaveProperty('disabled', true)
+    // Moving row 1 down flips the reference order without moving secrets.
+    fireEvent.click(downs[0]!)
+    expect(shownRefs()).toEqual(['OPENROUTER_KEYROTATION_2', 'OPENROUTER_KEYROTATION_1'])
+    fireEvent.click(screen.getAllByLabelText(en.moveUp)[1]!)
+    expect(shownRefs()).toEqual(['OPENROUTER_KEYROTATION_1', 'OPENROUTER_KEYROTATION_2'])
+    // In a longer list a move displaces exactly two rows and leaves the rest.
+    fireEvent.click(screen.getByRole('button', { name: `+ ${en.addKey}` }))
+    fireEvent.click(screen.getAllByLabelText(en.moveDown)[1]!)
+    expect(shownRefs()).toEqual([
+      'OPENROUTER_KEYROTATION_1', 'OPENROUTER_KEYROTATION_3', 'OPENROUTER_KEYROTATION_2',
     ])
   })
 
-  it('demands at least one model row before saving', async () => {
-    await mountSection()
-    fireEvent.click(screen.getByRole('button', { name: `${en.edit} OpenRouter` }))
-    fireEvent.click(screen.getByRole('button', { name: en.removeModel }))
-    expect(screen.getByText(en.modelsEmpty)).toBeTruthy()
-    // Adding one back clears the demand.
-    fireEvent.click(screen.getByRole('button', { name: en.addModel }))
-    expect(screen.queryByText(en.modelsEmpty)).toBeNull()
+  it('removes a row from the draft', async () => {
+    await mountSeat()
+    fireEvent.click(screen.getAllByLabelText(en.removeKey)[1]!)
+    expect(shownRefs()).toEqual(['OPENROUTER_KEYROTATION_1'])
   })
 
-  it('renders a stored key row without a reference as unaddressed', async () => {
-    await mountSection({ namespaces: [namespace({
-      value: { providers: { openrouter: {
-        displayName: 'OpenRouter',
-        models: [{ id: 'm-1', name: 'Model One', contextWindow: 8192 }],
-        keys: [{}, { apiKeyEnv: 'OPENROUTER_KEYROTATION_2' }],
-      } } },
-    })] })
-    fireEvent.click(screen.getByRole('button', { name: `${en.edit} OpenRouter` }))
-    expect(screen.getByText(`${en.keyReference}: —`)).toBeTruthy()
-    const keyInputs = screen.getAllByLabelText(en.keyValue)
-    expect((keyInputs[0] as HTMLInputElement).placeholder).toBe(en.keyValuePlaceholder)
-  })
-
-  it('surfaces a refused save inside the card and clears it on the next edit', async () => {
-    const face = {
-      llm: { keyRotation: () => Promise.resolve(ok({ configured: true, routes: [] })) },
-      settings: {
-        describe: () => Promise.resolve(ok({ writable: true, hasDocument: false, namespaces: [namespace()] })),
-        mutate: () => Promise.resolve(fail('settings-conflict')),
-      },
-      credentials: {
-        describe: () => Promise.resolve(ok({ credentials: {} })),
-        set: () => Promise.resolve(ok({})),
-        unset: () => Promise.resolve(ok({})),
-      },
-    }
-    const mirror = new SettingsDescribeMirror(face as never)
-    const controller = createKeyRotationStore(face as never, mirror)
-    await controller.load()
-    render(<KeyRotationSection {...propsOf({ controller, t: key => en[key] })} />)
-    fireEvent.click(screen.getByRole('button', { name: `${en.edit} OpenRouter` }))
-    fireEvent.change(screen.getByLabelText(en.baseUrl), { target: { value: 'https://changed.example/api/v1' } })
-    fireEvent.click(screen.getByRole('button', { name: en.save }))
-    expect(await screen.findByRole('alert')).toBeTruthy()
-    expect(screen.getByRole('alert').textContent).toBe('settings-conflict')
-    // The next edit retracts the failure with the draft change.
-    fireEvent.change(screen.getByLabelText(en.baseUrl), { target: { value: 'https://openrouter.example/api/v1' } })
-    expect(screen.queryByRole('alert')).toBeNull()
+  it('blocks saving an added-but-blank row until a value is typed', async () => {
+    await mountSeat()
+    fireEvent.click(screen.getByRole('button', { name: `+ ${en.addKey}` }))
+    // The unstored row has no value yet: save is disabled and the copy says why.
+    expect(screen.getByRole('button', { name: en.save })).toHaveProperty('disabled', true)
+    expect(screen.getByText(en.keyBlank)).toBeTruthy()
+    // Typing the value clears the refusal and re-enables the commit.
+    fireEvent.change(valueInput(2), { target: { value: 'third-secret' } })
+    expect(screen.queryByText(en.keyBlank)).toBeNull()
+    expect(screen.getByRole('button', { name: en.save })).toHaveProperty('disabled', false)
   })
 })
 
-describe('add and remove routes', () => {
-  it('adds a route under a valid fresh name and opens its blank editor', async () => {
-    const mounted = await mountSection()
-    fireEvent.change(screen.getByLabelText(en.routeName), { target: { value: 'newroute' } })
-    fireEvent.click(screen.getByRole('button', { name: en.addRoute }))
-    expect(screen.getByText(en.editorNewTitle)).toBeTruthy()
-    expect(screen.getByText(`${en.keyReference}: NEWROUTE_KEYROTATION_1`)).toBeTruthy()
-    // Nothing is written until the card saves.
-    expect(mounted.mutations).toHaveLength(0)
+describe('saving', () => {
+  it('writes typed values through the seam and clears them after the committed save', async () => {
+    const mounted = await mountSeat()
+    fireEvent.change(valueInput(0), { target: { value: 'typed-secret' } })
+    fireEvent.click(screen.getByRole('button', { name: en.save }))
+    await waitFor(() => {
+      expect(mounted.sets).toEqual([{ ref: 'OPENROUTER_KEYROTATION_1', value: 'typed-secret' }])
+    })
+    // A pure value change writes NO settings op: the reference list did not move.
+    expect(mounted.mutations).toEqual([])
+    expect(mounted.unsets).toEqual([])
+    // Consumed values clear back to placeholders; the kept row stays in order.
+    await waitFor(() => { expect(valueInput(0).value).toBe('') })
+    expect(valueInput(0).placeholder).toBe(en.keyStored)
+    expect(shownRefs()).toEqual(['OPENROUTER_KEYROTATION_1', 'OPENROUTER_KEYROTATION_2'])
   })
 
-  it('rejects an invalid route name before opening anything', async () => {
-    const mounted = await mountSection()
-    fireEvent.change(screen.getByLabelText(en.routeName), { target: { value: 'Bad Name' } })
-    fireEvent.click(screen.getByRole('button', { name: en.addRoute }))
-    expect(screen.getByRole('alert').textContent).toBe(en.routeNameInvalid)
-    expect(screen.queryByText(en.editorNewTitle)).toBeNull()
-    expect(mounted.mutations).toHaveLength(0)
-  })
-
-  it('deletes a user-owned route after confirmation, unsetting its references', async () => {
-    const mounted = await mountSection()
-    fireEvent.click(screen.getByRole('button', { name: `${en.removeRoute} OpenRouter` }))
-    expect(screen.getByText('Delete OpenRouter?')).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Delete OpenRouter' }))
-    await waitFor(() => { expect(mounted.mutations).toEqual([{
+  it('lands a reorder as one whole-array keys write over references only', async () => {
+    const mounted = await mountSeat()
+    fireEvent.click(screen.getAllByLabelText(en.moveDown)[0]!)
+    fireEvent.change(valueInput(0), { target: { value: 'now-second-secret' } })
+    fireEvent.change(valueInput(1), { target: { value: 'now-first-secret' } })
+    fireEvent.click(screen.getByRole('button', { name: en.save }))
+    await waitFor(() => { expect(mounted.mutations).toHaveLength(1) })
+    expect(mounted.sets).toEqual([
+      { ref: 'OPENROUTER_KEYROTATION_2', value: 'now-second-secret' },
+      { ref: 'OPENROUTER_KEYROTATION_1', value: 'now-first-secret' },
+    ])
+    expect(mounted.mutations[0]).toEqual({
       ns: 'llm-key-rotation',
-      ops: [{ op: 'unset', path: ['providers', 'openrouter'] }],
-    }]) })
+      ops: [{
+        op: 'set',
+        path: ['providers', 'openrouter', 'keys'],
+        value: [
+          { apiKeyEnv: 'OPENROUTER_KEYROTATION_2' },
+          { apiKeyEnv: 'OPENROUTER_KEYROTATION_1' },
+        ],
+      }],
+    })
+    // Secret material never reaches the settings document.
+    expect(JSON.stringify(mounted.mutations[0])).not.toContain('secret')
+  })
+
+  it('unsets a dropped reference on save', async () => {
+    const mounted = await mountSeat()
+    fireEvent.click(screen.getAllByLabelText(en.removeKey)[1]!)
+    fireEvent.click(screen.getByRole('button', { name: en.save }))
+    await waitFor(() => { expect(mounted.unsets).toEqual([{ ref: 'OPENROUTER_KEYROTATION_2' }]) })
+    expect(mounted.mutations).toEqual([{
+      ns: 'llm-key-rotation',
+      ops: [{
+        op: 'set',
+        path: ['providers', 'openrouter', 'keys'],
+        value: [{ apiKeyEnv: 'OPENROUTER_KEYROTATION_1' }],
+      }],
+    }])
+  })
+
+  it('unsets the whole profile when every row was removed', async () => {
+    const mounted = await mountSeat()
+    fireEvent.click(screen.getAllByLabelText(en.removeKey)[0]!)
+    fireEvent.click(screen.getAllByLabelText(en.removeKey)[0]!)
+    expect(shownRefs()).toEqual([])
+    fireEvent.click(screen.getByRole('button', { name: en.save }))
+    await waitFor(() => {
+      expect(mounted.mutations).toEqual([{
+        ns: 'llm-key-rotation',
+        ops: [{ op: 'unset', path: ['providers', 'openrouter'] }],
+      }])
+    })
     expect(mounted.unsets).toEqual([
       { ref: 'OPENROUTER_KEYROTATION_1' },
       { ref: 'OPENROUTER_KEYROTATION_2' },
     ])
   })
 
-  it('hides delete for base-layer-owned routes', async () => {
-    await mountSection({ namespaces: [namespace({
-      base: { providers: { openrouter: {} } },
-    })] })
-    expect(screen.queryByText(en.removeRoute)).toBeNull()
-    expect(screen.getByRole('button', { name: `${en.edit} OpenRouter` })).toBeTruthy()
-  })
-
-  it('reports a refused removal inside the dialog and stays retryable', async () => {
-    const face = {
-      llm: { keyRotation: () => Promise.resolve(ok({ configured: true, routes: [] })) },
-      settings: {
-        describe: () => Promise.resolve(ok({ writable: true, hasDocument: false, namespaces: [namespace()] })),
-        mutate: () => Promise.resolve(fail('settings-conflict')),
-      },
-      credentials: {
-        describe: () => Promise.resolve(ok({ credentials: {} })),
-        set: () => Promise.resolve(ok({})),
-        unset: () => Promise.resolve(ok({})),
-      },
-    }
-    const mirror = new SettingsDescribeMirror(face as never)
-    const controller = createKeyRotationStore(face as never, mirror)
-    await controller.load()
-    render(<KeyRotationSection {...propsOf({ controller, t: key => en[key] })} />)
-    fireEvent.click(screen.getByRole('button', { name: `${en.removeRoute} OpenRouter` }))
-    fireEvent.click(screen.getByRole('button', { name: 'Delete OpenRouter' }))
-    expect(await screen.findByText('settings-conflict')).toBeTruthy()
-  })
-
-  it('cancels out of the delete dialog without writing anything', async () => {
-    const mounted = await mountSection()
-    fireEvent.click(screen.getByRole('button', { name: `${en.removeRoute} OpenRouter` }))
-    expect(screen.getByText('Delete OpenRouter?')).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: en.cancel }))
-    expect(screen.queryByText('Delete OpenRouter?')).toBeNull()
-    expect(mounted.mutations).toHaveLength(0)
-  })
-
-  it('keeps the delete dialog pinned while a removal is in flight', async () => {
-    let release!: () => void
-    const gate = new Promise<void>((resolve) => { release = resolve })
-    const face = {
-      llm: { keyRotation: () => Promise.resolve(ok({ configured: true, routes: [] })) },
-      settings: {
-        describe: () => Promise.resolve(ok({ writable: true, hasDocument: false, namespaces: [namespace()] })),
-        mutate: () => gate.then(() => ok(namespace())),
-      },
-      credentials: {
-        describe: () => Promise.resolve(ok({ credentials: {} })),
-        set: () => Promise.resolve(ok({})),
-        unset: () => Promise.resolve(ok({})),
-      },
-    }
-    const mirror = new SettingsDescribeMirror(face as never)
-    const controller = createKeyRotationStore(face as never, mirror)
-    await controller.load()
-    render(<KeyRotationSection {...propsOf({ controller, t: key => en[key] })} />)
-    fireEvent.click(screen.getByRole('button', { name: `${en.removeRoute} OpenRouter` }))
-    fireEvent.click(screen.getByRole('button', { name: 'Delete OpenRouter' }))
-    expect(await screen.findByText(en.deleting)).toBeTruthy()
-    // Escape during the in-flight removal is refused; the dialog stays pinned.
-    fireEvent.keyDown(document, { key: 'Escape' })
-    expect(screen.getByText('Delete OpenRouter?')).toBeTruthy()
-    release()
-    await waitFor(() => { expect(screen.queryByText('Delete OpenRouter?')).toBeNull() })
-  })
-
-  it('refuses quietly when the target route became base-owned while the dialog stood open', async () => {
-    let baseOwned = false
-    const mutations: Array<{ ns: string; ops: unknown }> = []
-    const face = {
-      llm: { keyRotation: () => Promise.resolve(ok({ configured: true, routes: [] })) },
-      settings: {
-        describe: () => Promise.resolve(ok({
-          writable: true,
-          hasDocument: false,
-          namespaces: [baseOwned ? namespace({ base: { providers: { openrouter: {} } } }) : namespace()],
-        })),
-        mutate: (payload: { ns: string; ops: unknown }) => {
-          mutations.push(payload)
-          return Promise.resolve(ok(namespace()))
-        },
-      },
-      credentials: {
-        describe: () => Promise.resolve(ok({ credentials: {} })),
-        set: () => Promise.resolve(ok({})),
-        unset: () => Promise.resolve(ok({})),
-      },
-    }
-    const mirror = new SettingsDescribeMirror(face as never)
-    const controller = createKeyRotationStore(face as never, mirror)
-    await controller.load()
-    render(<KeyRotationSection {...propsOf({ controller, t: key => en[key] })} />)
-    fireEvent.click(screen.getByRole('button', { name: `${en.removeRoute} OpenRouter` }))
-    // A layering change takes the route over while the dialog stands open.
-    baseOwned = true
-    // The page store re-reads only through the mirror, whose own refresh the
-    // owning plugin drives; stage it the same way.
-    await mirror.load()
-    await controller.load()
-    // The reload re-renders the section (hiding the card's delete affordance);
-    // the dialog itself stays pinned on its held target.
-    await screen.findByText('Delete OpenRouter?')
-    fireEvent.click(screen.getByRole('button', { name: 'Delete OpenRouter' }))
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Delete OpenRouter' })).toHaveProperty('disabled', false)
-    })
-    // The refusal writes nothing and keeps the dialog for another look.
-    expect(screen.getByText('Delete OpenRouter?')).toBeTruthy()
-    expect(mutations).toHaveLength(0)
-  })
-
-  it('saves a brand-new route as one whole profile and closes its card cleanly', async () => {
-    const mounted = await mountSection()
-    fireEvent.change(screen.getByLabelText(en.routeName), { target: { value: 'freshroute' } })
-    fireEvent.click(screen.getByRole('button', { name: en.addRoute }))
-    fireEvent.change(screen.getAllByLabelText(en.displayName)[0]!, { target: { value: 'Fresh' } })
-    fireEvent.change(screen.getAllByLabelText(en.modelId)[0]!, { target: { value: 'f-1' } })
-    fireEvent.change(screen.getAllByLabelText(en.keyValue)[0]!, { target: { value: 'fresh-secret' } })
+  it('surfaces a refused save inside the card and keeps the draft', async () => {
+    await mountSeat({ mutateAnswer: fail('settings-conflict') })
+    // Dropping the second row makes the save carry a real keys op, which the
+    // deployment refuses; the typed value on the kept row is part of the draft.
+    fireEvent.click(screen.getAllByLabelText(en.removeKey)[1]!)
+    fireEvent.change(valueInput(0), { target: { value: 'kept-secret' } })
     fireEvent.click(screen.getByRole('button', { name: en.save }))
-    await waitFor(() => {
-      expect(mounted.sets).toEqual([{ ref: 'FRESHROUTE_KEYROTATION_1', value: 'fresh-secret' }])
-    })
-    // One whole-profile write over reference names only; blanks stay unstored.
-    expect(mounted.mutations).toEqual([{
-      ns: 'llm-key-rotation',
-      ops: [{
-        op: 'set',
-        path: ['providers', 'freshroute'],
-        value: {
-          displayName: 'Fresh',
-          models: [{ id: 'f-1' }],
-          keys: [{ apiKeyEnv: 'FRESHROUTE_KEYROTATION_1' }],
-        },
-      }],
-    }])
-    expect(mounted.unsets).toHaveLength(0)
-    await waitFor(() => { expect(screen.queryAllByLabelText(en.keyValue)).toHaveLength(0) })
-
-    // A second new-route card closes on cancel without writing.
-    fireEvent.change(screen.getByLabelText(en.routeName), { target: { value: 'spare' } })
-    fireEvent.click(screen.getByRole('button', { name: en.addRoute }))
-    expect(screen.getAllByText(en.editorNewTitle)).toHaveLength(1)
-    fireEvent.click(screen.getByRole('button', { name: en.cancel }))
-    expect(screen.queryAllByLabelText(en.keyValue)).toHaveLength(0)
-    expect(mounted.mutations).toHaveLength(1)
+    expect(await screen.findByText('settings-conflict')).toBeTruthy()
+    // The failed save leaves the card's draft untouched for another attempt.
+    expect(valueInput(0).value).toBe('kept-secret')
+    expect(shownRefs()).toEqual(['OPENROUTER_KEYROTATION_1'])
   })
 
-  it('orders stored cards by display name rather than route id', async () => {
-    await mountSection({ routes: [], namespaces: [namespace({
-      value: { providers: {
-        zzz: { displayName: 'Alpha', models: [{ id: 'm' }], keys: [] },
-        aaa: { displayName: 'Zeta', models: [{ id: 'm' }], keys: [] },
-      } },
-    })] })
-    const body = document.body.textContent ?? ''
-    expect(body.indexOf('Alpha')).toBeGreaterThan(-1)
-    // Without the label sort, the ids would print Zeta's card first.
-    expect(body.indexOf('Alpha')).toBeLessThan(body.indexOf('Zeta'))
+  it('performs no writes when the draft already matches the stored section', async () => {
+    const mounted = await mountSeat()
+    fireEvent.click(screen.getByRole('button', { name: en.save }))
+    await waitFor(() => { expect(mounted.controller.store.getSnapshot().namespace).toBeDefined() })
+    expect(mounted.mutations).toEqual([])
+    expect(mounted.sets).toEqual([])
+    expect(mounted.unsets).toEqual([])
   })
 })
 
 describe('read-only deployments', () => {
   it('disables every write affordance and says so', async () => {
-    await mountSection({ writable: false })
+    await mountSeat({ writable: false })
     expect(screen.getByText(en.readOnly)).toBeTruthy()
-    expect(screen.getByLabelText(en.routeName)).toHaveProperty('disabled', true)
-    fireEvent.click(screen.getByRole('button', { name: `${en.edit} OpenRouter` }))
-    expect(screen.getByRole('button', { name: en.addRoute })).toHaveProperty('disabled', true)
-    expect(screen.getByRole('button', { name: en.save })).toHaveProperty('disabled', true)
+    expect(valueInput(0)).toHaveProperty('disabled', true)
     expect(screen.getAllByLabelText(en.moveUp)[0]).toHaveProperty('disabled', true)
+    expect(screen.getAllByLabelText(en.moveDown)[0]).toHaveProperty('disabled', true)
+    expect(screen.getAllByLabelText(en.removeKey)[0]).toHaveProperty('disabled', true)
+    expect(screen.getByRole('button', { name: `+ ${en.addKey}` })).toHaveProperty('disabled', true)
+    expect(screen.getByRole('button', { name: en.save })).toHaveProperty('disabled', true)
+    // Pool health stays readable in a read-only deployment.
+    expect(screen.getByText(en.activeChip)).toBeTruthy()
   })
 })

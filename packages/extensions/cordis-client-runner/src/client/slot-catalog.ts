@@ -1347,6 +1347,32 @@ export const CLIENT_SLOT_API: readonly ClientSlotEntry[] = [
     source: 'packages/client/ui-settings/src/client/contract/slots.ts:29',
   },
   {
+    key: 'settings.models.credential',
+    kind: 'single',
+    scope: 'root',
+    summary: 'The credential editor seat inside one provider card of the Models section, rendered exactly where the single API-key input would sit.',
+    doc: 'The credential editor seat inside one provider card of the Models\nsection, rendered exactly where the single API-key input would sit.\nThe section dispatches with the edited route and keeps its native\nkey field as the dispatch fallback, so a feature replaces the field\nfor every provider only while it is actually mounted. Declared at\nruntime by the feature that owns the Models section; the type lives\nhere so feature plugins collaborate without depending on one another.',
+    registerOptions: [],
+    ownerProps: [
+      '/** Owner share of a provider card\'s credential seat (the section names the route). */\nexport interface SettingsModelsCredentialOwnerProps {\n  /** Provider route id whose credentials the seat edits. */\n  provider: string\n  /** Marker field: the owner passes no children. */\n  children?: never\n}',
+    ],
+    ownerPropsReferences: [],
+    standardProps: [
+      'useSessions: SnapshotSelectorHook<SessionListState>',
+      'useWorkspaces: SnapshotSelectorHook<import(\'./workspaces/service.ts\').WorkspaceListState>',
+    ],
+    keyDomain: '',
+    hookContext: '',
+    slotInject: '',
+    declaredBy: 'an entry in \'settings.section\' (client-ui-settings-models), so it exists while that entry is mounted',
+    occupants: [
+      'client-ui-settings-key-rotation KeysEditor',
+    ],
+    replaceRisk: 'shadows-shipped-ui',
+    example: 'return {\n  inject: [\'slots\'],\n  apply(ctx) {\n    ctx.slots.inject(\'settings.models.credential\', () => ctx.slots.register(\n      { name: \'settings.models.credential\' },\n      () => React.createElement(\'div\', null, \'hello\'),\n    ))\n  },\n}',
+    source: 'packages/client/ui-settings/src/client/contract/slots.ts:98',
+  },
+  {
     key: 'settings.onboarding',
     kind: 'list',
     scope: 'root',

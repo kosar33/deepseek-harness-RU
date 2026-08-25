@@ -1,12 +1,13 @@
-/** Page-store join and pure helpers: pool snapshot × settings namespace × credential states. */
+/** Store join and pure helpers: pool snapshot × settings namespace × credential writes. */
 import { describe, expect, it } from 'vitest'
 import type {
-  CredentialView, KeyRotationRouteView, RpcResponse, SettingsNamespaceView,
+  KeyRotationRouteView, RpcResponse, SettingsNamespaceView,
 } from '@deepseek-ai/dsh-api-remotes/client'
 import { SettingsDescribeMirror } from '@deepseek-ai/dsh-client-ui-settings/src/client/settings-mirror.ts'
+import { formatResetCountdown } from '../src/client/countdown.ts'
 import {
-  baseOwnedRoutes, countdownParts, createKeyRotationStore, deriveKeyRef, draftFailure, draftOf, fill,
-  messageOf, routeNameValid, routeOps, storedRefsOf,
+  countdownParts, createKeyRotationStore, deriveKeyRef, fill, keysOps, messageOf,
+  ROTATION_NS, storedRefsOf,
 } from '../src/client/store.ts'
 
 let nextRpc = 0
@@ -17,22 +18,18 @@ function fail<T>(message: string): RpcResponse<T> {
   return { rpcId: `r-${nextRpc++}` as never, result: { ok: false, error: { code: 'internal', message, details: {} } } }
 }
 
-/** A resolved namespace storing one user route plus one base-layer route. */
+/** A resolved namespace storing one user route's key references. */
 const NAMESPACE: SettingsNamespaceView = {
   ns: 'llm-key-rotation',
   schema: {},
   value: {
     providers: {
       openrouter: {
-        displayName: 'OpenRouter',
-        baseURL: 'https://openrouter.example/api/v1',
-        api: 'openai-completions',
-        models: [{ id: 'm-1', name: 'Model One', contextWindow: 8192 }],
         keys: [{ apiKeyEnv: 'OPENROUTER_KEYROTATION_1' }, { apiKeyEnv: 'OPENROUTER_KEYROTATION_2' }],
       },
     },
   },
-  base: { providers: { builtin: { models: [{ id: 'b' }], keys: [{ apiKeyEnv: 'BUILTIN_KEY' }] } } },
+  base: { providers: {} },
   applies: 'live',
   secrets: [],
   revision: 0,
@@ -53,10 +50,13 @@ const ROUTES: KeyRotationRouteView[] = [{
 }]
 
 interface ScriptedOptions {
-  configured?: boolean
   routes?: KeyRotationRouteView[]
   namespaces?: SettingsNamespaceView[]
   writable?: boolean
+  rotationAnswer?: RpcResponse<{ configured: boolean; routes: KeyRotationRouteView[] }>
+  describeAnswer?: RpcResponse<{ writable: boolean; hasDocument: boolean; namespaces: SettingsNamespaceView[] }>
+  unsetAnswer?: RpcResponse<Record<string, never>>
+  setAnswer?: RpcResponse<Record<string, never>>
   mutateAnswer?: RpcResponse<SettingsNamespaceView>
 }
 
@@ -72,13 +72,10 @@ function scripted(options: ScriptedOptions = {}): {
   const unsets: Array<{ ref: string }> = []
   const face = {
     llm: {
-      keyRotation: () => Promise.resolve(ok({
-        configured: options.configured ?? true,
-        routes: options.routes ?? ROUTES,
-      })),
+      keyRotation: () => Promise.resolve(options.rotationAnswer ?? ok({ configured: true, routes: options.routes ?? ROUTES })),
     },
     settings: {
-      describe: () => Promise.resolve(ok({
+      describe: () => Promise.resolve(options.describeAnswer ?? ok({
         writable: options.writable ?? true,
         hasDocument: false,
         namespaces: options.namespaces ?? [NAMESPACE],
@@ -89,19 +86,13 @@ function scripted(options: ScriptedOptions = {}): {
       },
     },
     credentials: {
-      describe: (payload: { refs: string[] }) => Promise.resolve(ok({
-        credentials: Object.fromEntries(payload.refs.map((ref): [string, CredentialView] => [ref, {
-          configured: ref !== 'OPENROUTER_KEYROTATION_2',
-          writable: true,
-        }])),
-      })),
       set: (payload: { ref: string; value: string }) => {
         sets.push(payload)
-        return Promise.resolve(ok({}))
+        return Promise.resolve(options.setAnswer ?? ok({}))
       },
       unset: (payload: { ref: string }) => {
         unsets.push(payload)
-        return Promise.resolve(ok({}))
+        return Promise.resolve(options.unsetAnswer ?? ok({}))
       },
     },
   }
@@ -116,11 +107,6 @@ async function mountedStore(options?: ScriptedOptions) {
   return { controller, ...wired }
 }
 
-/** Drain the microtask queue so fire-and-forget credential reads settle. */
-async function settled(): Promise<void> {
-  await new Promise<void>((resolve) => { setTimeout(resolve, 0) })
-}
-
 describe('pure helpers', () => {
   it('derives references one past the largest index already in use', () => {
     expect(deriveKeyRef('openrouter', [])).toBe('OPENROUTER_KEYROTATION_1')
@@ -129,6 +115,17 @@ describe('pure helpers', () => {
     // Non-numeric tails and lower numbers never raise the watermark.
     expect(deriveKeyRef('openrouter', ['OPENROUTER_KEYROTATION_X', 'OPENROUTER_KEYROTATION_5', 'OPENROUTER_KEYROTATION_2']))
       .toBe('OPENROUTER_KEYROTATION_6')
+    // Route ids sanitize into addressable reference prefixes.
+    expect(deriveKeyRef('deepseek-official', [])).toBe('DEEPSEEK_OFFICIAL_KEYROTATION_1')
+  })
+
+  it('lists stored references and skips rows without their own reference', () => {
+    expect(storedRefsOf('openrouter', NAMESPACE)).toEqual(['OPENROUTER_KEYROTATION_1', 'OPENROUTER_KEYROTATION_2'])
+    expect(storedRefsOf('absent', NAMESPACE)).toEqual([])
+    expect(storedRefsOf('openrouter', undefined)).toEqual([])
+    // A stored row without its own reference is skipped, not addressed empty.
+    const hole = { ...NAMESPACE, value: { providers: { hole: { keys: [{}, { apiKeyEnv: 'HOLE_2' }] } } } }
+    expect(storedRefsOf('hole', hole)).toEqual(['HOLE_2'])
   })
 
   it('rounds countdown minutes up so an expiring park never reads zero', () => {
@@ -139,180 +136,50 @@ describe('pure helpers', () => {
     expect(countdownParts('2026-08-24T11:00:00.000Z', now)).toEqual({ hours: 0, minutes: 1 })
   })
 
-  it('fills named template slots', () => {
+  it('fills named template slots and keeps unknown ones', () => {
     expect(fill('{route} gone', { route: 'x' })).toBe('x gone')
     expect(fill('{missing}', {})).toBe('{missing}')
   })
 
-  it('validates route names as addressable dict keys', () => {
-    expect(routeNameValid('openrouter')).toBe(true)
-    expect(routeNameValid('a-b-2')).toBe(true)
-    expect(routeNameValid('OpenRouter')).toBe(false)
-    expect(routeNameValid('1abc')).toBe(false)
-    expect(routeNameValid('')).toBe(false)
-  })
-
-  it('judges drafts before any wire call', () => {
-    const storedRefs = ['R_1']
-    const good = {
-      displayName: '', baseURL: '', api: '',
-      models: [{ id: 'm', name: '', contextWindow: '' }],
-      keys: [
-        { ref: 'R_1', value: '' }, // blank on a stored reference means keep
-        { ref: 'R_2', value: 'v' },
-      ],
-    }
-    expect(draftFailure(good, storedRefs)).toBeUndefined()
-    expect(draftFailure({ ...good, models: [] }, storedRefs)).toBe('modelIdRequired')
-    expect(draftFailure({ ...good, models: [{ id: '', name: '', contextWindow: '' }] }, storedRefs)).toBe('modelIdRequired')
-    expect(draftFailure({
-      ...good, models: [{ id: 'm', name: '', contextWindow: '' }, { id: 'm', name: '', contextWindow: '' }],
-    }, storedRefs)).toBe('modelIdDuplicate')
-    expect(draftFailure({
-      ...good, models: [{ id: 'm', name: '', contextWindow: 'x' }],
-    }, storedRefs)).toBe('contextWindowInvalid')
-    expect(draftFailure({
-      ...good, models: [{ id: 'm', name: '', contextWindow: '0' }],
-    }, storedRefs)).toBe('contextWindowInvalid')
-    // A brand-new row with no typed value would silently store nothing.
-    expect(draftFailure({ ...good, keys: [{ ref: 'R_NEW', value: '' }] }, storedRefs)).toBe('keyBlank')
+  it('renders the hours template above one hour and the minutes template below it', () => {
+    const copy = { resetCountdownHours: 'Limit resets in {h} h {m} min', resetCountdownMinutes: 'Limit resets in {m} min' }
+    const now = Date.parse('2026-08-24T12:00:00.000Z')
+    expect(formatResetCountdown('2026-08-24T13:30:00.000Z', now, copy)).toBe('Limit resets in 1 h 30 min')
+    expect(formatResetCountdown('2026-08-24T12:20:00.000Z', now, copy)).toBe('Limit resets in 20 min')
   })
 
   it('builds minimal path ops against the stored section', () => {
-    const draft = {
-      displayName: 'OpenRouter',
-      baseURL: 'https://changed.example/api/v1',
-      api: 'openai-completions',
-      models: [{ id: 'm-1', name: 'Model One', contextWindow: '8192' }],
-      keys: [{ ref: 'OPENROUTER_KEYROTATION_1', value: '' }, { ref: 'OPENROUTER_KEYROTATION_2', value: '' }],
-    }
-    const ops = routeOps('openrouter', draft, NAMESPACE)
-    // Only baseURL differs: one set; every untouched field stays owned where it is.
-    expect(ops).toEqual([{ op: 'set', path: ['providers', 'openrouter', 'baseURL'], value: 'https://changed.example/api/v1' }])
-
-    const reordered = { ...draft, baseURL: 'https://openrouter.example/api/v1', keys: [...draft.keys].reverse() }
-    expect(routeOps('openrouter', reordered, NAMESPACE)).toEqual([{
+    // An unchanged reference list writes nothing.
+    expect(keysOps('openrouter', ['OPENROUTER_KEYROTATION_1', 'OPENROUTER_KEYROTATION_2'], NAMESPACE)).toEqual([])
+    // Key order IS rotation priority: a reorder lands as one whole-array set.
+    expect(keysOps('openrouter', ['OPENROUTER_KEYROTATION_2', 'OPENROUTER_KEYROTATION_1'], NAMESPACE)).toEqual([{
       op: 'set',
       path: ['providers', 'openrouter', 'keys'],
       value: [{ apiKeyEnv: 'OPENROUTER_KEYROTATION_2' }, { apiKeyEnv: 'OPENROUTER_KEYROTATION_1' }],
     }])
-
-    // A cleared field unsets instead of storing an empty string.
-    const cleared = { ...draft, baseURL: 'https://openrouter.example/api/v1', displayName: '' }
-    expect(routeOps('openrouter', cleared, NAMESPACE)).toEqual([
-      { op: 'unset', path: ['providers', 'openrouter', 'displayName'] },
-    ])
-
-    // A route absent from the stored section lands as one whole profile.
-    const fresh = { ...draft, displayName: '', api: '', keys: [{ ref: 'NEW_1', value: '' }] }
-    expect(routeOps('fresh', fresh, NAMESPACE)).toEqual([{
+    // A shortened list still lands as the whole-array set.
+    expect(keysOps('openrouter', ['OPENROUTER_KEYROTATION_1'], NAMESPACE)).toEqual([{
       op: 'set',
-      path: ['providers', 'fresh'],
-      value: {
-        baseURL: 'https://changed.example/api/v1',
-        models: [{ id: 'm-1', name: 'Model One', contextWindow: 8192 }],
-        keys: [{ apiKeyEnv: 'NEW_1' }],
-      },
+      path: ['providers', 'openrouter', 'keys'],
+      value: [{ apiKeyEnv: 'OPENROUTER_KEYROTATION_1' }],
     }])
   })
 
-  it('lands a brand-new profile with only the fields the card carries', () => {
-    const fresh = {
-      displayName: 'Fresh',
-      baseURL: '',
-      api: 'openai-completions',
-      models: [{ id: 'f-1', name: '', contextWindow: '' }],
-      keys: [{ ref: 'FRESH_1', value: '' }],
-    }
-    expect(routeOps('fresh', fresh, NAMESPACE)).toEqual([{
+  it('unsets the whole profile when every row is removed and stays silent when nothing was stored', () => {
+    expect(keysOps('openrouter', [], NAMESPACE)).toEqual([{ op: 'unset', path: ['providers', 'openrouter'] }])
+    // Nothing stored and nothing to store: an absent entry needs no write.
+    const bare = { ...NAMESPACE, value: { providers: {} } }
+    expect(keysOps('ghost', [], bare)).toEqual([])
+    // A route absent from the stored section lands as one whole-column write.
+    expect(keysOps('fresh', ['FRESH_KEYROTATION_1'], bare)).toEqual([{
       op: 'set',
-      path: ['providers', 'fresh'],
-      value: {
-        displayName: 'Fresh',
-        api: 'openai-completions',
-        models: [{ id: 'f-1' }],
-        keys: [{ apiKeyEnv: 'FRESH_1' }],
-      },
+      path: ['providers', 'fresh', 'keys'],
+      value: [{ apiKeyEnv: 'FRESH_KEYROTATION_1' }],
     }])
-  })
-
-  it('unsets cleared fields and skips fields the stored section does not own', () => {
-    const draft = {
-      displayName: 'OpenRouter',
-      baseURL: 'https://openrouter.example/api/v1',
-      api: 'openai-completions',
-      models: [{ id: 'm-1', name: 'Model One', contextWindow: '8192' }],
-      keys: [
-        { ref: 'OPENROUTER_KEYROTATION_1', value: '' },
-        { ref: 'OPENROUTER_KEYROTATION_2', value: '' },
-      ],
-    }
-    // Clearing baseURL and api lands two unsets; every untouched field stays put.
-    expect(routeOps('openrouter', { ...draft, baseURL: '', api: '' }, NAMESPACE)).toEqual([
-      { op: 'unset', path: ['providers', 'openrouter', 'baseURL'] },
-      { op: 'unset', path: ['providers', 'openrouter', 'api'] },
-    ])
-
-    // A stored profile owning nothing yet: inherited-blank fields emit nothing,
-    // while the model and key rows still land as whole-column writes.
-    const bare = { ...NAMESPACE, value: { providers: { mini: {} } } }
-    expect(routeOps('mini', {
-      displayName: '', baseURL: '', api: '',
-      models: [{ id: 'm-9', name: '', contextWindow: '' }],
-      keys: [{ ref: 'MINI_1', value: '' }],
-    }, bare)).toEqual([
-      { op: 'set', path: ['providers', 'mini', 'models'], value: [{ id: 'm-9' }] },
-      { op: 'set', path: ['providers', 'mini', 'keys'], value: [{ apiKeyEnv: 'MINI_1' }] },
-    ])
-  })
-
-  it('sets only the stored fields the draft actually renames', () => {
-    const stored = { ...NAMESPACE, value: { providers: { full: { models: [{ id: 'm-1' }], keys: [{ apiKeyEnv: 'FULL_1' }] } } } }
-    const ops = routeOps('full', {
-      displayName: 'Full Name',
-      baseURL: 'https://full.example/api/v1',
-      api: 'anthropic',
-      models: [{ id: 'm-1', name: 'm-1', contextWindow: '' }],
-      keys: [{ ref: 'FULL_1', value: '' }],
-    }, stored)
-    // A name equal to the id stores no name; an empty context window inherits.
-    expect(ops).toEqual([
-      { op: 'set', path: ['providers', 'full', 'displayName'], value: 'Full Name' },
-      { op: 'set', path: ['providers', 'full', 'baseURL'], value: 'https://full.example/api/v1' },
-      { op: 'set', path: ['providers', 'full', 'api'], value: 'anthropic' },
-    ])
-
-    // A stored row missing its own reference compares equal to the blank
-    // draft row, so keeping it writes nothing.
-    const holey = { ...NAMESPACE, value: { providers: { hole: { keys: [{}] } } } }
-    expect(routeOps('hole', {
-      displayName: '', baseURL: '', api: '',
-      models: [],
-      keys: [{ ref: '', value: '' }],
-    }, holey)).toEqual([])
-  })
-
-  it('reads absent profiles and absent fields into blank draft rows', () => {
-    expect(draftOf('ghost', NAMESPACE)).toEqual({
-      displayName: '', baseURL: '', api: '', models: [], keys: [],
-    })
-    const sparse = { ...NAMESPACE, value: { providers: { tiny: { models: [{}], keys: [{}] } } } }
-    expect(draftOf('tiny', sparse)).toEqual({
-      displayName: '', baseURL: '', api: '',
-      models: [{ id: '', name: '', contextWindow: '' }],
-      keys: [{ ref: '', value: '' }],
-    })
-  })
-
-  it('lists stored references and base ownership of a namespace view', () => {
-    expect(storedRefsOf('openrouter', NAMESPACE)).toEqual(['OPENROUTER_KEYROTATION_1', 'OPENROUTER_KEYROTATION_2'])
-    expect(storedRefsOf('absent', NAMESPACE)).toEqual([])
-    // A stored row without its own reference is skipped, not addressed empty.
-    const hole = { ...NAMESPACE, value: { providers: { hole: { keys: [{}, { apiKeyEnv: 'HOLE_2' }] } } } }
-    expect(storedRefsOf('hole', hole)).toEqual(['HOLE_2'])
-    expect(baseOwnedRoutes(NAMESPACE).has('builtin')).toBe(true)
-    expect(baseOwnedRoutes(NAMESPACE).has('openrouter')).toBe(false)
-    expect(baseOwnedRoutes(undefined).size).toBe(0)
+    // A stored row without its own reference compares as addressed-empty, so
+    // emptying the draft still removes the whole entry.
+    const hole = { ...NAMESPACE, value: { providers: { hole: { keys: [{}] } } } }
+    expect(keysOps('hole', [], hole)).toEqual([{ op: 'unset', path: ['providers', 'hole'] }])
   })
 
   it('describes any thrown value for failure text', () => {
@@ -326,242 +193,151 @@ describe('createKeyRotationStore', () => {
     const { controller } = await mountedStore()
     const state = controller.store.getSnapshot()
     expect(state.status).toBe('ready')
-    expect(state.configured).toBe(true)
     expect(state.writable).toBe(true)
     expect(state.routes).toEqual(ROUTES)
-    expect(state.namespace?.ns).toBe('llm-key-rotation')
+    expect(state.namespace?.ns).toBe(ROTATION_NS)
     expect(state.error).toBeNull()
   })
 
-  it('reports an absent plugin through configured=false', async () => {
-    const { controller } = await mountedStore({ configured: false, routes: [] })
+  it('degrades a settings outage to a read-only seat without failing the page', async () => {
+    const { controller } = await mountedStore({
+      describeAnswer: fail('settings service is down'),
+      routes: [],
+    })
     const state = controller.store.getSnapshot()
-    expect(state.configured).toBe(false)
-    expect(state.routes).toEqual([])
+    expect(state.status).toBe('ready')
+    expect(state.writable).toBe(false)
+    expect(state.namespace).toBeUndefined()
+    expect(state.error).toBe('settings service is down')
   })
 
-  it('reports a failed load through the error status with retryable text', async () => {
+  it('reports a refused rotation answer through the error status with retryable text', async () => {
+    const { controller } = await mountedStore({ rotationAnswer: fail('host exploded') })
+    expect(controller.store.getSnapshot().status).toBe('error')
+    expect(controller.store.getSnapshot().error).toBe('host exploded')
+  })
+
+  it('reports a transport rejection through the error status', async () => {
     const wired = scripted()
     const broken = createKeyRotationStore({
-      llm: { keyRotation: () => Promise.resolve(fail('host exploded')) },
+      llm: { keyRotation: () => Promise.reject(new Error('connection lost')) },
     } as never, wired.mirror)
     await broken.load()
     expect(broken.store.getSnapshot().status).toBe('error')
-    expect(broken.store.getSnapshot().error).toBe('host exploded')
+    expect(broken.store.getSnapshot().error).toBe('connection lost')
   })
 
-  it('opens editors prefilled from the stored section and describes its references', async () => {
-    const { controller } = await mountedStore()
-    controller.openEditor('openrouter', false)
-    const state = controller.store.getSnapshot()
-    expect(state.editing).toBe('openrouter')
-    expect(state.draft).toEqual({
-      displayName: 'OpenRouter',
-      baseURL: 'https://openrouter.example/api/v1',
-      api: 'openai-completions',
-      models: [{ id: 'm-1', name: 'Model One', contextWindow: '8192' }],
-      keys: [
-        { ref: 'OPENROUTER_KEYROTATION_1', value: '' },
-        { ref: 'OPENROUTER_KEYROTATION_2', value: '' },
-      ],
-    })
-    await settled()
-    const credentials = controller.store.getSnapshot().credentials
-    expect(credentials.get('OPENROUTER_KEYROTATION_1')?.configured).toBe(true)
-    expect(credentials.get('OPENROUTER_KEYROTATION_2')?.configured).toBe(false)
-
-    controller.closeEditor()
-    expect(controller.store.getSnapshot().editing).toBeUndefined()
-    expect(controller.store.getSnapshot().draft).toBeUndefined()
-  })
-
-  it('opens a new-route editor under the reserved name with derived rows', async () => {
-    const { controller } = await mountedStore()
-    controller.openEditor('newroute', true)
-    const state = controller.store.getSnapshot()
-    expect(state.editing).toBe('newroute')
-    expect(state.draft).toEqual({
-      displayName: '', baseURL: '', api: '',
-      models: [{ id: '', name: '', contextWindow: '' }],
-      keys: [{ ref: 'NEWROUTE_KEYROTATION_1', value: '' }],
-    })
-  })
-
-  it('saves typed values through the credential seam and records references only', async () => {
+  it('saves typed values through the seam and records references only', async () => {
     const { controller, mutations, sets, unsets } = await mountedStore()
-    controller.openEditor('openrouter', false)
-    controller.updateDraft({
-      displayName: 'OpenRouter',
-      baseURL: 'https://openrouter.example/api/v1',
-      api: 'openai-completions',
-      models: [{ id: 'm-1', name: 'Model One', contextWindow: '8192' }],
-      keys: [
-        { ref: 'OPENROUTER_KEYROTATION_1', value: 'brand-new-secret' },
-        { ref: 'OPENROUTER_KEYROTATION_3', value: 'another-secret' },
-      ],
-    })
-    await settled()
-    expect(await controller.save()).toBe(true)
-
-    // The settings write carries reference names only — never a key value.
-    expect(mutations).toHaveLength(1)
-    expect(JSON.stringify(mutations[0])).not.toContain('secret')
-    // Typed values land in the credential store; the dropped second row's
-    // reference is unset.
-    expect(sets).toEqual([
-      { ref: 'OPENROUTER_KEYROTATION_1', value: 'brand-new-secret' },
+    const failure = await controller.saveRoute('openrouter', [
+      { ref: 'OPENROUTER_KEYROTATION_1', value: '  typed-secret  ' },
       { ref: 'OPENROUTER_KEYROTATION_3', value: 'another-secret' },
     ])
+    expect(failure).toBeUndefined()
+
+    // Dropped references unset; typed values land trimmed in the credential store.
     expect(unsets).toEqual([{ ref: 'OPENROUTER_KEYROTATION_2' }])
-    expect(controller.store.getSnapshot().editing).toBeUndefined()
-    // The post-save reload refreshed the live panel.
+    expect(sets).toEqual([
+      { ref: 'OPENROUTER_KEYROTATION_1', value: 'typed-secret' },
+      { ref: 'OPENROUTER_KEYROTATION_3', value: 'another-secret' },
+    ])
+    // The settings write carries reference names only — never a key value — as
+    // one whole-array keys op over the draft order.
+    expect(mutations).toEqual([{
+      ns: ROTATION_NS,
+      ops: [{
+        op: 'set',
+        path: ['providers', 'openrouter', 'keys'],
+        value: [{ apiKeyEnv: 'OPENROUTER_KEYROTATION_1' }, { apiKeyEnv: 'OPENROUTER_KEYROTATION_3' }],
+      }],
+    }])
+    expect(JSON.stringify(mutations[0])).not.toContain('secret')
+    // The write answer folded into the mirror and the reload refreshed the pool.
     expect(controller.store.getSnapshot().status).toBe('ready')
+    expect(controller.store.getSnapshot().namespace?.ns).toBe(ROTATION_NS)
   })
 
-  it('keeps the editor open with the failure text when a write is refused', async () => {
-    const { controller, sets, unsets } = await mountedStore({ mutateAnswer: fail('settings-conflict') })
-    controller.openEditor('openrouter', false)
-    controller.updateDraft({
-      displayName: 'Changed',
-      baseURL: 'https://openrouter.example/api/v1',
-      api: 'openai-completions',
-      models: [{ id: 'm-1', name: 'Model One', contextWindow: '8192' }],
-      keys: [{ ref: 'OPENROUTER_KEYROTATION_1', value: 'kept-stored' }],
-    })
-    await settled()
-    expect(await controller.save()).toBe(false)
-    const state = controller.store.getSnapshot()
-    expect(state.saveError).toBe('settings-conflict')
-    expect(state.editing).toBe('openrouter')
-    expect(unsets).toHaveLength(0)
-    expect(sets).toHaveLength(0)
+  it('skips credential writes for kept rows with blank values and writes no ops when unchanged', async () => {
+    const { controller, mutations, sets, unsets } = await mountedStore()
+    const failure = await controller.saveRoute('openrouter', [
+      { ref: 'OPENROUTER_KEYROTATION_1', value: '' },
+      { ref: 'OPENROUTER_KEYROTATION_2', value: '  ' },
+    ])
+    expect(failure).toBeUndefined()
+    expect(sets).toEqual([])
+    expect(unsets).toEqual([])
+    expect(mutations).toEqual([])
   })
 
-  it('removes a user-owned route with its stored references and refuses base-owned ones', async () => {
+  it('treats an unaddressed row as nothing to store yet', async () => {
+    const { controller, mutations, sets } = await mountedStore()
+    // A brand-new row carries its derived reference once added by the editor;
+    // saveRoute itself still guards the unaddressed shape defensively.
+    const failure = await controller.saveRoute('openrouter', [
+      { ref: 'OPENROUTER_KEYROTATION_1', value: '' },
+      { ref: '', value: 'untethered' },
+    ])
+    expect(failure).toBeUndefined()
+    expect(sets).toEqual([])
+    // Only the kept first row reaches the settings document.
+    expect(mutations).toEqual([{
+      ns: ROTATION_NS,
+      ops: [{
+        op: 'set',
+        path: ['providers', 'openrouter', 'keys'],
+        value: [{ apiKeyEnv: 'OPENROUTER_KEYROTATION_1' }],
+      }],
+    }])
+  })
+
+  it('removes every row into one profile unset plus the references unsets', async () => {
     const { controller, mutations, unsets } = await mountedStore()
-    expect(await controller.removeRoute('builtin')).toBe(false)
-    expect(mutations).toHaveLength(0)
-
-    expect(await controller.removeRoute('openrouter')).toBe(true)
-    expect(mutations).toEqual([{ ns: 'llm-key-rotation', ops: [{ op: 'unset', path: ['providers', 'openrouter'] }] }])
+    const failure = await controller.saveRoute('openrouter', [])
+    expect(failure).toBeUndefined()
+    expect(mutations).toEqual([{
+      ns: ROTATION_NS,
+      ops: [{ op: 'unset', path: ['providers', 'openrouter'] }],
+    }])
     expect(unsets).toEqual([
       { ref: 'OPENROUTER_KEYROTATION_1' },
       { ref: 'OPENROUTER_KEYROTATION_2' },
     ])
   })
 
-  it('refuses to save with no editor open', async () => {
-    const { controller } = await mountedStore()
-    expect(await controller.save()).toBe(false)
+  it('keeps the failure text of a refused mutation and reports it to the card', async () => {
+    const { controller, mutations } = await mountedStore({ mutateAnswer: fail('settings-conflict') })
+    const failure = await controller.saveRoute('openrouter', [
+      { ref: 'OPENROUTER_KEYROTATION_3', value: 'new-secret' },
+    ])
+    expect(failure).toBe('settings-conflict')
+    expect(mutations).toHaveLength(1)
   })
 
-  it('clears the credential states when the draft stops referencing any', async () => {
-    const { controller } = await mountedStore()
-    controller.openEditor('openrouter', false)
-    await settled()
-    expect(controller.store.getSnapshot().credentials.size).toBe(2)
-
-    const { draft } = controller.store.getSnapshot()
-    if (draft === undefined) throw new Error('editor did not open')
-    controller.updateDraft({ ...draft, keys: [] })
-    await settled()
-    expect(controller.store.getSnapshot().credentials.size).toBe(0)
+  it('reports a refused credential write mid-save', async () => {
+    const { controller, sets } = await mountedStore({ setAnswer: fail('credential store is read-only') })
+    const failure = await controller.saveRoute('openrouter', [
+      { ref: 'OPENROUTER_KEYROTATION_1', value: 'typed' },
+    ])
+    expect(failure).toBe('credential store is read-only')
+    expect(sets).toHaveLength(1)
   })
 
-  it('degrades failed credential reads to unknown states without failing the page', async () => {
-    const wired = scripted()
-    const broken = createKeyRotationStore({
-      ...(wired.face as Record<string, unknown>),
-      credentials: {
-        describe: () => Promise.resolve(fail('describe-down')),
-        set: () => Promise.resolve(ok({})),
-        unset: () => Promise.resolve(ok({})),
-      },
-    } as never, wired.mirror)
-    await broken.load()
-    broken.openEditor('openrouter', false)
-    await settled()
-    expect(broken.store.getSnapshot().status).toBe('ready')
-    expect(broken.store.getSnapshot().credentials.size).toBe(0)
-  })
-
-  it('keeps the editor open when removing a reference is refused mid-save', async () => {
-    const wired = scripted()
-    const refusingUnset = createKeyRotationStore({
-      ...(wired.face as Record<string, unknown>),
-      credentials: {
-        describe: () => Promise.resolve(ok({ credentials: {} })),
-        set: () => Promise.resolve(ok({})),
-        unset: () => Promise.resolve(fail('unset-down')),
-      },
-    } as never, wired.mirror)
-    await refusingUnset.load()
-    refusingUnset.openEditor('openrouter', false)
-    const { draft } = refusingUnset.store.getSnapshot()
-    if (draft === undefined) throw new Error('editor did not open')
-    refusingUnset.updateDraft({ ...draft, keys: [{ ref: 'OPENROUTER_KEYROTATION_1', value: '' }] })
-    await settled()
-
-    expect(await refusingUnset.save()).toBe(false)
-    const state = refusingUnset.store.getSnapshot()
-    expect(state.saveError).toBe('unset-down')
-    expect(state.editing).toBe('openrouter')
-  })
-
-  it('records the failure text when a credential write is refused mid-save', async () => {
-    const wired = scripted()
-    const refusingSet = createKeyRotationStore({
-      ...(wired.face as Record<string, unknown>),
-      credentials: {
-        describe: () => Promise.resolve(ok({ credentials: {} })),
-        set: () => Promise.resolve(fail('set-down')),
-        unset: () => Promise.resolve(ok({})),
-      },
-    } as never, wired.mirror)
-    await refusingSet.load()
-    refusingSet.openEditor('openrouter', false)
-    const { draft } = refusingSet.store.getSnapshot()
-    if (draft === undefined) throw new Error('editor did not open')
-    refusingSet.updateDraft({ ...draft, keys: [{ ref: 'OPENROUTER_KEYROTATION_1', value: 'typed' }] })
-    await settled()
-
-    expect(await refusingSet.save()).toBe(false)
-    expect(refusingSet.store.getSnapshot().saveError).toBe('set-down')
-  })
-
-  it('reports the failure text when removing a route fails at its references', async () => {
-    const wired = scripted()
-    const refusingUnset = createKeyRotationStore({
-      ...(wired.face as Record<string, unknown>),
-      credentials: {
-        describe: () => Promise.resolve(ok({ credentials: {} })),
-        set: () => Promise.resolve(ok({})),
-        unset: () => Promise.resolve(fail('unset-down')),
-      },
-    } as never, wired.mirror)
-    await refusingUnset.load()
-
-    expect(await refusingUnset.removeRoute('openrouter')).toBe(false)
-    expect(refusingUnset.store.getSnapshot().saveError).toBe('unset-down')
+  it('reports a refused reference removal mid-save', async () => {
+    const { controller, unsets } = await mountedStore({ unsetAnswer: fail('credential is read-only') })
+    const failure = await controller.saveRoute('openrouter', [
+      { ref: 'OPENROUTER_KEYROTATION_1', value: '' },
+    ])
+    expect(failure).toBe('credential is read-only')
+    expect(unsets).toHaveLength(1)
   })
 
   it('treats a describe answer without the writable flag as read-only', async () => {
-    const face = {
-      llm: { keyRotation: () => Promise.resolve(ok({ configured: true, routes: ROUTES })) },
-      settings: {
-        describe: () => Promise.resolve(ok({ hasDocument: false, namespaces: [NAMESPACE] })),
-        mutate: () => Promise.resolve(ok(NAMESPACE)),
-      },
-      credentials: {
-        describe: () => Promise.resolve(ok({ credentials: {} })),
-        set: () => Promise.resolve(ok({})),
-        unset: () => Promise.resolve(ok({})),
-      },
-    }
-    const wire = face as never
-    const controller = createKeyRotationStore(wire, new SettingsDescribeMirror(wire))
+    // The wire answer omits `writable`; the mirror's view type keeps it required,
+    // so the fixture widens through the same erased face the store reads.
+    const describeAnswer = ok({ hasDocument: false, namespaces: [NAMESPACE] }) as never
+    const wired = scripted({ describeAnswer })
+    const controller = createKeyRotationStore(wired.face as never, wired.mirror)
     await controller.load()
-    expect(controller.store.getSnapshot().status).toBe('ready')
     expect(controller.store.getSnapshot().writable).toBe(false)
   })
 })

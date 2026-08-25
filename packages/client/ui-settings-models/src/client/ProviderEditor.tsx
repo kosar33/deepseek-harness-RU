@@ -1,7 +1,9 @@
 /**
  * One provider's editor card, hand-written per adapter family: the primary
- * field is a single write-only **API key** input (the page never asks for an
- * environment-variable name — a typed key stores through `credentials.set`
+ * field is a single write-only **API key** input — swapped for the
+ * `settings.models.credential` seat while a mounted feature binds it (the
+ * page never asks for an environment-variable name — a typed key stores
+ * through `credentials.set`
  * under the profile's reference, deriving `<ROUTE>_API_KEY` when the profile
  * has none. The pi-ai profile records that derivation as `apiKeyEnv` only when
  * a key is entered; a blank key materializes a reference-free profile for
@@ -24,6 +26,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { CredentialView, IApiClient, SettingsNamespaceView, SettingsPathOpView } from '@deepseek-ai/dsh-api-remotes/client'
+import type { PropsRenderSlots } from '@deepseek-ai/dsh-client-ui-slots'
 import {
   DeepSeekModelsEditor, modelDrafts, validateDeepSeekModels,
 } from './DeepSeekModelsEditor.tsx'
@@ -69,6 +72,13 @@ export interface ProviderEditorProps {
   t: (key: keyof typeof en) => string
   /** Disable writes (read-only settings provider). */
   readOnly: boolean
+  /**
+   * The declared `settings.models.credential` seat. Bound, it renders exactly
+   * where the single-key input would (the native field survives only as the
+   * dispatch fallback) and this card commits no credential of its own;
+   * unbound — the feature is not mounted — the native field renders unchanged.
+   */
+  credentialSlot?: NonNullable<PropsRenderSlots<'settings.models.credential'>['renderSlot']>
   /** Render only the credential field and actions, without provider settings. */
   credentialOnly?: boolean
   /** Require a newly entered credential before this editor can submit. */
@@ -221,7 +231,10 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
   // as "no key supplied" rather than as a key — that is how a card whose
   // provider already has a stored key is edited without re-entering it.
   const keyValue = keyDraft.trim()
+  // A bound credential seat owns its own commit, so a "must type a key" gate
+  // on this card's Apply would deadlock against an input that never renders.
   const credentialRequiredFailure = props.credentialRequired === true
+    && props.credentialSlot === undefined
     && keyDraft.length > 0 && keyValue.length === 0
     ? 'keyRequired' as const
     : undefined
@@ -357,6 +370,26 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
       : keyState?.configured === true && props.credentialRequired !== true
         ? t('keyStored')
         : family === 'pi-ai' ? t('keyPlaceholderNative') : t('keyPlaceholder')
+    /** The native single-key field; also the seat dispatch's fallback. */
+    const nativeKeyField = (
+      <div className={styles['field']}>
+        <span className={styles['fieldLabel']}>{t('keyInput')}</span>
+        <input
+          className={styles['input']}
+          type="password"
+          autoComplete="off"
+          value={keyDraft}
+          placeholder={keyPlaceholder}
+          aria-label={t('keyInput')}
+          aria-invalid={shownKeyFailure !== undefined}
+          required={props.credentialRequired === true}
+          autoFocus={props.autoFocusCredential === true}
+          disabled={disabled || keyLocked}
+          onChange={(event) => { setKeyDraft(event.target.value) }}
+        />
+        {shownKeyFailure === undefined ? null : <p className={styles['error']}>{t(shownKeyFailure)}</p>}
+      </div>
+    )
     /** What both family editors take: the rows, whose layer owns them, and the two writes. */
     const catalogProps = {
       models,
@@ -370,23 +403,9 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
     }
     return (
       <>
-        <div className={styles['field']}>
-          <span className={styles['fieldLabel']}>{t('keyInput')}</span>
-          <input
-            className={styles['input']}
-            type="password"
-            autoComplete="off"
-            value={keyDraft}
-            placeholder={keyPlaceholder}
-            aria-label={t('keyInput')}
-            aria-invalid={shownKeyFailure !== undefined}
-            required={props.credentialRequired === true}
-            autoFocus={props.autoFocusCredential === true}
-            disabled={disabled || keyLocked}
-            onChange={(event) => { setKeyDraft(event.target.value) }}
-          />
-          {shownKeyFailure === undefined ? null : <p className={styles['error']}>{t(shownKeyFailure)}</p>}
-        </div>
+        {props.credentialSlot === undefined
+          ? nativeKeyField
+          : props.credentialSlot('settings.models.credential', { provider: props.provider }, { fallback: nativeKeyField })}
         {props.credentialOnly === true ? null : <details className={styles['customized']}>
           <summary className={styles['customizedSummary']}>{t('customized')}</summary>
           <div className={styles['customizedBody']}>
@@ -507,7 +526,8 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
         submitDisabled={disabled || layout === 'unknown'
           || (props.credentialOnly !== true && modelFailure !== undefined)
           || shownKeyFailure !== undefined
-          || (props.credentialRequired === true && keyValue.length === 0)}
+          || (props.credentialRequired === true && props.credentialSlot === undefined
+            && keyValue.length === 0)}
         submitLabel={props.submitLabel ?? 'apply'}
         submitBusyLabel={props.submitBusyLabel ?? 'applying'}
         {...props.cancelLabel === undefined ? {} : { cancelLabel: props.cancelLabel }}

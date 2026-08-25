@@ -1,20 +1,16 @@
 /**
  * Configuration schema and key-pool resolution for the rotation plugin.
  *
- * A `providers` entry reuses the dsh-llm-pi-ai provider-profile fields — the
- * schema passes unknown profile fields through untouched, and profile
- * validation is delegated wholesale to that package's own resolver — minus
- * `apiKeyEnv`, replaced by an ordered `keys` list. Each key names either a
- * credential reference or a literal dev-only value. Resolution fails loud at
- * plugin load for every malformed route, so a composition never mounts half a
- * pool.
+ * A `providers` entry names an EXISTING provider route — one a plain adapter
+ * family (dsh-llm-pi-ai, dsh-llm-deepseek) already serves — and carries only
+ * the ordered `keys` list that overrides that route's native single-key
+ * resolution. Identity fields (endpoint, protocol, models) stay owned by the
+ * route's home section; this plugin never registers or duplicates them.
  *
  * @module @deepseek-ai/dsh-llm-key-rotation/config
  */
 
 import z from '@deepseek-ai/schemastery'
-import { resolveProfiles } from '@deepseek-ai/dsh-llm-pi-ai'
-import type { PiAiProviderProfile, ResolvedPiAiProviderProfile } from '@deepseek-ai/dsh-llm-pi-ai'
 import { toPoolMember } from './pool.ts'
 import type { KeyPool } from './pool.ts'
 
@@ -28,18 +24,19 @@ export interface RotationKeyConfig {
   label?: string
 }
 
-/** A pi-ai provider profile whose credential comes from the ordered {@link keys} list. */
-export type RotationProviderConfig = Omit<PiAiProviderProfile, 'apiKeyEnv'> & {
+/** The ordered keys this plugin rotates across for one existing provider route. */
+export interface RotationProviderConfig {
   /** The ordered keys to rotate across; at least one is required. */
   keys?: RotationKeyConfig[]
 }
 
-/** Plugin configuration: the rotated provider routes this instance owns. */
+/** Plugin configuration: which existing routes rotate their keys, and how. */
 export interface Config {
   /**
-   * Rotated routes keyed by provider. An empty (or omitted) dict keeps the
-   * plugin dormant; every listed route registers on `ctx.llm`, so its route
-   * must not also be declared in a plain dsh-llm-pi-ai section.
+   * Rotated routes keyed by an existing provider route id. An empty (or
+   * omitted) dict keeps the plugin dormant; every listed route must already
+   * be served by a plain adapter family, whose credentials this plugin then
+   * overrides.
    */
   providers?: Record<string, RotationProviderConfig>
   /**
@@ -59,9 +56,8 @@ const rotationKey: z<RotationKeyConfig> = z.object({
 
 /**
  * Runtime schema for {@link Config}. Only the rotation-specific fields are
- * declared: schemastery merges undeclared keys back into the result, so each
- * provider's remaining profile fields reach resolution exactly as written and
- * are validated by dsh-llm-pi-ai's resolver.
+ * declared: a route entry is its ordered keys list alone, because every other
+ * profile fact belongs to the route's owning section.
  */
 export const Config: z<Config> = z.object({
   providers: z.dict(z.object({ keys: z.array(rotationKey) })).default({}),
@@ -69,38 +65,33 @@ export const Config: z<Config> = z.object({
   dshHome: z.string(),
 })
 
-/** The resolved output of one configuration: adapter profiles and their pools, both route-keyed. */
+/** The resolved output of one configuration: rotation state, route-keyed. */
 export interface ResolvedPools {
-  /** Validated pi-ai profiles for every configured route. */
-  readonly profiles: ReadonlyMap<string, ResolvedPiAiProviderProfile>
   /** Rotation state for every configured route. */
   readonly pools: ReadonlyMap<string, KeyPool>
 }
 
-function stripKeys(source: RotationProviderConfig): PiAiProviderProfile {
-  const { keys: _keys, ...profile } = source
-  return profile
-}
-
 /**
- * Validate the whole providers dict and build the adapter profiles and pools.
- * This is the one explicit resolve step, so a missing dict resolves to the
- * empty dormant posture here rather than through a hidden fallback, and every
- * malformed route, key source, duplicate label, or unserviceable profile fails
- * before anything mounts.
- * @param providers - configured rotated routes.
- * @returns the detached profiles and pools, both keyed by route.
+ * Validate the whole providers dict and build the pools. This is the one
+ * explicit resolve step, so a missing dict resolves to the empty dormant
+ * posture here rather than through a hidden fallback, and every malformed
+ * key source, duplicate label, or empty route fails before anything mounts.
+ * A route no plain adapter serves would create a pool nobody consults; the
+ * settings editor only ever writes routes picked from live provider cards,
+ * and a hand-edited typo surfaces as an inert pool rather than a failure.
+ * @param providers - configured rotated routes keyed by existing route id.
+ * @returns the detached pools, keyed by route.
  */
 export function resolvePools(providers: Record<string, RotationProviderConfig> | undefined): ResolvedPools {
   const entries = Object.entries(providers ?? {})
   const pools = new Map<string, KeyPool>()
-  const plainProfiles: Record<string, PiAiProviderProfile> = {}
   for (const [route, source] of entries) {
     if (route.length === 0) throw new Error('llm-key-rotation: provider names must be non-empty')
     if ('apiKeyEnv' in source) {
       throw new Error(
-        `llm-key-rotation: provider "${route}" sets apiKeyEnv, which belongs on a plain dsh-llm-pi-ai row;`
-        + ' this plugin rotates keys[], where each key names its own apiKeyEnv or dev-only value',
+        `llm-key-rotation: provider "${route}" sets apiKeyEnv, which belongs on the route's own`
+        + ' dsh-llm-pi-ai profile; this plugin rotates keys[], where each key names its own'
+        + ' apiKeyEnv or dev-only value',
       )
     }
     if (!Array.isArray(source.keys) || source.keys.length === 0) {
@@ -123,10 +114,6 @@ export function resolvePools(providers: Record<string, RotationProviderConfig> |
       index: 0,
       parkedUntil: new Map(),
     })
-    plainProfiles[route] = stripKeys(source)
   }
-  // Profile validation (route names, models, protocols, retry policies) is the
-  // pi-ai resolver's job; running it here surfaces those failures at load too.
-  const profiles = resolveProfiles(plainProfiles)
-  return { profiles, pools }
+  return { pools }
 }

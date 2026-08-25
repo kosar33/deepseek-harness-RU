@@ -162,8 +162,8 @@
     },
     "docs/testing.ru.md": {
       "source": "docs/testing.md",
-      "sourceBlob": "a1a2ac778b5334b480bba3decb0da338731980ad",
-      "ruBlob": "75521878e61e9203439d58fad656f52a4d3f2973"
+      "sourceBlob": "1ec4d4e65fa83dd390a75386945dcfb472822edc",
+      "ruBlob": "2f9ceefa87551c321bbdcb55f23b11327c5ee2c6"
     },
     "docs/development.ru.md": {
       "source": "docs/development.md",
@@ -472,6 +472,8 @@
       "source": "packages/client/ui-settings-models/README.md",
       "sourceBlob": "781d7a8134c8118ddf4a78f3ee153a8043bae0a6",
       "ruBlob": "ad6180c21fe11f7a48f004a99f7b404763662018"
+      "sourceBlob": "a373ab72c9a4c3ba2b00430905224c7d34415c14",
+      "ruBlob": "a1c37dfeb978c95c4cb737624b9a160325a782dd"
     },
     "packages/mcp/README.ru.md": {
       "source": "packages/mcp/README.md",
@@ -2230,6 +2232,8 @@
       "source": "docs/event-producer-consumer.md",
       "sourceBlob": "1fb65d55f5a0d8121f4f171c956196fde746103f",
       "ruBlob": "4d18b39f30559fcc20e8180538cabb4a23364239"
+      "sourceBlob": "7ea6efe74c4f969c4e03bbe98b4340a35fc0cb3f",
+      "ruBlob": "6b8a3a3649b7291e1a01f681b3861b6ca1ee2d4f"
     },
     "docs/graph-atlas.ru.md": {
       "source": "docs/graph-atlas.md",
@@ -2239,8 +2243,8 @@
     },
     "packages/llm/llm-key-rotation/README.ru.md": {
       "source": "packages/llm/llm-key-rotation/README.md",
-      "sourceBlob": "be6c2832e2cae50fd06059bec9cfe2f8da4dd373",
-      "ruBlob": "5ce1e0f513feb442a7f0d6af0eba73e768fad7e4"
+      "sourceBlob": "b0ca224a35a7266d0b6546b4f2418b5df9ebb5f9",
+      "ruBlob": "ecb7f39b27f9cd17bcd317eb18abf4993c992369"
     },
     "docs/module-graph.ru.md": {
       "source": "docs/module-graph.md",
@@ -2262,11 +2266,13 @@
       "sourceBlob": "de340b7ffade528301b4538b0553bc11ec969985",
       "ruBlob": "2fc0f487cc86cf32047d2240f9302d830bcc86a9"
       "ruBlob": "1cd36c0666cce56dfecd4558e73f9b09ca847b24"
+      "sourceBlob": "d47325af5d6d100d60d23c7d14d7a4f8610bc965",
+      "ruBlob": "513406e224f1610259d885ea08356887343ff834"
     },
     "packages/client/ui-settings-key-rotation/README.ru.md": {
       "source": "packages/client/ui-settings-key-rotation/README.md",
-      "sourceBlob": "f0784301d114c9de3b561ead0a0598d1ab159234",
-      "ruBlob": "22a84b1eab6f6c00d7a04227b24f1f7e4b4d588e"
+      "sourceBlob": "81ed3b167073cc785dddba9aaa374bcf87ed56a4",
+      "ruBlob": "d1b301c01b79029f0a41d4891d844067c6859c72"
     }
   }
 }

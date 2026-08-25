@@ -16,7 +16,7 @@ import { useState } from 'react'
 import type { ReactNode } from 'react'
 import type { IApiClient } from '@deepseek-ai/dsh-api-remotes/client'
 import { Button, IconPlusOutline16, Modal } from '@deepseek-ai/dsh-client-ui-primitives'
-import type { InjectFace } from '@deepseek-ai/dsh-client-ui-slots'
+import type { InjectFace, PropsRenderSlots } from '@deepseek-ai/dsh-client-ui-slots'
 import { CustomProviderCard } from './CustomProviderCard.tsx'
 import { deriveKeyRef, messageOf, protocolChoices, providerUsable } from './store.ts'
 import type { ModelsSettingsStore, ProviderRow } from './store.ts'
@@ -43,9 +43,12 @@ export interface ModelsSectionInjected {
 
 /**
  * Props delivered by the slot outlet: the inject face spread flat (the
- * renderer erases the share boundary at the render call).
+ * renderer erases the share boundary at the render call), plus the provider
+ * credential seat this section declares under `settings.models.credential`.
  */
-export type ModelsSectionProps = Partial<InjectFace<ModelsSectionInjected>>
+export type ModelsSectionProps =
+  Partial<InjectFace<ModelsSectionInjected>>
+  & Partial<PropsRenderSlots<'settings.models.credential'>>
 
 type ModelsSectionFace = InjectFace<ModelsSectionInjected>
 
@@ -73,16 +76,19 @@ interface ProviderEditorRenderProps extends Pick<
   'namespace' | 'schema' | 'api' | 't' | 'readOnly' | 'onClose'
 > {
   target: EditorTarget
+  /** The declared credential seat, forwarded so every card swaps its key field. */
+  credentialSlot?: NonNullable<PropsRenderSlots<'settings.models.credential'>['renderSlot']>
 }
 
 /** Render an editor for either the setup posture or an expanded provider row. */
-function renderProviderEditor({ target, ...props }: ProviderEditorRenderProps): ReactNode {
+function renderProviderEditor({ target, credentialSlot, ...props }: ProviderEditorRenderProps): ReactNode {
   return (
     <ProviderEditor
       provider={target.provider}
       displayName={target.displayName}
       settingsPath={target.settingsPath}
       {...target.declared === true ? { declared: true } : {}}
+      {...credentialSlot === undefined ? {} : { credentialSlot }}
       {...props}
     />
   )
@@ -176,15 +182,21 @@ export function providerCopy(template: string, target: ProviderIdentity): string
  * @returns the section, or null while the shell has not injected yet.
  */
 export function ModelsSection(props: ModelsSectionProps): ReactNode {
-  const { controller, useSnapshot, api, schema, t } = props
+  const { controller, useSnapshot, api, schema, t, renderSlot } = props
   if (
     controller === undefined || useSnapshot === undefined || api === undefined
     || schema === undefined || t === undefined
   ) return null
-  return <Loaded injected={{ controller, useSnapshot, api, schema, t }} />
+  return <Loaded
+    injected={{ controller, useSnapshot, api, schema, t }}
+    {...renderSlot === undefined ? {} : { renderSlot }}
+  />
 }
 
-function Loaded({ injected }: { injected: ModelsSectionFace }): ReactNode {
+function Loaded(
+  { injected, renderSlot }:
+  { injected: ModelsSectionFace; renderSlot?: NonNullable<PropsRenderSlots<'settings.models.credential'>['renderSlot']> },
+): ReactNode {
   const { controller, api, schema, t } = injected
   const state = injected.useSnapshot(snapshot => snapshot)
   const [editing, setEditing] = useState<EditorTarget | undefined>(undefined)
@@ -245,6 +257,9 @@ function Loaded({ injected }: { injected: ModelsSectionFace }): ReactNode {
   }
 
   if (state.status === 'idle') void controller.load()
+  // Forwarded to every card so a mounted credential feature replaces each
+  // provider's key field; `undefined` keeps every native field.
+  const slotProps = renderSlot === undefined ? {} : { credentialSlot: renderSlot }
   if (state.status === 'error') {
     /* v8 ignore next -- an error status always carries text; the fallback satisfies the nullable type */
     const errorText = state.error ?? ''
@@ -312,6 +327,7 @@ function Loaded({ injected }: { injected: ModelsSectionFace }): ReactNode {
                   t,
                   readOnly: !state.writable,
                   onClose: (changed) => { closeSetup(changed, target) },
+                  ...slotProps,
                 })}
               </li>
             )
@@ -397,6 +413,7 @@ function Loaded({ injected }: { injected: ModelsSectionFace }): ReactNode {
                   t,
                   readOnly: !state.writable,
                   onClose: (changed) => { closeEditor(changed, target) },
+                  ...slotProps,
                 })
                 : null}
             </li>
@@ -437,6 +454,7 @@ function Loaded({ injected }: { injected: ModelsSectionFace }): ReactNode {
                 t={t}
                 readOnly={!state.writable}
                 onClose={(changed) => { closeEditor(changed, addTarget) }}
+                {...slotProps}
               />
             </div>
           )

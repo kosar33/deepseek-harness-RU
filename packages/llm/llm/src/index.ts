@@ -47,6 +47,13 @@ export type { LlmCallConfig, LlmCallConfigAdapterDefaults } from './call-config.
 declare module '@deepseek-ai/cordis' {
   interface Context {
     llm: LlmRuntime
+    /**
+     * Optional per-route credential override; present only when a plugin such
+     * as dsh-llm-key-rotation provides it. Read through strict
+     * `ctx.get('llmApiKeyOverride')` — never through the property proxy,
+     * whose read is topology-sensitive for absent services.
+     */
+    llmApiKeyOverride?: LlmApiKeyOverride
   }
 
   interface Events {
@@ -257,6 +264,25 @@ export abstract class LlmAdapter {
    * @returns the chunk stream, obeying the adapter contract documented on `StreamChunk`.
    */
   abstract stream(options: GenerateOptions): AsyncIterable<StreamChunk>
+}
+
+/**
+ * Optional per-route API-key override that adapter families consult before
+ * their native credential resolution. The key-rotation plugin provides one;
+ * a composition without it resolves every credential exactly as before.
+ * Consumers read it through `ctx.get('llmApiKeyOverride')`: it is an optional
+ * service, so neither its presence nor its route set takes part in adapter
+ * registration — the registering family stays the route's only owner.
+ */
+export interface LlmApiKeyOverride {
+  /**
+   * Resolve the API key serving one route right now.
+   * @param provider - the provider route about to authenticate.
+   * @returns the key to authenticate with, or `undefined` when this route has
+   *   no override pool and the caller must fall through to its native
+   *   credential resolution.
+   */
+  resolve(provider: string): Promise<string | undefined>
 }
 
 /**

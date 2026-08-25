@@ -12,6 +12,7 @@ import { credentialRef } from '@deepseek-ai/dsh-credentials'
 import { createUserMessage } from '@deepseek-ai/dsh-llm'
 import * as LlmRuntime from '@deepseek-ai/dsh-llm'
 import * as CredentialsLocal from '@deepseek-ai/dsh-credentials-local'
+import * as LlmPiAi from '@deepseek-ai/dsh-llm-pi-ai'
 import { startMockLlmServer } from '@deepseek-ai/dsh-llm-mock-server'
 import type { MockLlmServer } from '@deepseek-ai/dsh-llm-mock-server'
 import * as Retry from '@deepseek-ai/dsh-llm-retry'
@@ -42,6 +43,7 @@ afterEach(async () => {
 function moduleTable(): Map<string, unknown> {
   return new Map<string, unknown>([
     ['@deepseek-ai/dsh-llm', LlmRuntime],
+    ['@deepseek-ai/dsh-llm-pi-ai', LlmPiAi],
     ['@deepseek-ai/dsh-session', SessionStore],
     ['@deepseek-ai/dsh-system-prompt', SystemPrompt],
     ['@deepseek-ai/dsh-tools', ToolRuntime],
@@ -77,7 +79,7 @@ describe('real Loader composition', () => {
   // Real-Loader composition resolves workspace packages through tsx at test
   // time; first resolution after the host/client program split is slow enough
   // to trip the default 5s budget on cold caches.
-  it('boots rotated OpenRouter-style routes from cordis.yml and recovers across keys', { timeout: 60_000 }, async () => {
+  it('boots a plain pi-ai route plus a key overlay and recovers across keys', { timeout: 60_000 }, async () => {
     server = await startMockLlmServer({ sequence: ['rate_limit', 'success'] })
     root = await mkdtemp(join(tmpdir(), 'dsh-key-rotation-loader-'))
     const credentialPath = join(root, '.credentials.yaml').replaceAll('\\', '/')
@@ -99,17 +101,23 @@ describe('real Loader composition', () => {
       `    path: '${credentialPath}'`,
       "- name: '@deepseek-ai/dsh-llm-retry'",
       '- id: llm-openrouter',
-      "  name: '@deepseek-ai/dsh-llm-key-rotation'",
+      "  name: '@deepseek-ai/dsh-llm-pi-ai'",
       '  config:',
-      `    parkFile: '${join(root, '.llm-key-rotation-parks.json').replaceAll('\\', '/')}'`,
       '    providers:',
       '      openrouter:',
+      '        displayName: OpenRouter',
       '        api: openai-completions',
       `        baseURL: '${server.baseURL}'`,
       '        models:',
       '          - id: mock-model',
       '            name: Mock Model',
       '            contextWindow: 8192',
+      '- id: llm-openrouter-keys',
+      "  name: '@deepseek-ai/dsh-llm-key-rotation'",
+      '  config:',
+      `    parkFile: '${join(root, '.llm-key-rotation-parks.json').replaceAll('\\', '/')}'`,
+      '    providers:',
+      '      openrouter:',
       '        keys:',
       '          - apiKeyEnv: OPENROUTER_KEY_1',
       '          - apiKeyEnv: OPENROUTER_KEY_2',
@@ -119,6 +127,9 @@ describe('real Loader composition', () => {
 
     await bootFromYml(root, configPath, moduleTable())
 
+    // The route is registered exactly once — by dsh-llm-pi-ai. Loading with
+    // both plugins composed proves the overlay registers nothing: a second
+    // registration of the same route would have failed the mount loud.
     expect(context!.llm.listProviders().map(provider => provider.id)).toEqual(['openrouter'])
     const agent = context!.agentLoop.create(SessionId('loader-key-rotation'), {
       provider: 'openrouter',
@@ -143,6 +154,12 @@ describe('real Loader composition', () => {
     expect(record?.parkedAt).toBeGreaterThan(0)
     expect(record?.resetAt).toBeGreaterThan(Date.now())
     expect(agent.session.events.some(event => event.type === 'llm/retry')).toBe(false)
+    expect((context!.get('llmKeyRotation') as KeyRotation.LlmKeyRotationState).snapshot()).toEqual([
+      expect.objectContaining({
+        provider: 'openrouter',
+        activeLabel: 'OPENROUTER_KEY_2',
+      }),
+    ])
     expect(agent.session.deriveMessages().at(-1)).toMatchObject({
       role: 'assistant',
       content: [{ type: 'text', text: 'mock response recovered' }],
@@ -150,9 +167,9 @@ describe('real Loader composition', () => {
   })
 
   // The web editor's exact round trip, over the real composition: credential
-  // values through the credentials seam, route rows through a settings mutate,
-  // and the rotated route serving without a restart.
-  it('activates an editor-written route from the settings section and serves it', { timeout: 60_000 }, async () => {
+  // values through the credentials seam, key rows through a settings mutate,
+  // and the already-registered route serving from the pool without a restart.
+  it('activates an editor-written pool over an existing route and serves it', { timeout: 60_000 }, async () => {
     server = await startMockLlmServer({ sequence: ['success'] })
     root = await mkdtemp(join(tmpdir(), 'dsh-key-rotation-editor-'))
     const credentialPath = join(root, '.credentials.yaml').replaceAll('\\', '/')
@@ -174,6 +191,18 @@ describe('real Loader composition', () => {
       `    path: '${join(root, 'settings.yaml').replaceAll('\\', '/')}'`,
       '    watch: false',
       "- name: '@deepseek-ai/dsh-llm-retry'",
+      '- id: llm-openrouter',
+      "  name: '@deepseek-ai/dsh-llm-pi-ai'",
+      '  config:',
+      '    providers:',
+      '      openrouter:',
+      '        displayName: OpenRouter',
+      '        api: openai-completions',
+      `        baseURL: '${server.baseURL}'`,
+      '        models:',
+      '          - id: mock-model',
+      '            name: Mock Model',
+      '            contextWindow: 8192',
       '- id: llm-key-pool',
       "  name: '@deepseek-ai/dsh-llm-key-rotation'",
       '  config:',
@@ -183,7 +212,9 @@ describe('real Loader composition', () => {
     ].join('\n'))
     await bootFromYml(root, configPath, moduleTable())
 
-    expect(context!.llm.listProviders()).toEqual([])
+    // The route exists from the start because pi-ai registered it; rotation
+    // is dormant until the editor saves keys.
+    expect(context!.llm.listProviders().map(provider => provider.id)).toEqual(['openrouter'])
     const face = context!.get('llmKeyRotation') as KeyRotation.LlmKeyRotationState
     expect(face.snapshot()).toEqual([])
 
@@ -194,27 +225,25 @@ describe('real Loader composition', () => {
       op: 'set',
       path: ['providers', 'openrouter'],
       value: {
-        displayName: 'OpenRouter',
-        api: 'openai-completions',
-        baseURL: server.baseURL,
-        models: [{ id: 'mock-model', name: 'Mock Model', contextWindow: 8192 }],
         keys: [{ apiKeyEnv: 'OPENROUTER_KEYROTATION_1' }],
       },
     }])
     await vi.waitFor(() => {
-      expect(context!.llm.listProviders().map(provider => provider.id)).toEqual(['openrouter'])
-    })
-    expect(face.snapshot()).toEqual([{
-      provider: 'openrouter',
-      activeLabel: 'OPENROUTER_KEYROTATION_1',
-      keys: [{
+      expect(face.snapshot()).toEqual([{
         provider: 'openrouter',
-        label: 'OPENROUTER_KEYROTATION_1',
-        source: 'reference',
-        reference: 'OPENROUTER_KEYROTATION_1',
-        status: { state: 'usable' },
-      }],
-    }])
+        activeLabel: 'OPENROUTER_KEYROTATION_1',
+        keys: [{
+          provider: 'openrouter',
+          label: 'OPENROUTER_KEYROTATION_1',
+          source: 'reference',
+          reference: 'OPENROUTER_KEYROTATION_1',
+          status: { state: 'usable' },
+        }],
+      }])
+    })
+    // The registry is unchanged by the section commit: still exactly the one
+    // pi-ai-owned route.
+    expect(context!.llm.listProviders().map(provider => provider.id)).toEqual(['openrouter'])
 
     const agent = context!.agentLoop.create(SessionId('editor-written-route'), {
       provider: 'openrouter',

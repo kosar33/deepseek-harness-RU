@@ -5,7 +5,7 @@ import type { ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import Schema from '@deepseek-ai/schemastery'
 import { bindSnapshotSelector } from '@deepseek-ai/dsh-client-test-runtime'
-import type { RpcResponse, SettingsNamespaceView } from '@deepseek-ai/dsh-api-remotes/client'
+import type { KeyRotationRouteView, RpcResponse, SettingsNamespaceView } from '@deepseek-ai/dsh-api-remotes/client'
 import {
   ModelsSection, needsSetup, providerCopy, providerTargetLabel, removeProviderProfile,
 } from '../src/client/ModelsSection.tsx'
@@ -162,6 +162,8 @@ function scriptedFace(overrides: {
         ],
       }))),
       models: vi.fn(() => Promise.resolve(ok({ groups: [], failures: [] }))),
+      keyRotation: vi.fn(async (): Promise<RpcResponse<{ configured: boolean; routes: KeyRotationRouteView[] }>> =>
+        ok({ configured: false, routes: [] })),
     },
     settings: {
       describe: vi.fn(() => Promise.resolve(ok({ writable: true, hasDocument: false, namespaces: wireNamespaces() }))),
@@ -345,6 +347,36 @@ describe('ModelsSection', () => {
     expect(screen.getByText('zombie').closest('li')?.querySelector('[role="img"]')).toBeNull()
   })
 
+  it('shows the configured dot while a mounted rotation pool covers the route', async () => {
+    const mounted = await mountSection()
+    // The native reference stops resolving while the rotation pool takes the
+    // route over: the dot must read the same fact that serves requests.
+    mounted.face.credentials.describe.mockImplementation((payload: { refs: string[] }) =>
+      Promise.resolve(ok({
+        credentials: Object.fromEntries(payload.refs.map(ref => [ref, { configured: false, writable: true }])),
+      })))
+    mounted.face.llm.keyRotation.mockImplementation(() => {
+      const routes: KeyRotationRouteView[] = [{
+        provider: 'openai',
+        activeLabel: 'OPENAI_KEYROTATION_1',
+        keys: [{
+          label: 'OPENAI_KEYROTATION_1',
+          source: 'reference',
+          reference: 'OPENAI_KEYROTATION_1',
+          status: { state: 'usable' },
+        }],
+      }]
+      return Promise.resolve(ok({ configured: true, routes }))
+    })
+    await act(async () => { await mounted.controller.load() })
+    const covered = screen.getByRole('img', { name: en.credentialConfigured })
+    expect(covered.className).toContain('credentialDotConfigured')
+    expect(covered.closest('li')?.textContent).toContain('openai')
+    // A route the pool does not name and whose reference is unset stays red.
+    const missing = screen.getByRole('img', { name: en.credentialMissing })
+    expect(missing.closest('li')?.textContent).toContain('DeepSeek')
+  })
+
   it('turns the setup card into a row once the credential reports configured', async () => {
     const { face } = await mountFirstRun()
     face.credentials.describe.mockImplementation((payload: { refs: string[] }) => Promise.resolve(ok({
@@ -373,6 +405,7 @@ describe('ModelsSection', () => {
       removable: false,
       apiKeyEnv: 'X',
       credential,
+      rotationCovered: false,
     })
     expect(needsSetup(row(undefined), false)).toBe(true)
     expect(needsSetup(row({ configured: true, writable: true }), false)).toBe(false)

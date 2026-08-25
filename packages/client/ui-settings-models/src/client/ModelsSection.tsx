@@ -333,7 +333,10 @@ function Loaded(
             )
           }
           const open = !adding && editing?.provider === row.entry.provider
-          const credentialConfigured = row.credential?.configured === true
+          // A covered route serves requests through the rotation override even
+          // with its native reference unset, so the dot reads the same fact
+          // the request path does.
+          const credentialConfigured = row.credential?.configured === true || row.rotationCovered === true
           const credentialMissing = !credentialConfigured
             && row.apiKeyEnv !== undefined
             && row.credential?.configured === false

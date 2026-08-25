@@ -19,6 +19,7 @@ function row(overrides: Partial<ProviderRow> = {}): ProviderRow {
     removable: false,
     apiKeyEnv: 'DEEPSEEK_API_KEY',
     credential: missingCredential,
+    rotationCovered: false,
     ...overrides,
   }
 }
@@ -37,6 +38,7 @@ function otherRow(overrides: Partial<ProviderRow> = {}): ProviderRow {
     removable: true,
     apiKeyEnv: 'HFAI_API_KEY',
     credential: { configured: true, source: 'file', writable: true },
+    rotationCovered: false,
     ...overrides,
   }
 }
@@ -63,6 +65,17 @@ describe('providerUsable', () => {
 
   it('treats a reference-free registered route as provider-native authentication', () => {
     expect(providerUsable(otherRow({ apiKeyEnv: undefined, credential: undefined }))).toBe(true)
+  })
+
+  it('counts a mounted key-rotation pool as serving the route without a native credential', () => {
+    expect(providerUsable(otherRow({ credential: missingCredential, rotationCovered: true }))).toBe(true)
+    expect(providerUsable(otherRow({ credential: missingCredential, rotationCovered: false }))).toBe(false)
+    // Dormant stays dormant even when covered: nothing can serve it.
+    expect(providerUsable(otherRow({
+      entry: { ...otherRow().entry, active: false },
+      credential: missingCredential,
+      rotationCovered: true,
+    }))).toBe(false)
   })
 })
 

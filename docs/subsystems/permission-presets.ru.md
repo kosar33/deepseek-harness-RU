@@ -79,7 +79,7 @@ Generated from source by `scripts/gen-cordis-catalog.ts` (verified fresh by `pnp
 
 ### `ctx.permissionPresets` — `PermissionPresetService`
 
-Owns the deployment's permission presets and their write path. Requires a confining `ctx.shell` executor and `ctx.approval`; unmatched knob values are reported as CUSTOM_PRESET, not an error.
+Владеет пресетами разрешений развёртывания и путём их записи. Требует ограничивающего исполнителя `ctx.shell` и `ctx.approval`; не совпавшие значения ручек сообщаются как CUSTOM_PRESET, а не как ошибка.
 
 ```ts cordis-catalog
 /**

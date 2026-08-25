@@ -192,7 +192,7 @@ Source: [`packages/core/system-prompt/src/index.ts`](../../packages/core/system-
 
 #### `system-prompt/change` — emit
 
-Emitted when any prompt provider changes. This registry notification is unfiltered because a global change affects every scope.
+Генерируется при изменении любого провайдера промптов. Уведомление реестра неотфильтровано, поскольку глобальное изменение затрагивает каждую область.
 
 ```ts cordis-catalog
 /**

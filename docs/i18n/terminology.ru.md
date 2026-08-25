@@ -50,6 +50,8 @@
 | same-world subprocess | same-world subprocess | Допустимая первая аннотация «same-world subprocess (дочерний процесс, разделяющий с хостом файловую систему и ядро)» |
 | seam | seam | Никогда не «шов»; см. capability seam |
 | Service Definition, Service Provider | Service Definition, Service Provider | Именованные роли capability seam |
+| settlement | фиксация итога | Терминальная запись исхода задачи или вызова; в коде и JSDoc остаётся без перевода. Составное: settlement delivery → доставка итога |
+| redaction | редактирование | Очистка конфиденциальных данных из выгружаемой копии; каскад `session-telemetry/record` — «каскад редактирования». Канонический журнал не переписывается никогда |
 | skill | скилл | Мн. ч. «скиллы»; составные: agent skill → агентский скилл |
 | slot | slot | Именованное регистрируемое место в клиентской архитектуре |
 | spill | spill | Составные: spill-файл, spill-путь |

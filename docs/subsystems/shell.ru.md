@@ -234,7 +234,7 @@ Generated from source by `scripts/gen-cordis-catalog.ts` (verified fresh by `pnp
 
 Abstract bash execution service. Subclass, implement the abstract methods, and load the subclass as a plugin — it registers as `ctx.shell` (one implementation per context; loading a second throws, which is cordis' standard duplicate-service behavior).
 
-Implementations must honor these semantics:
+Реализации обязаны соблюдать эту семантику:
 
 - run rejects only for infrastructure failures. Nonzero exits, timeout kills, and abort kills resolve with a ShellRunResult.
 - start returns immediately; no timeout applies to background processes. `done` settles at process close and never rejects; spawn failures settle as `killed` with the error on stderr.

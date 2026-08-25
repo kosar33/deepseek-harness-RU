@@ -172,7 +172,7 @@ Generated from source by `scripts/gen-cordis-catalog.ts` (verified fresh by `pnp
 
 ### `ctx.codeRuntime` — `CodeRuntime` (abstract seam)
 
-Registers one `ctx.codeRuntime` implementation. Program, budget, abort, and substrate failures resolve in CodeRunResult; only Service Definition contract misuse rejects. Implementations bridge structured-cloneable bindings, materialize each declared namespace rejection class, treat programs as hostile peers, isolate runs from one another, and terminate and await in-flight runs during disposal.
+Регистрирует одну реализацию `ctx.codeRuntime`. Сбои программы, бюджета, отмены и субстрата разрешаются в `CodeRunResult`; отклоняется только нарушение контракта Service Definition. Реализации наводят мосты для привязок, пригодных к structured-clone, материализуют каждый объявленный класс отказов namespace, считают программы враждебными равноправными сторонами, изолируют прогоны друг от друга и при удалении завершают идущие прогоны и ожидают их.
 
 ```ts cordis-catalog
 /**

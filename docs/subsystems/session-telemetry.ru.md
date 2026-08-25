@@ -137,7 +137,7 @@ Generated from source by `scripts/gen-cordis-catalog.ts` (verified fresh by `pnp
 
 ### `ctx.sessionTelemetry` — `SessionTelemetryBackend` (abstract seam)
 
-Loadable form of the backend contract: one implementation per context — the cordis `Service` registration under the `telemetry` key throws on a duplicate, cordis' standard behavior. A backend composes a SessionTelemetryCoordinator in its constructor to install the capture side.
+Загружаемая форма контракта бэкенда: одна реализация на контекст — регистрация cordis-`Service` под ключом `telemetry` бросает исключение при дубликате, стандартное поведение cordis. Бэкенд компонует `SessionTelemetryCoordinator` в своём конструкторе, чтобы установить сторону захвата.
 
 ```ts cordis-catalog
 /**
@@ -166,7 +166,7 @@ Source: [`packages/session/session-telemetry/src/index.ts`](../../packages/sessi
 
 #### `session-telemetry/record` — waterfall
 
-Transform one outbound record before it reaches the backend. This waterfall is the Service Definition's redaction extension point. It ships NO rules of its own: the innermost `next()` passes the record through unchanged, and with no listener mounted records reach the backend as captured, so exported data is exactly as clean as the rules a deployment mounts. Listeners stack by transforming `next()`'s return value; returning without `next()` replaces everything beneath. Dispatched synchronously on the capture hot path inside the coordinator's containment: a throwing listener withholds that one record (fail-closed) and never reaches the agent loop. Live capture dispatches at append time; on-demand capture dispatches while reading the canonical log. Redaction applies to the exported copy only; the canonical session log is never rewritten.
+Преобразует одну исходящую запись до того, как она достигнет бэкенда. Этот каскад — точка расширения редактирования у Service Definition. Собственных правил у него нет: внутренний `next()` проводит запись без изменений, а без смонтированного слушателя записи достигают бэкенда ровно в том виде, в каком захвачены, поэтому экспортированные данные настолько чисты, насколько чисты правила, смонтированные развёртыванием. Слушатели образуют цепочку, преобразуя возвращаемое значение `next()`; возврат без `next()` заменяет всё нижележащее. Диспетчеризация выполняется синхронно на горячем пути захвата внутри перехвата координатора: бросающий исключение слушатель задерживает эту одну запись (fail-closed) и никогда не достигает агентного цикла. Живой захват диспетчеризуется в момент добавления записи; захват по требованию — при чтении канонического журнала. Редактирование применяется только к экспортируемой копии; канонический журнал сессии никогда не переписывается.
 
 ```ts cordis-catalog
 /**

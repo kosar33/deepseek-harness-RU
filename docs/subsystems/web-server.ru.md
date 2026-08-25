@@ -131,7 +131,7 @@ Source: [`packages/host/webserver/src/index.ts`](../../packages/host/webserver/s
 
 #### `webserver/index-inject` — emit
 
-Collect the structured index injection table. Emitted on every index render and every worker boot-payload request; listeners push their current rows, so a row's data is read fresh at emit time.
+Собирает структурную таблицу инъекций индекса. Генерируется при каждой отрисовке индекса и каждом запросе boot-payload воркера; слушатели выдают свои текущие строки, поэтому данные строки читаются свежими в момент генерации.
 
 ```ts cordis-catalog
 /**

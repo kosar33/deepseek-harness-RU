@@ -324,7 +324,7 @@ Generated from source by `scripts/gen-cordis-catalog.ts` (verified fresh by `pnp
 
 ### `ctx.agentDefaultModel` — `AgentDefaultModelConfig`
 
-Owns the default model selection independently of any Host or transport. The composition entry remains usable without a settings provider; when one is mounted, its user layer is read live.
+Владеет выбором модели по умолчанию независимо от любого Host и транспорта. Запись композиции остаётся работоспособной без settings-провайдера; когда он смонтирован, его пользовательский слой читается вживую.
 
 ```ts cordis-catalog
 /**
@@ -389,7 +389,7 @@ Source: [`packages/core/agent-loop/src/index.ts`](../../packages/core/agent-loop
 
 Registry over the deployment's agent presets.
 
-Discovery is unmemoized: `list()` and `resolve()` re-read the roots on every call so a preset authored while the process runs is visible immediately, and a preset deleted underneath a picker disappears from the next read.
+Обнаружение не кешируется: `list()` и `resolve()` перечитывают корни при каждом вызове, поэтому пресет, созданный при работающем процессе, виден немедленно, а удалённый пресет исчезает уже при следующем чтении.
 
 ```ts cordis-catalog
 /**
@@ -895,7 +895,7 @@ Source: [`packages/core/agent/src/runtime-types.ts`](../../packages/core/agent/s
 
 #### `agent/request` — waterfall
 
-Replace the frozen call configuration. `await next()` yields the config the machine would use (agent options on the first request, the logged header afterwards); return a replacement to switch. Model-visible content must use logged channels; this waterfall cannot mutate messages.
+Заменяет замороженную конфигурацию вызова. `await next()` отдаёт конфигурацию, которую машина использовала бы сама (агентские опции на первом запросе, залогированный заголовок далее); верните замену, чтобы переключить. Видимое модели содержимое обязано идти залогированными каналами; этот каскад не может мутировать сообщения.
 
 ```ts cordis-catalog
 /**
@@ -921,7 +921,7 @@ Source: [`packages/core/agent/src/runtime-types.ts`](../../packages/core/agent/s
 
 #### `agent/request-error` — waterfall
 
-Handle one failed model-request attempt before the loop retries or closes its step. A listener returns `{ kind: 'retry' }` without calling `next()` when it owns recovery, or calls `next()` to delegate. The default `undefined` leaves the failure terminal.
+Обрабатывающий слушатель разбирает одну неудавшуюся попытку модельного запроса до того, как цикл повторит или закроет шаг. Слушатель возвращает `{ kind: 'retry' }`, не вызывая `next()`, когда владеет восстановлением, или вызывает `next()` для делегирования. Значение по умолчанию `undefined` оставляет неудачу терминальной.
 
 ```ts cordis-catalog
 /**

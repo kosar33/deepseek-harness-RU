@@ -701,7 +701,7 @@ Source: [`packages/core/tools/src/index.ts`](../../packages/core/tools/src/index
 
 #### `tools/result` — emit
 
-Observe the frozen, lossless-JSON final outcome. Listener failures are contained. Scope-filtered dispatch (`@deepseek-ai/dsh-scope`): keyed by `exec.agent`.
+Наблюдает замороженный финальный исход в формате lossless-JSON. Сбои слушателей перехватываются. Диспетчеризация с фильтром по области (`@deepseek-ai/dsh-scope`): ключ — `exec.agent`.
 
 ```ts cordis-catalog
 /**

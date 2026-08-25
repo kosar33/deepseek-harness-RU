@@ -254,7 +254,7 @@ Source: [`packages/host/apiproxy/src/api/index.ts`](../../packages/host/apiproxy
 
 ### `ctx.typert` — `TypertRegistry`
 
-Registry of generated schemas, package reflection, invocations, and Remote dependency providers.
+Реестр сгенерированных схем, рефлексии пакетов, вызовов и поставщиков зависимостей Remote.
 
 ```ts cordis-catalog
 /**

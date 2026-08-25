@@ -259,7 +259,7 @@ Generated from source by `scripts/gen-cordis-catalog.ts` (verified fresh by `pnp
 
 ### `ctx.e2b` — `E2BRuntime`
 
-Creates one lazily consumable E2B SDK handle and deletes the sandbox at timeout or disposal. Creation begins at plugin construction; adapters await getSandbox before their first operation.
+Создаёт один лениво потребляемый дескриптор E2B SDK и удаляет песочницу по таймауту или при удалении. Создание начинается при конструировании плагина; адаптеры ожидают `getSandbox` перед первой операцией.
 
 ```ts cordis-catalog
 /**
@@ -278,7 +278,7 @@ Source: [`packages/e2b/e2b/src/index.ts`](../../packages/e2b/e2b/src/index.ts)
 
 Abstract subprocess service. Subclass, implement spawn, and load the subclass as a plugin — it registers as `ctx.subprocess` (one implementation per context; loading a second throws, which is cordis' standard duplicate-service behavior).
 
-Implementations must honor these semantics:
+Реализации обязаны соблюдать эту семантику:
 
 - Executable paths belong to one execution world shared with the mounted filesystem provider.
 - spawn returns immediately with a live handle; `done` resolves at process close with exit facts and rejects only for spawn-level failures.

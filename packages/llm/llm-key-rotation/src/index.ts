@@ -92,6 +92,7 @@ import {
   advanceAfter,
   currentUsable,
   excerptReason,
+  isProviderReturnedError,
   isUpstreamPoolLimit,
   nextUtcMidnight,
   parkMember,
@@ -165,6 +166,13 @@ export interface LlmKeyRotationState {
    * without mutating pool state or the persisted file.
    */
   readonly snapshot: () => readonly KeyRotationRouteSnapshot[]
+  /**
+   * Clear every live park of one route — the operator's escape hatch for
+   * parks that turned out to be false (an upstream shared-pool throttle, a
+   * stale persisted document). Clears memory and persists immediately;
+   * reports whether anything was actually cleared.
+   */
+  readonly resetParks: (route: string) => boolean
 }
 
 /**
@@ -309,21 +317,43 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
     // Single-member pools keep today's behavior exactly: every failure reaches
     // downstream recovery untouched, including its backoff waits.
     if (pool === undefined || pool.members.length < 2) return next()
-    if (failure.code !== RATE_LIMIT) return next()
-    if (isUpstreamPoolLimit(failure)) {
+    // Shared-pool 429s decide first: their flattened body embeds the vendor
+    // phrase checked below, but their remedy is same-key backoff, not
+    // key rotation.
+    if (failure.code === RATE_LIMIT && isUpstreamPoolLimit(failure)) {
       // The 429 names the provider's shared upstream pool as the limiter, so
       // the served key's own quota is untouched: parking would bench every
       // healthy key in the pool until the fallback horizon while the actual
       // remedy — waiting briefly — is ordinary backoff on this same key.
       ctx.logger.warn(
         'llm-key-rotation: provider "%s" hit an upstream shared-pool rate limit on key "%s";'
-        + ' leaving rotation untouched for downstream retry; reason: %s',
+          + ' leaving rotation untouched for downstream retry; reason: %s',
         pool.route,
         (pool.members[pool.index] as PoolMember).label,
         excerptReason(failure.message),
       )
       return next()
     }
+    if (isProviderReturnedError(failure)) {
+      // The upstream vendor behind the route failed — not this credential. No
+      // park is written; the identical request re-issues on the next key so a
+      // multi-key pool spends its spare attempts instead of dying on one
+      // vendor hiccup. The loop's own retry budget bounds total attempts.
+      const served = currentUsable(pool, Date.now())
+      const nextMember = advanceAfter(pool, served.index, Date.now())
+      if (nextMember === undefined) return next()
+      pool.index = nextMember.index
+      ctx.logger.warn(
+        'llm-key-rotation: provider "%s" relayed an upstream vendor error on key "%s";'
+          + ' retrying with "%s" without parking; reason: %s',
+        pool.route,
+        served.member.label,
+        nextMember.member.label,
+        excerptReason(failure.message),
+      )
+      return { kind: 'retry' }
+    }
+    if (failure.code !== RATE_LIMIT) return next()
 
     // Runs before ordinary recovery registrations (`prepend`), so a parked key
     // is advanced past before dsh-llm-retry schedules a same-key backoff wait
@@ -400,6 +430,23 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
             : { provider: pool.route, label: member.label, source: 'literal' as const, status }
         }),
       }))
+    },
+    resetParks: (route) => {
+      const pool = state.pools.get(route)
+      if (pool === undefined) return false
+      const now = Date.now()
+      let cleared = 0
+      for (const [index, stamp] of pool.parkedUntil) {
+        if (stamp.resetAtMs > now) {
+          pool.parkedUntil.delete(index)
+          cleared += 1
+        }
+      }
+      if (cleared === 0) return false
+      ctx.logger.warn('llm-key-rotation: provider "%s": %d park(s) cleared manually', route, cleared)
+      // The cleared state must survive a restart like any other park change.
+      void persistParks().catch(reportWriteFailure)
+      return true
     },
   }
   ctx.provide('llmKeyRotation', stateFace)

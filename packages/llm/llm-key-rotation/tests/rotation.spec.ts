@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -12,6 +13,7 @@ import { LocalCredentialProvider } from '@deepseek-ai/dsh-credentials-local'
 import * as Retry from '@deepseek-ai/dsh-llm-retry'
 import { SessionId } from '@deepseek-ai/dsh-session'
 import * as KeyRotation from '../src/index.ts'
+import type { LlmKeyRotationState } from '../src/index.ts'
 import type { Config as RotationConfig, RotationKeyConfig } from '../src/config.ts'
 
 const MOCK_TEXT = 'mock response recovered'
@@ -41,7 +43,7 @@ class ScriptedAdapter extends LlmAdapter {
 
   constructor(
     private readonly ctx: Context,
-    private readonly steps: readonly ('rate_limit' | 'server_error' | 'upstream_limit' | 'success')[],
+    private readonly steps: readonly ('rate_limit' | 'server_error' | 'upstream_limit' | 'provider_returned' | 'success')[],
     private readonly nativeEnv?: string,
   ) {
     super()
@@ -58,9 +60,11 @@ class ScriptedAdapter extends LlmAdapter {
     const rotated = await override?.resolve(options.provider)
     const key = rotated ?? (this.nativeEnv === undefined ? undefined : process.env[this.nativeEnv])
     if (key !== undefined) this.servedKeys.push(key)
-    if (step === 'rate_limit' || step === 'server_error' || step === 'upstream_limit') {
+    if (step === 'rate_limit' || step === 'server_error' || step === 'upstream_limit' || step === 'provider_returned') {
       // The upstream_limit step carries OpenRouter's flattened shared-pool 429
       // body verbatim — pi-ai reduces the wire error to exactly this text.
+      // The provider_returned step is the bare vendor-relay phrase the same
+      // gateway ships when its upstream fails without any shared-pool marker.
       yield {
         type: 'finish',
         reason: {
@@ -70,8 +74,10 @@ class ScriptedAdapter extends LlmAdapter {
               ? '429: {"message":"Provider returned error","code":429,"metadata":{"raw":"stealth is temporarily'
                 + ' rate-limited upstream. Please retry shortly.","provider_name":"Stealth","is_byok":false,'
                 + '"limit_source":"upstream_provider_shared_pool","remedy_hint":"Retry shortly"}}'
-              : `${step} strike`,
-            code: step === 'server_error' ? 'SERVER' : 'RATE_LIMIT',
+              : step === 'provider_returned'
+                ? '502: {"error":{"message":"Provider returned error","code":502}}'
+                : `${step} strike`,
+            code: step === 'server_error' || step === 'provider_returned' ? 'SERVER' : 'RATE_LIMIT',
           },
         },
       }
@@ -108,7 +114,7 @@ async function writeCredentials(entries: Record<string, string>): Promise<string
 async function boot(options: {
   providers?: RotationConfig['providers']
   credentialPath?: string
-  steps?: readonly ('rate_limit' | 'server_error' | 'upstream_limit' | 'success')[]
+  steps?: readonly ('rate_limit' | 'server_error' | 'upstream_limit' | 'provider_returned' | 'success')[]
   nativeEnv?: string
   route?: string
   registerForeign?: boolean
@@ -304,6 +310,30 @@ describe('multi-key rotation through the real loop', () => {
       role: 'assistant',
       content: [{ type: 'text', text: MOCK_TEXT }],
     })
+  })
+
+  it('retries a bare vendor relay on the next key without parking it', async () => {
+    const path = await writeCredentials({ OPENROUTER_KEY_1: 'k1', OPENROUTER_KEY_2: 'k2' })
+    const { ctx, adapter } = await boot({
+      credentialPath: path,
+      steps: ['provider_returned', 'success'],
+      providers: keys({ apiKeyEnv: 'OPENROUTER_KEY_1' }, { apiKeyEnv: 'OPENROUTER_KEY_2' }),
+    })
+
+    const agent = context!.agentLoop.create(SessionId('vendor-relay'), { provider: 'openrouter', model: 'mock-model' })
+    await sendAndWait(agent)
+
+    // Rotation advanced onto the spare itself; no backoff retry event ran.
+    expect(adapter.servedKeys).toEqual(['k1', 'k2'])
+    expect(agent.session.events.some(event => event.type === 'llm/retry')).toBe(false)
+    expect(agent.session.deriveMessages().at(-1)).toMatchObject({
+      role: 'assistant',
+      content: [{ type: 'text', text: MOCK_TEXT }],
+    })
+    // The benched key stays clean: nothing parked, nothing persisted.
+    const face = ctx.get('llmKeyRotation') as LlmKeyRotationState
+    expect(face.snapshot()[0]!.keys.every(key => key.status.state === 'usable')).toBe(true)
+    expect(existsSync(join(home!, '.llm-key-rotation-parks.json'))).toBe(false)
   })
 
   it('rotates even when dsh-llm-retry registered first, because the listener prepends', async () => {

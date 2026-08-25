@@ -89,6 +89,27 @@ export function isUpstreamPoolLimit(failure: LlmFailure): boolean {
 }
 
 /**
+ * The flattened body of an upstream-provider relay failure (OpenRouter answers
+ * `{"error":{"message":"Provider returned error",...}}` when the model's
+ * vendor fails or throttles behind the gateway). pi-ai flattening keeps the
+ * phrase in message text, matched case-insensitively because gateways have
+ * shipped both capitalizations.
+ */
+const PROVIDER_RETURNED_MARKER = 'provider returned error'
+
+/**
+ * Whether a failure is the provider relaying its upstream vendor's error —
+ * a property of the model route, not of the served credential. Parking on it
+ * would bench keys that did nothing wrong; the request is retried on the
+ * next key without touching any park state.
+ * @param failure - the failed attempt's normalized facts.
+ * @returns whether the failure reads as an upstream vendor relay.
+ */
+export function isProviderReturnedError(failure: LlmFailure): boolean {
+  return failure.message.toLowerCase().includes(PROVIDER_RETURNED_MARKER)
+}
+
+/**
  * The next UTC midnight strictly after `nowMs`, as epoch milliseconds. This is
  * the fallback park duration for daily quota limits whose reset instant the
  * adapter layer does not surface.

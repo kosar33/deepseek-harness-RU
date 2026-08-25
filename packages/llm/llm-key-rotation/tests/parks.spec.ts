@@ -245,6 +245,26 @@ describe('persistent park records', () => {
     expect(stateFace(ctx).snapshot()[0]!.activeLabel).toBe('OPENROUTER_KEY_1')
   })
 
+  it('clears live parks through resetParks, serves the freed key again, and empties the document', async () => {
+    home = await mkdtemp(join(tmpdir(), 'dsh-key-parks-'))
+    await writeCredentials()
+    await seedParks([
+      { route: 'openrouter', label: 'OPENROUTER_KEY_1', parkedAt: Date.now(), resetAt: Date.now() + 60_000 },
+      { route: 'openrouter', label: 'OPENROUTER_KEY_2', parkedAt: Date.now(), resetAt: Date.now() + 120_000 },
+    ])
+    const { ctx } = await bootStandard(0)
+    const face = stateFace(ctx)
+
+    expect(face.resetParks('ghost-route')).toBe(false)
+    expect(face.resetParks('openrouter')).toBe(true)
+    expect(face.snapshot()[0]!.keys.every(key => key.status.state === 'usable')).toBe(true)
+    // The cleared state survives a restart like any other park change; the
+    // write is fire-and-forget, so wait it out.
+    await vi.waitFor(async () => {
+      expect(JSON.parse(await readFile(parkPath(), 'utf8'))).toEqual({ version: 1, parks: [] })
+    })
+  })
+
   it('drops expired rows on mount and rewrites the document without them', async () => {
     home = await mkdtemp(join(tmpdir(), 'dsh-key-parks-'))
     await writeCredentials()

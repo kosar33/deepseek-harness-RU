@@ -75,6 +75,7 @@ export interface RpcMethodMap {
   'llm.models': LlmApi['models']
   'llm.discoverModels': LlmApi['discoverModels']
   'llm.keyRotation': LlmApi['keyRotation']
+  'llm.keyRotationResetParks': LlmApi['keyRotationResetParks']
 }
 
 /** Business request payload of method K (reaches through the RpcRequest narrow form to payload). */

@@ -81,6 +81,7 @@ interface ScriptedOptions {
   namespaces?: SettingsNamespaceView[]
   writable?: boolean
   mutateAnswer?: RpcResponse<SettingsNamespaceView>
+  resetAnswer?: RpcResponse<{ configured: boolean; routes: KeyRotationRouteView[] }>
 }
 
 function scripted(options: ScriptedOptions = {}): {
@@ -88,13 +89,19 @@ function scripted(options: ScriptedOptions = {}): {
   mutations: Array<{ ns: string; ops: unknown }>
   sets: Array<{ ref: string; value: string }>
   unsets: Array<{ ref: string }>
+  resets: string[]
 } {
   const mutations: Array<{ ns: string; ops: unknown }> = []
   const sets: Array<{ ref: string; value: string }> = []
   const unsets: Array<{ ref: string }> = []
+  const resets: string[] = []
   const face = {
     llm: {
       keyRotation: () => Promise.resolve(ok({ configured: true, routes: options.routes ?? ROUTES })),
+      keyRotationResetParks: (payload: { provider: string }) => {
+        resets.push(payload.provider)
+        return Promise.resolve(options.resetAnswer ?? ok({ configured: true, routes: options.routes ?? ROUTES }))
+      },
     },
     settings: {
       describe: () => Promise.resolve(ok({
@@ -120,7 +127,7 @@ function scripted(options: ScriptedOptions = {}): {
   }
   const mirror = new SettingsDescribeMirror(face as never)
   const controller = createKeyRotationStore(face as never, mirror)
-  return { controller, mutations, sets, unsets }
+  return { controller, mutations, sets, unsets, resets }
 }
 
 type SeatT = KeysEditorInjected['t']
@@ -360,6 +367,49 @@ describe('row editing', () => {
     fireEvent.change(valueInput(2), { target: { value: 'third-secret' } })
     expect(screen.queryByText(en.keyBlank)).toBeNull()
     expect(screen.getByRole('button', { name: en.save })).toHaveProperty('disabled', false)
+  })
+
+  it('refuses to save two rows holding the same value, even with different spacing', async () => {
+    await mountSeat()
+    fireEvent.change(valueInput(0), { target: { value: 'twin-secret' } })
+    expect(screen.getByRole('button', { name: en.save })).toHaveProperty('disabled', false)
+    fireEvent.change(valueInput(1), { target: { value: ' twin-secret ' } })
+    expect(screen.getByRole('button', { name: en.save })).toHaveProperty('disabled', true)
+    expect(screen.getByText(en.duplicateKey)).toBeTruthy()
+    // Clearing the twin releases the refusal again.
+    fireEvent.change(valueInput(1), { target: { value: 'own-secret' } })
+    expect(screen.getByRole('button', { name: en.save })).toHaveProperty('disabled', false)
+    expect(screen.queryByText(en.duplicateKey)).toBeNull()
+  })
+})
+
+describe('timeout reset', () => {
+  it('clears the route parks through the wire and reloads the snapshot', async () => {
+    const mounted = await mountSeat()
+    const reset = screen.getByRole('button', { name: en.resetTimeouts }) as HTMLButtonElement
+    expect(reset.disabled).toBe(false)
+    fireEvent.click(reset)
+    await waitFor(() => { expect(mounted.resets).toEqual(['openrouter']) })
+  })
+
+  it('disables the reset while nothing on the route is parked', async () => {
+    await mountSeat({
+      routes: [{
+        provider: 'openrouter',
+        activeLabel: 'OPENROUTER_KEYROTATION_2',
+        keys: [
+          { label: 'OPENROUTER_KEYROTATION_1', source: 'reference', reference: 'OPENROUTER_KEYROTATION_1', status: { state: 'usable' } },
+          { label: 'OPENROUTER_KEYROTATION_2', source: 'reference', reference: 'OPENROUTER_KEYROTATION_2', status: { state: 'usable' } },
+        ],
+      }],
+    })
+    expect((screen.getByRole('button', { name: en.resetTimeouts }) as HTMLButtonElement).disabled).toBe(true)
+  })
+
+  it('surfaces a refused reset inside the card', async () => {
+    await mountSeat({ resetAnswer: fail('host refused') })
+    fireEvent.click(screen.getByRole('button', { name: en.resetTimeouts }))
+    expect(await screen.findByText('host refused')).toBeTruthy()
   })
 })
 

@@ -151,6 +151,12 @@ export type KeyRotationController = {
    * @returns the failure message, or undefined once every write landed.
    */
   saveRoute: (route: string, rows: readonly KeyRowDraft[]) => Promise<string | undefined>
+  /**
+   * Clear every live park of one route through the host face, then reload.
+   * @param route - the provider route whose parks clear.
+   * @returns the failure message, or undefined once the reset landed.
+   */
+  resetRoute: (route: string) => Promise<string | undefined>
 }
 
 /**
@@ -213,6 +219,23 @@ export function createKeyRotationStore(api: RotationApi, describe: SettingsDescr
           if (!response.result.ok) throw new Error(response.result.error.message)
           describe.acceptView(response.result.value)
         }
+        await load()
+        return undefined
+      } catch (error: unknown) {
+        return messageOf(error)
+      }
+    },
+
+    /**
+     * Clear every live park of one route through the host face and refresh:
+     * the operator's escape hatch for parks that turned out to be false.
+     * @param route - provider route whose parks clear.
+     * @returns failure text, or undefined on success.
+     */
+    async resetRoute(route: string): Promise<string | undefined> {
+      try {
+        const response = await api.llm.keyRotationResetParks({ provider: route })
+        if (!response.result.ok) throw new Error(response.result.error.message)
         await load()
         return undefined
       } catch (error: unknown) {

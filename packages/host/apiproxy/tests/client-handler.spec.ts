@@ -127,6 +127,7 @@ function scriptedApi(overrides: {
       models: r => ok(r, { groups: [], failures: [] }),
       discoverModels: err,
       keyRotation: r => ok(r, { configured: false, routes: [] }),
+      keyRotationResetParks: r => ok(r, { configured: false, routes: [] }),
       ...overrides.llm,
     },
     events: { mux: () => empty<MuxFrame>(), host: () => empty<HostFrame>(), ...overrides.events },
@@ -774,6 +775,7 @@ describe('config unary surface', () => {
             ],
           }],
         })),
+        keyRotationResetParks: record('llm.keyRotationResetParks', r => ok(r, { configured: true, routes: [] })),
       },
     })
     const c = client(api)
@@ -808,11 +810,13 @@ describe('config unary surface', () => {
     expect(discovered.result).toEqual({ ok: true, value: { models: [{ id: 'acme-large', contextWindow: 65536 }] } })
     const rotation = await c.llm.keyRotation({})
     expect(rotation.result.ok).toBe(true)
+    const reset = await c.llm.keyRotationResetParks({ provider: 'openrouter' })
+    expect(reset.result).toEqual({ ok: true, value: { configured: true, routes: [] } })
 
     expect(seen.map(call => call.method)).toEqual([
       'settings.describe', 'settings.openDocument', 'settings.update', 'settings.replace', 'settings.mutate',
       'credentials.describe', 'credentials.set', 'credentials.unset',
-      'llm.providers', 'llm.models', 'llm.discoverModels', 'llm.keyRotation',
+      'llm.providers', 'llm.models', 'llm.discoverModels', 'llm.keyRotation', 'llm.keyRotationResetParks',
     ])
     expect(seen[2]?.payload).toEqual({ ns: 'llm-deepseek', patch: { baseURL: 'https://next' } })
     expect(seen[4]?.payload)

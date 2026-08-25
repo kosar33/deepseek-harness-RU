@@ -119,6 +119,7 @@ const PRIVILEGED_METHODS = new Set([
   'credentials.unset',
   'llm.discoverModels',
   'llm.keyRotation',
+  'llm.keyRotationResetParks',
 ])
 
 /**

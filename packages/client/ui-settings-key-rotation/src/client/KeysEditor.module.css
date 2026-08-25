@@ -187,6 +187,7 @@
 /* Mirrors ModelsSection `.primaryButton` / `.secondaryButton`: the capsule
  * pair the surrounding card already uses for its own actions. */
 .addButton,
+.resetButton,
 .saveButton {
   box-sizing: border-box;
   display: inline-flex;
@@ -201,8 +202,12 @@
   cursor: pointer;
 }
 
-.saveButton {
+/* The right-aligned pair: reset (outlined) leads, save (primary) closes. */
+.resetButton {
   margin-left: auto;
+}
+
+.saveButton {
   border: none;
   background: var(--dsw-alias-button-primary-fill);
   color: var(--dsw-alias-label-primary-foreground);
@@ -212,23 +217,27 @@
   background: var(--dsw-alias-button-primary-hover);
 }
 
-.addButton {
+.addButton,
+.resetButton {
   border: 1px solid var(--dsw-alias-border-l2);
   background: transparent;
   color: var(--dsw-alias-label-primary);
 }
 
-.addButton:hover:not(:disabled) {
+.addButton:hover:not(:disabled),
+.resetButton:hover:not(:disabled) {
   background: var(--dsw-alias-interactive-bg-hover-solid);
 }
 
 .addButton:disabled,
+.resetButton:disabled,
 .saveButton:disabled {
   opacity: 0.4;
   cursor: default;
 }
 
 .addButton:focus-visible,
+.resetButton:focus-visible,
 .saveButton:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px var(--dsw-alias-border-l3);

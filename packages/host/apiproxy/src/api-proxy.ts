@@ -3345,6 +3345,31 @@ export function createApiProxy(ctx: Context, defaults: ApiProxyDefaults): ApiPro
         }))
         return Promise.resolve(ok(request, { configured: true, routes }))
       },
+
+      keyRotationResetParks(request) {
+        // Same decoupling as the snapshot read above: the face is structural,
+        // an absent service answers the dormant envelope, and the fresh
+        // routes ride back so a caller folds them like a refresh.
+        const rotation = ctx.get('llmKeyRotation') as
+          | {
+            resetParks(route: string): boolean
+            snapshot(): readonly { provider: string; activeLabel: string; keys: readonly KeyRotationKeyView[] }[]
+          }
+          | undefined
+        if (rotation === undefined) return Promise.resolve(ok(request, { configured: false, routes: [] }))
+        rotation.resetParks(request.payload.provider)
+        const routes: KeyRotationRouteView[] = rotation.snapshot().map(route => ({
+          provider: route.provider,
+          activeLabel: route.activeLabel,
+          keys: route.keys.map(key => ({
+            label: key.label,
+            source: key.source,
+            ...key.reference === undefined ? {} : { reference: key.reference },
+            status: key.status,
+          })),
+        }))
+        return Promise.resolve(ok(request, { configured: true, routes }))
+      },
     },
 
     events: {

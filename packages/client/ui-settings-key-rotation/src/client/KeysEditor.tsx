@@ -107,6 +107,7 @@ function Loaded(
   }, [])
 
   const [saveFailure, setSaveFailure] = useState<string | undefined>(undefined)
+  const [resetting, setResetting] = useState(false)
 
   if (state.status === 'idle') void controller.load()
   if (state.status === 'error') {
@@ -131,8 +132,21 @@ function Loaded(
   const blankFailure = draft.rows.some(row => !isStored(row.ref) && row.value.trim().length === 0)
     ? t('keyBlank')
     : undefined
+  // Two rows holding the same value would persist one secret under two refs
+  // and silently rotate the same key twice; refused before anything saves.
+  const duplicateFailure = (() => {
+    const seen = new Set<string>()
+    for (const row of draft.rows) {
+      const value = row.value.trim()
+      if (value.length === 0) continue
+      if (seen.has(value)) return t('duplicateKey')
+      seen.add(value)
+    }
+    return undefined
+  })()
 
   const save = async (): Promise<void> => {
+    if (blankFailure !== undefined || duplicateFailure !== undefined) return
     const failure = await controller.saveRoute(provider, draft.rows)
     if (failure !== undefined) {
       setSaveFailure(failure)
@@ -141,6 +155,23 @@ function Loaded(
     setSaveFailure(undefined)
     // Consumed values clear back to placeholders; kept rows stay in order.
     setDraft({ provider, rows: draft.rows.filter(row => row.ref.length > 0).map(({ ref }) => ({ ref, value: '' })) })
+  }
+
+  // The escape hatch for parks that turned out to be false: one click clears
+  // every live park of this route through the host face and refreshes.
+  const hasParked = pool?.keys.some(key => key.status.state === 'parked') === true
+  const resetParks = async (): Promise<void> => {
+    setResetting(true)
+    try {
+      const failure = await controller.resetRoute(provider)
+      if (failure !== undefined) {
+        setSaveFailure(failure)
+        return
+      }
+      setSaveFailure(undefined)
+    } finally {
+      setResetting(false)
+    }
   }
 
   // Live pool health above the rows: the sticky position highlighted, a
@@ -239,14 +270,24 @@ function Loaded(
         </button>
         <button
           type="button"
+          className={styles['resetButton']}
+          disabled={disabled || !hasParked || resetting}
+          onClick={() => { void resetParks() }}
+        >
+          {t('resetTimeouts')}
+        </button>
+        <button
+          type="button"
           className={styles['saveButton']}
-          disabled={disabled || blankFailure !== undefined}
+          disabled={disabled || blankFailure !== undefined || duplicateFailure !== undefined}
           onClick={() => { void save() }}
         >
           {t('save')}
         </button>
       </div>
-      {blankFailure === undefined ? null : <p className={styles['error']}>{blankFailure}</p>}
+      {(blankFailure ?? duplicateFailure) === undefined
+        ? null
+        : <p className={styles['error']}>{blankFailure ?? duplicateFailure}</p>}
       {saveFailure === undefined ? null : <p className={styles['error']}>{saveFailure}</p>}
     </div>
   )

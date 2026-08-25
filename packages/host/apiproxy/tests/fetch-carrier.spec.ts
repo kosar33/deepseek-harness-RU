@@ -284,6 +284,9 @@ function fakeApi(overrides: Partial<{ muxFrames: MuxFrame[]; hostFrames: HostFra
       async keyRotation(request) {
         return { rpcId: request.rpcId, result: { ok: true, value: { configured: false, routes: [] } } }
       },
+      async keyRotationResetParks(request) {
+        return { rpcId: request.rpcId, result: { ok: true, value: { configured: false, routes: [] } } }
+      },
     },
     events: {
       mux: (_request, signal) => stream(muxFrames, signal),

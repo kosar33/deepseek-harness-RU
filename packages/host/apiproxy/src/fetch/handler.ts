@@ -63,7 +63,7 @@ import {
 import {
   credentialsDescribeRequestSchema, credentialsSetRequestSchema, credentialsUnsetRequestSchema,
 } from '../api/credentials.schema.ts'
-import { llmDiscoverModelsRequestSchema, llmKeyRotationRequestSchema, llmModelsRequestSchema, llmProvidersRequestSchema } from '../api/llm.schema.ts'
+import { llmDiscoverModelsRequestSchema, llmKeyRotationRequestSchema, llmKeyRotationResetParksRequestSchema, llmModelsRequestSchema, llmProvidersRequestSchema } from '../api/llm.schema.ts'
 import {
   subagentHistoryRequestSchema,
   subagentInterruptRequestSchema,
@@ -141,6 +141,10 @@ const UNARY_ROUTES: UnaryRoutes = {
   'llm.models': { schema: llmModelsRequestSchema, invoke: (api, r) => api.llm.models(r) },
   'llm.discoverModels': { schema: llmDiscoverModelsRequestSchema, invoke: (api, r, signal) => api.llm.discoverModels(r, signal) },
   'llm.keyRotation': { schema: llmKeyRotationRequestSchema, invoke: (api, r) => api.llm.keyRotation(r) },
+  'llm.keyRotationResetParks': {
+    schema: llmKeyRotationResetParksRequestSchema,
+    invoke: (api, r) => api.llm.keyRotationResetParks(r),
+  },
 }
 
 /** Route lookup that narrows an arbitrary path segment to a map key (single cast point for the string→key refinement). */

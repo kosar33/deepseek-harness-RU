@@ -23,6 +23,8 @@ export const en = {
   applying: 'Saving…',
   conflict: 'Someone else changed these settings while this card was open. Close it and reopen to edit the current values.',
   keyBlank: 'Enter the API key for this row, or delete the row.',
+  duplicateKey: 'Two rows hold the same key value; each row needs its own key.',
+  resetTimeouts: 'Reset timeouts',
 } as const
 
 /** Chinese strings, byte-equal defaults of the shipped UI copy. */
@@ -48,6 +50,8 @@ export const zh: Record<keyof typeof en, string> = {
   applying: '保存中…',
   conflict: '此卡片打开期间设置又被其他修改更新。关闭后重新打开即可编辑最新值。',
   keyBlank: '请输入该行的 API 密钥，或删除这一行。',
+  duplicateKey: '两行包含相同的密钥；每行需要自己的密钥。',
+  resetTimeouts: '重置停用时限',
 }
 
 /** Russian strings. */
@@ -73,6 +77,8 @@ export const ru: Record<keyof typeof en, string> = {
   applying: 'Сохранение…',
   conflict: 'Пока карточка была открыта, настройки изменились. Закройте её и откройте заново, чтобы редактировать актуальные значения.',
   keyBlank: 'Введите API-ключ этой строки или удалите строку.',
+  duplicateKey: 'Две строки содержат одинаковый ключ; каждой строке нужен свой ключ.',
+  resetTimeouts: 'Сбросить таймауты',
 }
 
 /** Copy key of the key-rotation section dictionaries. */

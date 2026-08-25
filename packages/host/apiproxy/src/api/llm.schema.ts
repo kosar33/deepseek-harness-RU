@@ -99,3 +99,6 @@ export const llmKeyRotationValueSchema = z.object({
   configured: z.boolean(),
   routes: z.array(keyRotationRouteViewSchema),
 }) satisfies z.ZodType<Wire<ResponseValue<'llm.keyRotation'>>>
+
+/** llm.keyRotationResetParks request payload. */
+export const llmKeyRotationResetParksRequestSchema = z.object({ provider: z.string().min(1) }) satisfies z.ZodType<Wire<RequestPayload<'llm.keyRotationResetParks'>>>

@@ -163,6 +163,7 @@ export interface IApiClient {
     models(payload: RequestPayload<'llm.models'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'llm.models'>>>
     discoverModels(payload: RequestPayload<'llm.discoverModels'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'llm.discoverModels'>>>
     keyRotation(payload: RequestPayload<'llm.keyRotation'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'llm.keyRotation'>>>
+    keyRotationResetParks(payload: RequestPayload<'llm.keyRotationResetParks'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'llm.keyRotationResetParks'>>>
   }
   /** client-response passthrough (rpcId is a backfill of the server-request's id — never minted here). */
   respond(message: ClientResponse, signal?: AbortSignal): Promise<RpcReceipt>
@@ -226,6 +227,8 @@ const UNARY_VALUE_SCHEMAS: { [K in keyof RpcMethodMap]: z.ZodType<Wire<ResponseV
   'llm.models': llmModelsValueSchema,
   'llm.discoverModels': llmDiscoverModelsValueSchema,
   'llm.keyRotation': llmKeyRotationValueSchema,
+  // Same envelope as the snapshot answer; the reset folds like a refresh.
+  'llm.keyRotationResetParks': llmKeyRotationValueSchema,
 }
 
 /** Default timeout for bounded unary calls (rpc-compare 2026-07-19: a hung host must not leave callers pending forever). */
@@ -503,6 +506,7 @@ export abstract class AbstractApiClient implements IApiClient {
     models: (payload, signal) => this.callUnary('llm.models', payload, signal),
     discoverModels: (payload, signal) => this.callUnary('llm.discoverModels', payload, signal),
     keyRotation: (payload, signal) => this.callUnary('llm.keyRotation', payload, signal),
+    keyRotationResetParks: (payload, signal) => this.callUnary('llm.keyRotationResetParks', payload, signal),
   }
 
   readonly events: IApiClient['events'] = {

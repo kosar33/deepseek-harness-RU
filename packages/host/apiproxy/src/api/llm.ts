@@ -112,6 +112,17 @@ export interface LlmApi {
    * reference names ride; key values never exist in the snapshot.
    */
   keyRotation(request: RpcRequest<{}>): Promise<RpcResponse<{ configured: boolean; routes: KeyRotationRouteView[] }>>
+
+  /**
+   * Clear every live park of one rotation route (the `llmKeyRotation` state
+   * face's `resetParks`): the operator's escape hatch for parks that turned
+   * out to be false. Answers with the same shape as {@link keyRotation} so a
+   * caller can fold the fresh snapshot directly; `configured: false` when no
+   * composition mounts the plugin.
+   */
+  keyRotationResetParks(
+    request: RpcRequest<{ provider: string }>,
+  ): Promise<RpcResponse<{ configured: boolean; routes: KeyRotationRouteView[] }>>
 }
 
 /** Wire view of one model an interrogated endpoint advertises. */

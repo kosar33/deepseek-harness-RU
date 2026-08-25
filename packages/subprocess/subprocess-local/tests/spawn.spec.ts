@@ -546,7 +546,7 @@ describe('OutputCollector', () => {
     expect(collector.readFrom(0).spillPath).toBeDefined()
 
     rmSync(volatile, { recursive: true, force: true })
-    expect(() => collector.push(Buffer.from('bbbb'))).not.toThrow()
+    expect(() => { collector.push(Buffer.from('bbbb')) }).not.toThrow()
 
     const out = collector.finalize()
     expect(out.text).toBe('bbbb')

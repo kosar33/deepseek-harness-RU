@@ -148,15 +148,29 @@ interface MountOptions extends ScriptedOptions {
 async function mountSeat(options: MountOptions = {}) {
   const wired = scripted(options)
   if (options.preload !== false) await wired.controller.load()
+  const commitSeat: { current?: (() => Promise<string | undefined>) | undefined } = {}
   const props: KeysEditorProps = {
     ...runtime,
     provider: options.provider ?? 'openrouter',
+    commitSeat,
     controller: wired.controller,
     useSnapshot: bindSnapshotSelector(wired.controller.store),
     t: options.t ?? (key => en[key]),
   }
   const view = render(<KeysEditor {...props} />)
-  return { view, props, ...wired }
+  return { view, props, commitSeat, ...wired }
+}
+
+/**
+ * Run the owner card's Apply hook — the seat registers its commit there, so
+ * this replaces the removed Save-button clicks in every write scenario.
+ */
+async function applyCommit(
+  mounted: { commitSeat: { current?: (() => Promise<string | undefined>) | undefined } },
+): Promise<string | undefined> {
+  let result: string | undefined
+  await act(async () => { result = await mounted.commitSeat.current?.() })
+  return result
 }
 
 /** The password input of one row, addressed by its displayed position. */
@@ -361,29 +375,31 @@ describe('row editing', () => {
     expect(shownRefs()).toEqual(['OPENROUTER_KEYROTATION_1'])
   })
 
-  it('blocks saving an added-but-blank row until a value is typed', async () => {
-    await mountSeat()
+  it('blocks committing an added-but-blank row until a value is typed', async () => {
+    const mounted = await mountSeat()
     fireEvent.click(screen.getByRole('button', { name: `+ ${en.addKey}` }))
-    // The unstored row has no value yet: save is disabled and the copy says why.
-    expect(screen.getByRole('button', { name: en.save })).toHaveProperty('disabled', true)
+    // The unstored row has no value yet: the Apply hook refuses by name.
+    expect(await applyCommit(mounted)).toBe(en.keyBlank)
     expect(screen.getByText(en.keyBlank)).toBeTruthy()
-    // Typing the value clears the refusal and re-enables the commit.
+    expect(mounted.sets).toEqual([])
+    // Typing the value clears the refusal and lets the commit through.
     fireEvent.change(valueInput(2), { target: { value: 'third-secret' } })
     expect(screen.queryByText(en.keyBlank)).toBeNull()
-    expect(screen.getByRole('button', { name: en.save })).toHaveProperty('disabled', false)
+    expect(await applyCommit(mounted)).toBeUndefined()
+    expect(mounted.sets).toEqual([{ ref: 'OPENROUTER_KEYROTATION_3', value: 'third-secret' }])
   })
 
-  it('refuses to save two rows holding the same value, even with different spacing', async () => {
-    await mountSeat()
-    fireEvent.change(valueInput(0), { target: { value: 'twin-secret' } })
-    expect(screen.getByRole('button', { name: en.save })).toHaveProperty('disabled', false)
-    fireEvent.change(valueInput(1), { target: { value: ' twin-secret ' } })
-    expect(screen.getByRole('button', { name: en.save })).toHaveProperty('disabled', true)
+  it('refuses to commit two rows holding the same value, even with different spacing', async () => {
+    const mounted = await mountSeat()
+    fireEvent.change(valueInput(0), { target: { value: ' twin-secret ' } })
+    fireEvent.change(valueInput(1), { target: { value: 'twin-secret' } })
+    expect(await applyCommit(mounted)).toBe(en.duplicateKey)
     expect(screen.getByText(en.duplicateKey)).toBeTruthy()
-    // Clearing the twin releases the refusal again.
+    expect(mounted.sets).toEqual([])
+    // Giving the second row its own value releases the refusal again.
     fireEvent.change(valueInput(1), { target: { value: 'own-secret' } })
-    expect(screen.getByRole('button', { name: en.save })).toHaveProperty('disabled', false)
-    expect(screen.queryByText(en.duplicateKey)).toBeNull()
+    expect(await applyCommit(mounted)).toBeUndefined()
+    expect(mounted.sets.map(set => set.ref)).toEqual(['OPENROUTER_KEYROTATION_1', 'OPENROUTER_KEYROTATION_2'])
   })
 })
 
@@ -421,7 +437,7 @@ describe('saving', () => {
   it('writes typed values through the seam and clears them after the committed save', async () => {
     const mounted = await mountSeat()
     fireEvent.change(valueInput(0), { target: { value: 'typed-secret' } })
-    fireEvent.click(screen.getByRole('button', { name: en.save }))
+    expect(await applyCommit(mounted)).toBeUndefined()
     await waitFor(() => {
       expect(mounted.sets).toEqual([{ ref: 'OPENROUTER_KEYROTATION_1', value: 'typed-secret' }])
     })
@@ -439,7 +455,7 @@ describe('saving', () => {
     fireEvent.click(screen.getAllByLabelText(en.moveDown)[0]!)
     fireEvent.change(valueInput(0), { target: { value: 'now-second-secret' } })
     fireEvent.change(valueInput(1), { target: { value: 'now-first-secret' } })
-    fireEvent.click(screen.getByRole('button', { name: en.save }))
+    expect(await applyCommit(mounted)).toBeUndefined()
     await waitFor(() => { expect(mounted.mutations).toHaveLength(1) })
     expect(mounted.sets).toEqual([
       { ref: 'OPENROUTER_KEYROTATION_2', value: 'now-second-secret' },
@@ -463,7 +479,7 @@ describe('saving', () => {
   it('unsets a dropped reference on save', async () => {
     const mounted = await mountSeat()
     fireEvent.click(screen.getAllByLabelText(en.removeKey)[1]!)
-    fireEvent.click(screen.getByRole('button', { name: en.save }))
+    expect(await applyCommit(mounted)).toBeUndefined()
     await waitFor(() => { expect(mounted.unsets).toEqual([{ ref: 'OPENROUTER_KEYROTATION_2' }]) })
     expect(mounted.mutations).toEqual([{
       ns: 'llm-key-rotation',
@@ -480,7 +496,7 @@ describe('saving', () => {
     fireEvent.click(screen.getAllByLabelText(en.removeKey)[0]!)
     fireEvent.click(screen.getAllByLabelText(en.removeKey)[0]!)
     expect(shownRefs()).toEqual([])
-    fireEvent.click(screen.getByRole('button', { name: en.save }))
+    expect(await applyCommit(mounted)).toBeUndefined()
     await waitFor(() => {
       expect(mounted.mutations).toEqual([{
         ns: 'llm-key-rotation',
@@ -494,21 +510,21 @@ describe('saving', () => {
   })
 
   it('surfaces a refused save inside the card and keeps the draft', async () => {
-    await mountSeat({ mutateAnswer: fail('settings-conflict') })
-    // Dropping the second row makes the save carry a real keys op, which the
+    const mounted = await mountSeat({ mutateAnswer: fail('settings-conflict') })
+    // Dropping the second row makes the commit carry a real keys op, which the
     // deployment refuses; the typed value on the kept row is part of the draft.
     fireEvent.click(screen.getAllByLabelText(en.removeKey)[1]!)
     fireEvent.change(valueInput(0), { target: { value: 'kept-secret' } })
-    fireEvent.click(screen.getByRole('button', { name: en.save }))
-    expect(await screen.findByText('settings-conflict')).toBeTruthy()
-    // The failed save leaves the card's draft untouched for another attempt.
+    expect(await applyCommit(mounted)).toBe('settings-conflict')
+    // The refusal travels to the owner card as its Apply failure message.
+    // The failed commit leaves the card's draft untouched for another attempt.
     expect(valueInput(0).value).toBe('kept-secret')
     expect(shownRefs()).toEqual(['OPENROUTER_KEYROTATION_1'])
   })
 
   it('performs no writes when the draft already matches the stored section', async () => {
     const mounted = await mountSeat()
-    fireEvent.click(screen.getByRole('button', { name: en.save }))
+    expect(await applyCommit(mounted)).toBeUndefined()
     await waitFor(() => { expect(mounted.controller.store.getSnapshot().namespace).toBeDefined() })
     expect(mounted.mutations).toEqual([])
     expect(mounted.sets).toEqual([])
@@ -518,14 +534,17 @@ describe('saving', () => {
 
 describe('read-only deployments', () => {
   it('disables every write affordance and says so', async () => {
-    await mountSeat({ writable: false })
+    const mounted = await mountSeat({ writable: false })
     expect(screen.getByText(en.readOnly)).toBeTruthy()
     expect(valueInput(0)).toHaveProperty('disabled', true)
     expect(screen.getAllByLabelText(en.moveUp)[0]).toHaveProperty('disabled', true)
     expect(screen.getAllByLabelText(en.moveDown)[0]).toHaveProperty('disabled', true)
     expect(screen.getAllByLabelText(en.removeKey)[0]).toHaveProperty('disabled', true)
     expect(screen.getByRole('button', { name: `+ ${en.addKey}` })).toHaveProperty('disabled', true)
-    expect(screen.getByRole('button', { name: en.save })).toHaveProperty('disabled', true)
+    // The commit hook stays wired but no-ops, so the owner card's Apply
+    // proceeds with its own fields and writes nothing for the keys.
+    expect(await applyCommit(mounted)).toBeUndefined()
+    expect(mounted.sets).toEqual([])
     // Pool health stays readable in a read-only deployment.
     expect(screen.getByText(en.activeChip)).toBeTruthy()
   })

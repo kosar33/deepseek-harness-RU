@@ -23,7 +23,7 @@
  * see instead of rebuilding the whole subtree from a partial descriptor.
  */
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { CredentialView, IApiClient, SettingsNamespaceView, SettingsPathOpView } from '@deepseek-ai/dsh-api-remotes/client'
 import type { PropsRenderSlots } from '@deepseek-ai/dsh-client-ui-slots'
@@ -175,6 +175,10 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
     () => schema.getPath(namespace.user, settingsPath),
   )
   const [expectedRevision, setExpectedRevision] = useState(() => namespace.revision)
+  // The commit hook a bound credential seat registers into. The holder object
+  // is created once per mounted editor and travels to the seat through the
+  // slot's owner props; Apply awaits it before its own writes.
+  const commitSeat = useRef<{ current?: (() => Promise<string | undefined>) | undefined }>({})
   const root = useMemo(() => schema.rehydrate(namespace.schema), [namespace.schema, schema])
   const node = useMemo(() => schema.nodeAtPath(root, settingsPath), [root, schema, settingsPath])
   const fallback = schema.getPath(namespace.value, settingsPath)
@@ -259,6 +263,10 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
    * outside the card. Ops name only the fields this card can see.
    */
   const applyOnce = async (): Promise<string | undefined> => {
+    // A bound seat commits first: its failure names itself inside this card,
+    // so one Apply press lands the keys and the section fields or neither.
+    const seatFailure = await commitSeat.current.current?.()
+    if (seatFailure !== undefined) return seatFailure
     const ns = namespace.ns
     // A pi-ai profile names the conventional reference only when this page is
     // about to store a key. Otherwise the provider keeps its native auth path.
@@ -405,7 +413,7 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
       <>
         {props.credentialSlot === undefined
           ? nativeKeyField
-          : props.credentialSlot('settings.models.credential', { provider: props.provider }, { fallback: nativeKeyField })}
+          : props.credentialSlot('settings.models.credential', { provider: props.provider, commitSeat: commitSeat.current }, { fallback: nativeKeyField })}
         {props.credentialOnly === true ? null : <details className={styles['customized']}>
           <summary className={styles['customizedSummary']}>{t('customized')}</summary>
           <div className={styles['customizedBody']}>

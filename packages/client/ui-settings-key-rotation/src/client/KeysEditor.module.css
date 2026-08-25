@@ -189,7 +189,6 @@
 /* Mirrors ModelsSection `.primaryButton` / `.secondaryButton`: the capsule
  * pair the surrounding card already uses for its own actions. */
 .addButton,
-.resetButton,
 .saveButton {
   box-sizing: border-box;
   display: inline-flex;
@@ -204,7 +203,7 @@
   cursor: pointer;
 }
 
-/* The right-aligned pair: reset (outlined) leads, save (primary) closes. */
+/* The reset capsule right-aligns alone; the card's Apply owns committing. */
 .resetButton {
   margin-left: auto;
 }
@@ -215,15 +214,27 @@
   color: var(--dsw-alias-label-primary-foreground);
 }
 
-.saveButton:hover:not(:disabled) {
-  background: var(--dsw-alias-button-primary-hover);
-}
-
-.addButton,
-.resetButton {
+.addButton {
   border: 1px solid var(--dsw-alias-border-l2);
   background: transparent;
   color: var(--dsw-alias-label-primary);
+}
+
+.resetButton {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 22px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+  cursor: pointer;
 }
 
 .addButton:hover:not(:disabled),
@@ -232,15 +243,13 @@
 }
 
 .addButton:disabled,
-.resetButton:disabled,
-.saveButton:disabled {
+.resetButton:disabled {
   opacity: 0.4;
   cursor: default;
 }
 
 .addButton:focus-visible,
-.resetButton:focus-visible,
-.saveButton:focus-visible {
+.resetButton:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px var(--dsw-alias-border-l3);
 }

@@ -10,7 +10,7 @@
  * whole-array `keys` set, so no secret ever reaches the settings document.
  */
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { InjectFace, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import clsx from 'clsx'
@@ -80,13 +80,17 @@ interface CardDraft {
  * @returns the editor seat, or null while the shell has not injected yet.
  */
 export function KeysEditor(props: KeysEditorProps): ReactNode {
-  const { controller, useSnapshot, t } = props
+  const { controller, useSnapshot, t, commitSeat } = props
   if (controller === undefined || useSnapshot === undefined || t === undefined) return null
-  return <Loaded provider={props.provider} injected={{ controller, useSnapshot, t }} />
+  return <Loaded provider={props.provider} commitSeat={commitSeat} injected={{ controller, useSnapshot, t }} />
 }
 
 function Loaded(
-  { provider, injected }: { provider: string; injected: SeatFace },
+  { provider, commitSeat, injected }: {
+    provider: string
+    commitSeat?: { current?: (() => Promise<string | undefined>) | undefined } | undefined
+    injected: SeatFace
+  },
 ): ReactNode {
   const { controller, useSnapshot, t } = injected
   const state = useSnapshot(snapshot => snapshot)
@@ -100,6 +104,20 @@ function Loaded(
     setDraft({ provider, rows: storedRefsOf(provider, state.namespace).map(ref => ({ ref, value: '' })) })
   }
 
+  // The commit the owner card's Apply runs before its own writes. The closure
+  // body is assigned later in the render (it needs the derived draft state);
+  // this latest-ref plus effect keep the owner's holder wired to it and
+  // unwound on unmount without violating hook order across early returns.
+  const commitRef = useRef<() => Promise<string | undefined>>(async () => undefined)
+  useEffect(() => {
+    if (commitSeat === undefined) return
+    const hook = (): Promise<string | undefined> => commitRef.current()
+    commitSeat.current = hook
+    return () => {
+      if (commitSeat.current === hook) commitSeat.current = undefined
+    }
+  }, [commitSeat])
+
   // Parked countdowns age with the wall clock between pushed refreshes.
   const [now, setNow] = useState(() => Date.now())
   useEffect(() => {
@@ -107,7 +125,7 @@ function Loaded(
     return () => { window.clearInterval(timer) }
   }, [])
 
-  const [saveFailure, setSaveFailure] = useState<string | undefined>(undefined)
+  const [failure, setFailure] = useState<string | undefined>(undefined)
   const [resetting, setResetting] = useState(false)
 
   if (state.status === 'idle') void controller.load()
@@ -146,16 +164,16 @@ function Loaded(
     return undefined
   })()
 
-  const save = async (): Promise<void> => {
-    if (blankFailure !== undefined || duplicateFailure !== undefined) return
-    const failure = await controller.saveRoute(provider, draft.rows)
-    if (failure !== undefined) {
-      setSaveFailure(failure)
-      return
-    }
-    setSaveFailure(undefined)
+  commitRef.current = async (): Promise<string | undefined> => {
+    if (disabled) return undefined
+    if (blankFailure !== undefined) return blankFailure
+    if (duplicateFailure !== undefined) return duplicateFailure
+    const writeFailure = await controller.saveRoute(provider, draft.rows)
+    if (writeFailure !== undefined) return writeFailure
     // Consumed values clear back to placeholders; kept rows stay in order.
     setDraft({ provider, rows: draft.rows.filter(row => row.ref.length > 0).map(({ ref }) => ({ ref, value: '' })) })
+    setFailure(undefined)
+    return undefined
   }
 
   // The escape hatch for parks that turned out to be false: one click clears
@@ -166,10 +184,10 @@ function Loaded(
     try {
       const failure = await controller.resetRoute(provider)
       if (failure !== undefined) {
-        setSaveFailure(failure)
+        setFailure(failure)
         return
       }
-      setSaveFailure(undefined)
+      setFailure(undefined)
     } finally {
       setResetting(false)
     }
@@ -273,19 +291,11 @@ function Loaded(
         >
           {t('resetTimeouts')}
         </button>
-        <button
-          type="button"
-          className={styles['saveButton']}
-          disabled={disabled || blankFailure !== undefined || duplicateFailure !== undefined}
-          onClick={() => { void save() }}
-        >
-          {t('save')}
-        </button>
       </div>
       {(blankFailure ?? duplicateFailure) === undefined
         ? null
         : <p className={styles['error']}>{blankFailure ?? duplicateFailure}</p>}
-      {saveFailure === undefined ? null : <p className={styles['error']}>{saveFailure}</p>}
+      {failure === undefined ? null : <p className={styles['error']}>{failure}</p>}
     </div>
   )
 }

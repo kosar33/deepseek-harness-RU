@@ -108,6 +108,15 @@ export interface SettingsGeneralItemOwnerProps {
 export interface SettingsModelsCredentialOwnerProps {
   /** Provider route id whose credentials the seat edits. */
   provider: string
+  /**
+   * Mutable commit-hook holder the bound seat fills in: the card's Apply
+   * awaits `current` first and treats a returned string as the card's own
+   * failure message, so one Apply press lands the keys and the section
+   * fields together or neither. The holder object is created once per
+   * mounted editor; `current` stays undefined while no seat is bound (the
+   * native field path) and after the seat unmounts.
+   */
+  commitSeat?: { current?: (() => Promise<string | undefined>) | undefined }
   /** Marker field: the owner passes no children. */
   children?: never
 }

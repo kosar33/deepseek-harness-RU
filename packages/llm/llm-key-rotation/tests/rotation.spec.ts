@@ -176,6 +176,12 @@ describe('multi-key rotation through the real loop', () => {
 
     expect(adapter.servedKeys).toEqual(['k1', 'k2', 'k2'])
     expect(first.session.events.some(event => event.type === 'llm/retry')).toBe(false)
+    // The park advance rides a durable record carrying the reset instant.
+    const rotated = first.session.events.findLast(event => event.type === 'llm/key-rotated')
+    expect(rotated).toMatchObject({
+      data: { provider: 'openrouter', from: 'OPENROUTER_KEY_1', to: 'OPENROUTER_KEY_2', cause: 'rate-limit' },
+    })
+    expect((rotated!.data as { resetAt?: string }).resetAt).toMatch(/^\d{4}-\d{2}-\d{2}T/)
     expect(second.session.deriveMessages().at(-1)).toMatchObject({
       role: 'assistant',
       content: [{ type: 'text', text: MOCK_TEXT }],
@@ -357,6 +363,12 @@ describe('multi-key rotation through the real loop', () => {
     expect(adapter.servedKeys).toEqual(['k1', 'k1', 'k1', 'k1', 'k2'])
     expect(agent.session.events.filter(event => event.type === 'llm/retry')).toHaveLength(3)
     expect(refreshed).toBeGreaterThanOrEqual(1)
+    // The advance lands as a durable record naming both credentials.
+    const rotated = agent.session.events.findLast(event => event.type === 'llm/key-rotated')
+    expect(rotated).toMatchObject({
+      data: { provider: 'openrouter', from: 'OPENROUTER_KEY_1', to: 'OPENROUTER_KEY_2', cause: 'vendor-relay' },
+    })
+    expect((rotated!.data as { resetAt?: string }).resetAt).toBeUndefined()
     expect(agent.session.deriveMessages().at(-1)).toMatchObject({
       role: 'assistant',
       content: [{ type: 'text', text: MOCK_TEXT }],

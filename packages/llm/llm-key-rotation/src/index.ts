@@ -83,6 +83,7 @@ import { launchEnvironmentOf } from '@deepseek-ai/dsh-launch-environment'
 import { assertUsableApiKey, LlmError } from '@deepseek-ai/dsh-llm'
 import type { LlmFailure, ResolvedRetryPolicy } from '@deepseek-ai/dsh-llm'
 import { installSettingsSection, settingsNamespace } from '@deepseek-ai/dsh-settings'
+import type { LlmKeyRotatedEventData } from './types.ts'
 import { Config, resolvePools } from './config.ts'
 import type { ResolvedPools, RotationProviderConfig } from './config.ts'
 import { readParkState, renderParkState, resolveParkSpec, writeParkState } from './park-store.ts'
@@ -373,6 +374,13 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
       if (nextMember === undefined) return next()
       pool.index = nextMember.index
       notifyPoolsChanged()
+      agent.session.append('llm/key-rotated', {
+        provider: pool.route,
+        from: served.member.label,
+        to: nextMember.member.label,
+        cause: 'vendor-relay',
+        reason: excerptReason(failure.message),
+      } satisfies LlmKeyRotatedEventData)
       ctx.logger.warn(
         'llm-key-rotation: provider "%s" relayed an upstream vendor error on key "%s";'
           + ' same-key retries spent, retrying with "%s" without parking; reason: %s',
@@ -403,6 +411,14 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
     if (nextMember === undefined) throw poolExhaustedError(pool)
     pool.index = nextMember.index
     notifyPoolsChanged()
+    agent.session.append('llm/key-rotated', {
+      provider: pool.route,
+      from: served.member.label,
+      to: nextMember.member.label,
+      cause: 'rate-limit',
+      resetAt: new Date(until).toISOString(),
+      reason: excerptReason(failure.message),
+    } satisfies LlmKeyRotatedEventData)
 
     ctx.logger.warn(
       'llm-key-rotation: provider "%s" hit %s on key "%s"; parked until %s; retrying with "%s"; reason: %s',

@@ -11,10 +11,12 @@ export const name = 'llm-key-rotation-invariant'
 export const inject = ['invariants']
 
 /**
- * No runtime invariant: this plugin appends no session events, and its one
- * durable record — the park-state document — is a projection of pool state
- * the plugin rewrites atomically and revalidates on every mount, with no
- * cross-service relationship to assert.
+ * No runtime invariant: the plugin's one session event (`llm/key-rotated`)
+ * is assembled from the advancing pool itself — labels and route come from
+ * the members the recovery listener just moved between — so its validity is
+ * fixed at the append site; the park-state document is a projection of pool
+ * state the plugin rewrites atomically and revalidates on every mount, with
+ * no cross-service relationship to assert.
  */
 const install: InvariantInstaller = (_ctx: Context, _fail: InvariantFailure): void => {}
 

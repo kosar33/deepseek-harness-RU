@@ -35,7 +35,7 @@ export interface ParkStamp {
 }
 
 /** Longest upstream-reason excerpt kept on a park record or exhaustion message. */
-export const REASON_EXCERPT_MAX = 300
+const REASON_EXCERPT_MAX = 300
 
 /**
  * Trim an upstream failure text to the excerpt the plugin keeps: long enough

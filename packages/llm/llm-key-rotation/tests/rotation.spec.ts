@@ -41,7 +41,7 @@ class ScriptedAdapter extends LlmAdapter {
 
   constructor(
     private readonly ctx: Context,
-    private readonly steps: readonly ('rate_limit' | 'server_error' | 'success')[],
+    private readonly steps: readonly ('rate_limit' | 'server_error' | 'upstream_limit' | 'success')[],
     private readonly nativeEnv?: string,
   ) {
     super()
@@ -58,12 +58,21 @@ class ScriptedAdapter extends LlmAdapter {
     const rotated = await override?.resolve(options.provider)
     const key = rotated ?? (this.nativeEnv === undefined ? undefined : process.env[this.nativeEnv])
     if (key !== undefined) this.servedKeys.push(key)
-    if (step === 'rate_limit' || step === 'server_error') {
+    if (step === 'rate_limit' || step === 'server_error' || step === 'upstream_limit') {
+      // The upstream_limit step carries OpenRouter's flattened shared-pool 429
+      // body verbatim — pi-ai reduces the wire error to exactly this text.
       yield {
         type: 'finish',
         reason: {
           kind: 'error',
-          failure: { message: `${step} strike`, code: step === 'rate_limit' ? 'RATE_LIMIT' : 'SERVER' },
+          failure: {
+            message: step === 'upstream_limit'
+              ? '429: {"message":"Provider returned error","code":429,"metadata":{"raw":"stealth is temporarily'
+                + ' rate-limited upstream. Please retry shortly.","provider_name":"Stealth","is_byok":false,'
+                + '"limit_source":"upstream_provider_shared_pool","remedy_hint":"Retry shortly"}}'
+              : `${step} strike`,
+            code: step === 'server_error' ? 'SERVER' : 'RATE_LIMIT',
+          },
         },
       }
       return
@@ -99,7 +108,7 @@ async function writeCredentials(entries: Record<string, string>): Promise<string
 async function boot(options: {
   providers?: RotationConfig['providers']
   credentialPath?: string
-  steps?: readonly ('rate_limit' | 'server_error' | 'success')[]
+  steps?: readonly ('rate_limit' | 'server_error' | 'upstream_limit' | 'success')[]
   nativeEnv?: string
   route?: string
   registerForeign?: boolean
@@ -185,8 +194,40 @@ describe('multi-key rotation through the real loop', () => {
     const error = agentErrors[0] as Error & { code?: string }
     expect(error.code).toBe('KEY_POOL_EXHAUSTED')
     expect(error.message).toContain('every key for provider route "openrouter" is rate-limited:')
-    expect(error.message).toMatch(/key-1 parked until \d{4}-\d{2}-\d{2}T00:00:00\.000Z,/)
-    expect(error.message).toMatch(/key-2 parked until [^,]+Z, key-3 parked until [^,]+Z/)
+    // The upstream failure text that caused each park rides the listing, so
+    // the visible error names the limiter instead of bare reset instants.
+    expect(error.message).toMatch(/key-1 parked until \d{4}-\d{2}-\d{2}T00:00:00\.000Z — rate_limit strike,/)
+    expect(error.message)
+      .toMatch(/key-2 parked until [^,]+Z — rate_limit strike, key-3 parked until [^,]+Z — rate_limit strike/)
+  }, 20_000)
+
+  it('parks nothing when the 429 names the upstream shared pool as the limiter', async () => {
+    const path = await writeCredentials({ OPENROUTER_KEY_1: 'k1', OPENROUTER_KEY_2: 'k2' })
+    const { ctx, adapter } = await boot({
+      credentialPath: path,
+      steps: ['upstream_limit', 'success'],
+      providers: keys({ apiKeyEnv: 'OPENROUTER_KEY_1' }, { apiKeyEnv: 'OPENROUTER_KEY_2' }),
+    })
+
+    const agent = ctx.agentLoop.create(SessionId('upstream-pool'), { provider: 'openrouter', model: 'mock-model' })
+    await sendAndWait(agent)
+
+    // The same key served both attempts: rotation stood aside and ordinary
+    // retry backoff carried the recovery.
+    expect(adapter.servedKeys).toEqual(['k1', 'k1'])
+    expect(agent.session.events.filter(event => event.type === 'llm/retry')).toHaveLength(1)
+    expect((ctx.get('llmKeyRotation') as KeyRotation.LlmKeyRotationState).snapshot())
+      .toEqual([expect.objectContaining({
+        provider: 'openrouter',
+        keys: [
+          expect.objectContaining({ label: 'OPENROUTER_KEY_1', status: { state: 'usable' } }),
+          expect.objectContaining({ label: 'OPENROUTER_KEY_2', status: { state: 'usable' } }),
+        ],
+      })])
+    expect(agent.session.deriveMessages().at(-1)).toMatchObject({
+      role: 'assistant',
+      content: [{ type: 'text', text: MOCK_TEXT }],
+    })
   }, 20_000)
 
   it('serves literal and reference members and resolves references from the launch environment without the seam', async () => {

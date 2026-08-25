@@ -30,6 +30,22 @@ export interface ParkStamp {
   readonly parkedAtMs: number
   /** When the member becomes usable again. */
   readonly resetAtMs: number
+  /** Trimmed upstream failure text that caused the park, when the failure carried one. */
+  readonly reason?: string
+}
+
+/** Longest upstream-reason excerpt kept on a park record or exhaustion message. */
+export const REASON_EXCERPT_MAX = 300
+
+/**
+ * Trim an upstream failure text to the excerpt the plugin keeps: long enough
+ * to name the real limiter (`limit_source`, provider wording), short enough
+ * for one log line and one error message.
+ * @param message - the raw upstream failure text.
+ * @returns the excerpt to persist and display.
+ */
+export function excerptReason(message: string): string {
+  return message.length <= REASON_EXCERPT_MAX ? message : `${message.slice(0, REASON_EXCERPT_MAX)}…`
 }
 
 /** One provider route's ordered keys with its sticky position and park stamps. */
@@ -49,6 +65,28 @@ export const KEY_POOL_EXHAUSTED = 'KEY_POOL_EXHAUSTED'
 
 /** The stable failure code this plugin rotates on. */
 export const RATE_LIMIT = 'RATE_LIMIT'
+
+/**
+ * The wire marker OpenRouter sets on a 429 whose throttle sits in its
+ * upstream provider's shared pool rather than on the caller's credential
+ * (`error.metadata.limit_source`). pi-ai flattens wire errors to message text
+ * before they reach the recovery seam (see dsh-llm-pi-ai stream.ts), so this
+ * surviving fragment of the response body is the only available signal.
+ */
+const UPSTREAM_POOL_MARKER = 'upstream_provider_shared_pool'
+
+/**
+ * Whether a rate-limit failure throttles the provider's shared upstream pool
+ * instead of this route's credential. Parking on such a failure would bench
+ * every healthy key until the fallback horizon while the served key's own
+ * quota is untouched; the remedy — waiting briefly — belongs to ordinary
+ * retry backoff on the same key.
+ * @param failure - the failed attempt's normalized facts.
+ * @returns whether the failure names an upstream shared-pool limit.
+ */
+export function isUpstreamPoolLimit(failure: LlmFailure): boolean {
+  return failure.message.includes(UPSTREAM_POOL_MARKER)
+}
 
 /**
  * The next UTC midnight strictly after `nowMs`, as epoch milliseconds. This is
@@ -158,7 +196,10 @@ export function advanceAfter(pool: KeyPool, fromIndex: number, nowMs: number): U
 export function parkedListing(pool: KeyPool): string {
   return pool.members.map((member, index) => {
     const stamp = pool.parkedUntil.get(index)
-    return `${member.label} parked until ${stamp === undefined ? 'unknown' : new Date(stamp.resetAtMs).toISOString()}`
+    const until = stamp === undefined ? 'unknown' : new Date(stamp.resetAtMs).toISOString()
+    return stamp?.reason === undefined
+      ? `${member.label} parked until ${until}`
+      : `${member.label} parked until ${until} — ${stamp.reason}`
   }).join(', ')
 }
 
@@ -180,6 +221,7 @@ export function parkRecordsOf(pool: KeyPool, nowMs: number): ParkRecord[] {
       label: (pool.members[index] as PoolMember).label,
       parkedAt: stamp.parkedAtMs,
       resetAt: stamp.resetAtMs,
+      ...stamp.reason === undefined ? {} : { reason: stamp.reason },
     })
   }
   return records

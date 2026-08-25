@@ -38,6 +38,8 @@ export interface ParkRecord {
   readonly parkedAt: number
   /** When the member returns to service, epoch milliseconds. */
   readonly resetAt: number
+  /** Trimmed upstream failure text that caused the park, when recorded. */
+  readonly reason?: string
 }
 
 /**
@@ -76,11 +78,16 @@ function parseParkRow(row: unknown, filename: string, position: number): ParkRec
       throw new TypeError(`llm-key-rotation: parks[${position}].${field} in ${filename} must be a finite non-negative epoch ms number`)
     }
   }
+  const reason = entry['reason']
+  if (reason !== undefined && (typeof reason !== 'string' || reason.length === 0)) {
+    throw new TypeError(`llm-key-rotation: parks[${position}].reason in ${filename} must be a non-empty string when present`)
+  }
   return {
     route: entry['route'] as string,
     label: entry['label'] as string,
     parkedAt: entry['parkedAt'] as number,
     resetAt: entry['resetAt'] as number,
+    ...reason === undefined ? {} : { reason },
   }
 }
 

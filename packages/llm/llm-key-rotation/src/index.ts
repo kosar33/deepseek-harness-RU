@@ -17,7 +17,10 @@
  * sticky position onto the first non-parked key, and returns
  * `{ kind: 'retry' }` so the loop re-issues the identical request immediately
  * under the next key. When no key is left, the thrown error names every key
- * and its reset instant. Single-key pools delegate untouched, so they behave
+ * and its reset instant. A 429 that names the provider's shared upstream pool
+ * as the limiter parks nothing: the served credential's own quota is
+ * untouched, so the failure delegates to ordinary retry backoff on the same
+ * key. Single-key pools delegate untouched, so they behave
  * exactly like the native resolution.
  *
  * Route keys resolve through the optional `llm-key-rotation` user-settings
@@ -88,6 +91,8 @@ import {
   RATE_LIMIT,
   advanceAfter,
   currentUsable,
+  excerptReason,
+  isUpstreamPoolLimit,
   nextUtcMidnight,
   parkMember,
   parkRecordsOf,
@@ -105,6 +110,7 @@ export {
   KEY_POOL_EXHAUSTED,
   advanceAfter,
   currentUsable,
+  isUpstreamPoolLimit,
   nextUtcMidnight,
   parkMember,
   parkRecordsOf,
@@ -304,6 +310,20 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
     // downstream recovery untouched, including its backoff waits.
     if (pool === undefined || pool.members.length < 2) return next()
     if (failure.code !== RATE_LIMIT) return next()
+    if (isUpstreamPoolLimit(failure)) {
+      // The 429 names the provider's shared upstream pool as the limiter, so
+      // the served key's own quota is untouched: parking would bench every
+      // healthy key in the pool until the fallback horizon while the actual
+      // remedy — waiting briefly — is ordinary backoff on this same key.
+      ctx.logger.warn(
+        'llm-key-rotation: provider "%s" hit an upstream shared-pool rate limit on key "%s";'
+        + ' leaving rotation untouched for downstream retry; reason: %s',
+        pool.route,
+        (pool.members[pool.index] as PoolMember).label,
+        excerptReason(failure.message),
+      )
+      return next()
+    }
 
     // Runs before ordinary recovery registrations (`prepend`), so a parked key
     // is advanced past before dsh-llm-retry schedules a same-key backoff wait
@@ -311,7 +331,10 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
     const now = Date.now()
     const served = currentUsable(pool, now)
     const until = resetFromFailure(failure, now) ?? nextUtcMidnight(now)
-    parkMember(pool, served.index, { parkedAtMs: now, resetAtMs: until })
+    // The trimmed upstream text rides the stamp: it re-surfaces in the
+    // exhaustion message and the persisted park document, so a later failure
+    // names the limiter instead of hiding it behind reset instants.
+    parkMember(pool, served.index, { parkedAtMs: now, resetAtMs: until, reason: excerptReason(failure.message) })
     // Persist before handing back the retry: a crash after the wire request
     // but before the write would otherwise resurrect the exhausted key on the
     // next boot. A failed write logs loudly and keeps rotating in memory.
@@ -321,12 +344,13 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
     pool.index = nextMember.index
 
     ctx.logger.warn(
-      'llm-key-rotation: provider "%s" hit %s on key "%s"; parked until %s; retrying with "%s"',
+      'llm-key-rotation: provider "%s" hit %s on key "%s"; parked until %s; retrying with "%s"; reason: %s',
       pool.route,
       failure.code,
       served.member.label,
       new Date(until).toISOString(),
       nextMember.member.label,
+      failure.message,
     )
     return { kind: 'retry' }
   }

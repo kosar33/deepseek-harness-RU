@@ -4,6 +4,8 @@ import {
   KEY_POOL_EXHAUSTED,
   advanceAfter,
   currentUsable,
+  excerptReason,
+  isUpstreamPoolLimit,
   nextUtcMidnight,
   parkRecordsOf,
   parkedListing,
@@ -39,6 +41,22 @@ describe('reset instants', () => {
     expect(resetFromFailure({ message: 'limited', code: 'RATE_LIMIT' }, NOW)).toBeUndefined()
     expect(resetFromFailure({ message: 'limited', code: 'RATE_LIMIT', providerRetryAfterMs: 0 }, NOW)).toBeUndefined()
     expect(resetFromFailure({ message: 'limited', code: 'RATE_LIMIT', providerRetryAfterMs: Number.POSITIVE_INFINITY }, NOW)).toBeUndefined()
+  })
+})
+
+describe('upstream shared-pool limits', () => {
+  it('recognizes the flattened OpenRouter body naming the upstream pool as the limiter', () => {
+    const message = '429: {"message":"Provider returned error","code":429,"metadata":'
+      + '{"raw":"stealth is temporarily rate-limited upstream. Please retry shortly.",'
+      + '"provider_name":"Stealth","is_byok":false,"limit_source":"upstream_provider_shared_pool",'
+      + '"remedy_hint":"Retry shortly"}}'
+    expect(isUpstreamPoolLimit({ message, code: 'RATE_LIMIT' })).toBe(true)
+  })
+
+  it('leaves every other rate-limit failure on the park path', () => {
+    expect(isUpstreamPoolLimit({ message: 'Rate limit exceeded: free-model-cap', code: 'RATE_LIMIT' })).toBe(false)
+    expect(isUpstreamPoolLimit({ message: '429 too many requests', code: 'RATE_LIMIT' })).toBe(false)
+    expect(isUpstreamPoolLimit({ message: '"limit_source":"key"', code: 'RATE_LIMIT' })).toBe(false)
   })
 })
 
@@ -103,6 +121,41 @@ describe('serving and advancing', () => {
     const error = poolExhaustedError(subject)
     expect(error).toBeInstanceOf(LlmError)
     expect(error.message).toContain('only-one parked until 2026-05-01T00:00:00.000Z')
+  })
+
+  it('carries the upstream reason on listings, exhaustion messages, and persistence records', () => {
+    const subject = pool(['alpha', 'beta'], 'openrouter')
+    parkMember(subject, 0, {
+      parkedAtMs: NOW,
+      resetAtMs: Date.UTC(2026, 4, 1),
+      reason: 'upstream shared pool throttled',
+    })
+    parkMember(subject, 1, { parkedAtMs: NOW, resetAtMs: Date.UTC(2026, 4, 2) })
+    expect(parkedListing(subject)).toBe(
+      'alpha parked until 2026-05-01T00:00:00.000Z — upstream shared pool throttled'
+        + ', beta parked until 2026-05-02T00:00:00.000Z',
+    )
+    expect(poolExhaustedError(subject).message).toContain(
+      'alpha parked until 2026-05-01T00:00:00.000Z — upstream shared pool throttled',
+    )
+    expect(parkRecordsOf(subject, NOW)).toEqual([
+      {
+        route: 'openrouter',
+        label: 'alpha',
+        parkedAt: NOW,
+        resetAt: Date.UTC(2026, 4, 1),
+        reason: 'upstream shared pool throttled',
+      },
+      // A stamp without a reason persists without one.
+      { route: 'openrouter', label: 'beta', parkedAt: NOW, resetAt: Date.UTC(2026, 4, 2) },
+    ])
+  })
+
+  it('trims long upstream reasons to a one-line excerpt', () => {
+    expect(excerptReason('x'.repeat(300))).toHaveLength(300)
+    const trimmed = excerptReason('x'.repeat(400))
+    expect(trimmed).toHaveLength(301)
+    expect(trimmed.endsWith('…')).toBe(true)
   })
 
   it('derives persistence records for live parks and skips expired ones without mutating state', () => {

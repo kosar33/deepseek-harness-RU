@@ -312,7 +312,7 @@ describe('multi-key rotation through the real loop', () => {
     })
   })
 
-  it('retries a bare vendor relay on the next key without parking it', async () => {
+  it('retries a bare vendor relay on the same key with visible backoff first', async () => {
     const path = await writeCredentials({ OPENROUTER_KEY_1: 'k1', OPENROUTER_KEY_2: 'k2' })
     const { ctx, adapter } = await boot({
       credentialPath: path,
@@ -323,14 +323,40 @@ describe('multi-key rotation through the real loop', () => {
     const agent = context!.agentLoop.create(SessionId('vendor-relay'), { provider: 'openrouter', model: 'mock-model' })
     await sendAndWait(agent)
 
-    // Rotation advanced onto the spare itself; no backoff retry event ran.
-    expect(adapter.servedKeys).toEqual(['k1', 'k2'])
-    expect(agent.session.events.some(event => event.type === 'llm/retry')).toBe(false)
+    // The retry chain still has budget, so the SAME key retries through the
+    // plugin's ordinary exponential backoff — visible as an llm/retry row.
+    expect(adapter.servedKeys).toEqual(['k1', 'k1'])
+    expect(agent.session.events.filter(event => event.type === 'llm/retry')).toHaveLength(1)
     expect(agent.session.deriveMessages().at(-1)).toMatchObject({
       role: 'assistant',
       content: [{ type: 'text', text: MOCK_TEXT }],
     })
-    // The benched key stays clean: nothing parked, nothing persisted.
+    // Nothing parked, nothing persisted.
+    const face = ctx.get('llmKeyRotation') as LlmKeyRotationState
+    expect(face.snapshot()[0]!.keys.every(key => key.status.state === 'usable')).toBe(true)
+    expect(existsSync(join(home!, '.llm-key-rotation-parks.json'))).toBe(false)
+  })
+
+  it('rotates onto the spare only after the same-key retry chain is spent', async () => {
+    const path = await writeCredentials({ OPENROUTER_KEY_1: 'k1', OPENROUTER_KEY_2: 'k2' })
+    const { ctx, adapter } = await boot({
+      credentialPath: path,
+      steps: ['provider_returned', 'provider_returned', 'provider_returned', 'provider_returned', 'success'],
+      providers: keys({ apiKeyEnv: 'OPENROUTER_KEY_1' }, { apiKeyEnv: 'OPENROUTER_KEY_2' }),
+    })
+
+    const agent = context!.agentLoop.create(SessionId('vendor-relay-spent'), { provider: 'openrouter', model: 'mock-model' })
+    await sendAndWait(agent)
+
+    // FAST_RETRY_POLICY allows three same-key retries (attempts k1 x4); once
+    // that chain is spent, rotation advances the sticky position to k2 for
+    // attempt five — without parking anything.
+    expect(adapter.servedKeys).toEqual(['k1', 'k1', 'k1', 'k1', 'k2'])
+    expect(agent.session.events.filter(event => event.type === 'llm/retry')).toHaveLength(3)
+    expect(agent.session.deriveMessages().at(-1)).toMatchObject({
+      role: 'assistant',
+      content: [{ type: 'text', text: MOCK_TEXT }],
+    })
     const face = ctx.get('llmKeyRotation') as LlmKeyRotationState
     expect(face.snapshot()[0]!.keys.every(key => key.status.state === 'usable')).toBe(true)
     expect(existsSync(join(home!, '.llm-key-rotation-parks.json'))).toBe(false)

@@ -77,11 +77,11 @@
  */
 
 import type { Context } from '@deepseek-ai/cordis'
-import type { RequestErrorAction } from '@deepseek-ai/dsh-agent'
+import type { Agent, RequestErrorAction } from '@deepseek-ai/dsh-agent'
 import type { LlmApiKeyOverride } from '@deepseek-ai/dsh-llm'
 import { launchEnvironmentOf } from '@deepseek-ai/dsh-launch-environment'
 import { assertUsableApiKey, LlmError } from '@deepseek-ai/dsh-llm'
-import type { LlmFailure } from '@deepseek-ai/dsh-llm'
+import type { LlmFailure, ResolvedRetryPolicy } from '@deepseek-ai/dsh-llm'
 import { installSettingsSection, settingsNamespace } from '@deepseek-ai/dsh-settings'
 import { Config, resolvePools } from './config.ts'
 import type { ResolvedPools, RotationProviderConfig } from './config.ts'
@@ -310,7 +310,12 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
   }
 
   async function recover(
-    { provider, failure }: { provider: string; failure: LlmFailure },
+    { agent, provider, failure, retryPolicy }: {
+      agent: Agent
+      provider: string
+      failure: LlmFailure
+      retryPolicy: ResolvedRetryPolicy | undefined
+    },
     next: () => Promise<RequestErrorAction>,
   ): Promise<RequestErrorAction> {
     const pool = state.pools.get(provider)
@@ -335,17 +340,37 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
       return next()
     }
     if (isProviderReturnedError(failure)) {
-      // The upstream vendor behind the route failed — not this credential. No
-      // park is written; the identical request re-issues on the next key so a
-      // multi-key pool spends its spare attempts instead of dying on one
-      // vendor hiccup. The loop's own retry budget bounds total attempts.
+      // The upstream vendor behind the route failed — not this credential.
+      // Same-key exponential backoff belongs to dsh-llm-retry: delegate while
+      // its chain still has budget (those attempts render as ordinary visible
+      // retry rows carrying the raw network error). Only once the last
+      // scheduled same-key retry has already run does rotation advance onto
+      // the next key — without parking, so the benched key stays clean.
+      const policy = retryPolicy
+      if (
+        policy !== undefined && policy.mode === 'normal'
+        && policy.retryableCodes.includes(failure.code)
+      ) {
+        // Structural read of the retry plugin's logged chain (dsh-llm-retry
+        // owns the event's type declaration; this face stays decoupled).
+        const prior = (
+          agent.session.events as unknown as readonly {
+            type: string
+            data?: { provider: string; retry: number; maxRetries: number }
+          }[]
+        )
+          .filter(event => event.type === 'llm/retry' && event.data?.provider === provider)
+          .at(-1)
+        if (prior === undefined || prior.data === undefined) return next()
+        if (prior.data.retry < prior.data.maxRetries) return next()
+      }
       const served = currentUsable(pool, Date.now())
       const nextMember = advanceAfter(pool, served.index, Date.now())
       if (nextMember === undefined) return next()
       pool.index = nextMember.index
       ctx.logger.warn(
         'llm-key-rotation: provider "%s" relayed an upstream vendor error on key "%s";'
-          + ' retrying with "%s" without parking; reason: %s',
+          + ' same-key retries spent, retrying with "%s" without parking; reason: %s',
         pool.route,
         served.member.label,
         nextMember.member.label,

@@ -1,6 +1,7 @@
 # Agent Note: 下一轮次开始时清空 todo 计划条
 
 Status: implemented
+Archived: 2026-08-25
 
 [English](2026-07-28-todo-plan-clears-on-next-turn.md) | 中文
 

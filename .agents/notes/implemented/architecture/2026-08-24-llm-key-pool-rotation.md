@@ -47,7 +47,8 @@ This design is pure-plugin. Every behavior rides documented extension points: ro
 - Cross-provider or cross-model failover; the request still names exactly one explicit provider and model.
 - Header-grade reset parsing through pi-ai; deferred until upstream forwards response headers or status beyond message text.
 - Correlating each failed request with the exact member that served it under concurrency; pools keep process-wide stickiness, and single-agent sessions are the supported posture.
-- Directory entries or Models-page editing for rotated routes; configuration lives in composition files.
+
+Editing rotated routes from web Settings shipped beside this mechanism and owns its own decision record: [Editing the key-rotation plugin from web Settings](2026-08-24-llm-key-rotation-settings-editor.md).
 
 ## Alternatives considered
 
@@ -75,6 +76,7 @@ This design is pure-plugin. Every behavior rides documented extension points: ro
 
 ## Related
 
+- [Editing the key-rotation plugin from web Settings](2026-08-24-llm-key-rotation-settings-editor.md) owns the settings-section surface over this plugin: the editor's save round-trip, the `llm.keyRotation` wire method, and the live status panel.
 - [Bounded recovery for transient LLM request failures](2026-06-21-bounded-llm-request-recovery.md) owns the recovery waterfall contract, retry timing, and the single-attempt adapter rule this plugin composes with.
 - [Provider-routed LLM adapters](2026-07-14-provider-routed-llm-adapters.md) owns explicit provider routing and per-request credential resolution.
 - [Request-error retry action](../simplification/2026-07-27-request-error-retry-action.md) owns the `{ kind: 'retry' }` return contract this listener uses to authorize an immediate switch.

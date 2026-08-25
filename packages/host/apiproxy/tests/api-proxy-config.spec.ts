@@ -263,7 +263,7 @@ function forwardedSettings(ns: string): HostFrame {
     type: 'host/remote-event',
     event: 'settings/document-updated',
     // The revision is the Host's own counter, so the matcher is the assertion.
-    args: [ns, expect.any(Number)], // oxlint-disable-line typescript/no-unsafe-assignment
+    args: [ns, expect.any(Number)],
   }
 }
 
@@ -702,6 +702,48 @@ describe('llm domain', () => {
       { type: 'host/remote-event', event: 'llm/adapters-updated', args: [] },
       { type: 'host/remote-event', event: 'llm/adapters-updated', args: [] },
     ])
+  })
+
+  it('reports the rotation snapshot when the plugin is composed and absence otherwise', async () => {
+    const ctx = await harness()
+    const api = createApiProxy(ctx, DEFAULTS)
+    expect(expectOk(await api.llm.keyRotation(request({})))).toEqual({ configured: false, routes: [] })
+    ctx.provide('llmKeyRotation', {
+      snapshot: () => [{
+        provider: 'openrouter',
+        activeLabel: 'OPENROUTER_KEYROTATION_2',
+        keys: [
+          {
+            provider: 'openrouter',
+            label: 'OPENROUTER_KEYROTATION_1',
+            source: 'reference' as const,
+            reference: 'OPENROUTER_KEYROTATION_1',
+            status: {
+              state: 'parked' as const,
+              parkedAt: '2026-08-24T10:00:00.000Z',
+              resetAt: '2026-08-25T00:00:00.000Z',
+            },
+          },
+          { provider: 'openrouter', label: 'OPENROUTER_KEYROTATION_2', source: 'reference' as const, reference: 'OPENROUTER_KEYROTATION_2', status: { state: 'usable' as const } },
+        ],
+      }],
+    })
+    expect(expectOk(await api.llm.keyRotation(request({})))).toEqual({
+      configured: true,
+      routes: [{
+        provider: 'openrouter',
+        activeLabel: 'OPENROUTER_KEYROTATION_2',
+        keys: [
+          {
+            label: 'OPENROUTER_KEYROTATION_1',
+            source: 'reference',
+            reference: 'OPENROUTER_KEYROTATION_1',
+            status: { state: 'parked', parkedAt: '2026-08-24T10:00:00.000Z', resetAt: '2026-08-25T00:00:00.000Z' },
+          },
+          { label: 'OPENROUTER_KEYROTATION_2', source: 'reference', reference: 'OPENROUTER_KEYROTATION_2', status: { state: 'usable' } },
+        ],
+      }],
+    })
   })
 })
 

@@ -203,6 +203,11 @@
     - id: ui-settings-models
       name: '@deepseek-ai/dsh-client-ui-settings-models'
 
+    # Key-rotation editor: live per-key status for the dsh-llm-key-rotation
+    # routes, with the key values stored through the credential seam only.
+    - id: ui-settings-key-rotation
+      name: '@deepseek-ai/dsh-client-ui-settings-key-rotation'
+
     - id: ui-settings-plugin-inventory
       name: '@deepseek-ai/dsh-client-ui-settings-plugin-inventory'
 

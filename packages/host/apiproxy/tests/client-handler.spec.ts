@@ -126,6 +126,7 @@ function scriptedApi(overrides: {
       providers: r => ok(r, { providers: [] }),
       models: r => ok(r, { groups: [], failures: [] }),
       discoverModels: err,
+      keyRotation: r => ok(r, { configured: false, routes: [] }),
       ...overrides.llm,
     },
     events: { mux: () => empty<MuxFrame>(), host: () => empty<HostFrame>(), ...overrides.events },
@@ -753,6 +754,26 @@ describe('config unary surface', () => {
         providers: record('llm.providers', r => ok(r, { providers: [providerRow] })),
         models: record('llm.models', r => ok(r, { groups: [group], failures: [] })),
         discoverModels: record('llm.discoverModels', r => ok(r, { models: [{ id: 'acme-large', contextWindow: 65536 }] })),
+        keyRotation: record('llm.keyRotation', r => ok(r, {
+          configured: true,
+          routes: [{
+            provider: 'openrouter',
+            activeLabel: 'OPENROUTER_KEYROTATION_2',
+            keys: [
+              {
+                label: 'OPENROUTER_KEYROTATION_1',
+                source: 'reference' as const,
+                reference: 'OPENROUTER_KEYROTATION_1',
+                status: {
+                  state: 'parked' as const,
+                  parkedAt: '2026-08-24T10:00:00.000Z',
+                  resetAt: '2026-08-25T00:00:00.000Z',
+                },
+              },
+              { label: 'OPENROUTER_KEYROTATION_2', source: 'reference' as const, reference: 'OPENROUTER_KEYROTATION_2', status: { state: 'usable' as const } },
+            ],
+          }],
+        })),
       },
     })
     const c = client(api)
@@ -785,11 +806,13 @@ describe('config unary surface', () => {
       apiKey: 'probe-key',
     })
     expect(discovered.result).toEqual({ ok: true, value: { models: [{ id: 'acme-large', contextWindow: 65536 }] } })
+    const rotation = await c.llm.keyRotation({})
+    expect(rotation.result.ok).toBe(true)
 
     expect(seen.map(call => call.method)).toEqual([
       'settings.describe', 'settings.openDocument', 'settings.update', 'settings.replace', 'settings.mutate',
       'credentials.describe', 'credentials.set', 'credentials.unset',
-      'llm.providers', 'llm.models', 'llm.discoverModels',
+      'llm.providers', 'llm.models', 'llm.discoverModels', 'llm.keyRotation',
     ])
     expect(seen[2]?.payload).toEqual({ ns: 'llm-deepseek', patch: { baseURL: 'https://next' } })
     expect(seen[4]?.payload)

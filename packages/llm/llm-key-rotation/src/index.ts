@@ -15,22 +15,33 @@
  * and its reset instant. Single-key pools delegate untouched, so they behave
  * exactly like the plain adapter.
  *
+ * Route configuration resolves through the optional `llm-key-rotation`
+ * user-settings section over the composition entry (the same layering every
+ * adapter family uses), so the web Settings editor can add routes and keys
+ * without hand-editing `cordis.yml`: a committed section change rebuilds the
+ * pools, restores their persisted parks, and swaps the registered route set in
+ * place. A route the plain dsh-llm-pi-ai section also owns fails loud at the
+ * registry — `DUPLICATE_ADAPTER` at load, or a logged refusal that keeps the
+ * previous routes serving when the collision arrives through a settings write.
+ *
  * Parks persist in `.llm-key-rotation-parks.json` beside `.credentials.yaml`
  * under the harness home (configurable through `parkFile`/`dshHome`), so an
- * exhausted key stays parked across restarts. On mount the document loads,
- * expired rows drop, rows naming routes or labels the current configuration
- * no longer has are pruned, and live parks reattach by route and label; every
- * park or expiry change rewrites the file atomically at owner-only mode. A
- * missing file is the empty state; a corrupt or wrong-version file fails the
- * mount loud. A failed persistence write never fails the recovery — it logs
- * loudly and rotation continues on in-memory state.
+ * exhausted key stays parked across restarts. On mount and on every rebuild
+ * the document loads, expired rows drop, rows naming routes or labels the
+ * current configuration no longer has are pruned, and live parks reattach by
+ * route and label; every park or expiry change rewrites the file atomically at
+ * owner-only mode. A missing file is the empty state; a corrupt or
+ * wrong-version file fails the mount loud. A failed persistence write never
+ * fails the recovery — it logs loudly and rotation continues on in-memory
+ * state.
  *
  * Other plugins read rotation state through `ctx.get('llmKeyRotation')`:
  * `snapshot()` renders every route's keys with their status, secrets excluded.
  * Usability in a snapshot is view-only — an expired park reports usable
  * without touching pool state or the file — so a settings-page widget can
  * render «лимит откатится через Nч Mм» from `status.resetAt` without
- * mutating anything.
+ * mutating anything. The face exists whenever the plugin is composed; a
+ * dormant configuration snapshots as an empty list.
  *
  * ```yaml
  * - id: llm-openrouter
@@ -58,8 +69,11 @@ import type { RequestErrorAction } from '@deepseek-ai/dsh-agent'
 import { launchEnvironmentOf } from '@deepseek-ai/dsh-launch-environment'
 import { assertUsableApiKey, LlmError } from '@deepseek-ai/dsh-llm'
 import type { LlmFailure } from '@deepseek-ai/dsh-llm'
+import type { AdapterRegistrationHandle } from '@deepseek-ai/dsh-llm'
 import { PiAiAdapter, authContextFrom, credentialStoreFrom } from '@deepseek-ai/dsh-llm-pi-ai'
+import { installSettingsSection, settingsNamespace } from '@deepseek-ai/dsh-settings'
 import { Config, resolvePools } from './config.ts'
+import type { Config as ConfigType, ResolvedPools, RotationProviderConfig } from './config.ts'
 import { readParkState, renderParkState, resolveParkSpec, writeParkState } from './park-store.ts'
 import type { ParkRecord } from './park-store.ts'
 import {
@@ -97,6 +111,9 @@ export const name = 'llm-key-rotation'
 /** The hub must exist before the rotated routes can register. */
 export const inject = ['llm']
 
+/** The user-settings namespace this plugin reads its providers dict from. */
+const NS = settingsNamespace('llm-key-rotation')
+
 /** Status of one pool key, for state consumers. */
 export type KeyRotationKeyStatus =
   | { readonly state: 'usable' }
@@ -128,7 +145,8 @@ export interface KeyRotationRouteSnapshot {
 
 /**
  * The state face other plugins read through `ctx.get('llmKeyRotation')`.
- * Absent while the plugin is dormant (no configured providers).
+ * Provided whenever the plugin is composed; a dormant configuration
+ * (no configured providers) snapshots as an empty list.
  */
 export interface LlmKeyRotationState {
   /**
@@ -143,23 +161,46 @@ export function describeError(error: unknown): string {
   return error instanceof Error ? error.message : String(error)
 }
 
-/** Register one rotated adapter, the recovery listener that rotates its keys, and the state face. */
-export async function apply(ctx: Context, config: Config): Promise<void> {
-  const { profiles, pools } = resolvePools(config.providers)
-  if (pools.size === 0) return
-  const parkFile = resolveParkSpec(config)
+/**
+ * Canonical facts of one providers dict for change detection: provider names
+ * sorted (dict order carries no meaning), each profile's fields and key order
+ * kept verbatim (key order IS rotation priority).
+ * @param providers - the configured rotated routes.
+ * @returns stable JSON text equal only for semantically equal dicts.
+ */
+function providersFacts(providers: Record<string, RotationProviderConfig> | undefined): string {
+  /* v8 ignore next -- both callers read a schema-parsed Config, whose
+     `providers.default({})` materializes the dict before change detection */
+  return JSON.stringify(Object.entries(providers ?? {}).sort(([left], [right]) => left.localeCompare(right)))
+}
 
-  // Restore persisted parks. Expired rows drop here, rows naming routes or
-  // labels the current configuration no longer has are pruned, and live ones
-  // reattach by route and label.
-  const loaded = await readParkState(parkFile.filename)
+/**
+ * Build one configuration's profiles and pools, then restore its parks: rows
+ * naming routes or labels the configuration no longer has prune, expired rows
+ * drop, live parks reattach by route and label, and a multi-key pool whose
+ * sticky member came back parked starts on its first usable member. A changed
+ * document rewrites immediately, so the file matches memory before any request
+ * can serve from these pools.
+ * @param providers - configured rotated routes.
+ * @param spec - resolved park-document location.
+ * @returns the detached profiles and pools, both keyed by route.
+ * @throws when the configuration is malformed or the park document unreadable —
+ * both fail the caller loud rather than mounting half a pool.
+ */
+async function buildWithParks(
+  providers: Record<string, RotationProviderConfig> | undefined,
+  spec: { filename: string },
+): Promise<ResolvedPools> {
+  const built = resolvePools(providers)
+  if (built.pools.size === 0) return built
+  const loaded = await readParkState(spec.filename)
   let restoredChanged = false
   for (const record of loaded) {
     if (record.resetAt <= Date.now()) {
       restoredChanged = true
       continue
     }
-    const pool = pools.get(record.route)
+    const pool = built.pools.get(record.route)
     const index = pool?.members.findIndex(member => member.label === record.label) ?? -1
     if (pool === undefined || index < 0) {
       restoredChanged = true
@@ -167,41 +208,54 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
     }
     pool.parkedUntil.set(index, { parkedAtMs: record.parkedAt, resetAtMs: record.resetAt })
   }
-  // A multi-key pool whose sticky member came back parked starts on the first
-  // usable member instead of failing its first request; an unparked pool keeps
-  // its position, and when everything is parked the index stays put so
-  // requests fail loud with the listing.
-  for (const pool of pools.values()) {
+  for (const pool of built.pools.values()) {
     if (pool.members.length < 2 || !pool.parkedUntil.has(pool.index)) continue
     const usable = advanceAfter(pool, pool.index, Date.now())
     if (usable !== undefined) pool.index = usable.index
   }
-
-  const recordsOf = (): ParkRecord[] =>
-    [...pools.values()].flatMap(pool => parkRecordsOf(pool, Date.now()))
-  const desired = recordsOf()
+  const desired = [...built.pools.values()].flatMap(pool => parkRecordsOf(pool, Date.now()))
   if (restoredChanged || renderParkState(desired) !== renderParkState(loaded)) {
-    await writeParkState(parkFile.filename, desired)
+    await writeParkState(spec.filename, desired)
   }
-  let lastPersisted = renderParkState(desired)
+  return built
+}
+
+/** Register one rotated adapter, the recovery listener that rotates its keys, and the state face. */
+export async function apply(ctx: Context, config: ConfigType): Promise<void> {
+  // The settings scope installs below and repoints this thunk at the resolved
+  // section; until then the composition entry is the whole configuration.
+  let current: () => ConfigType = () => config
+  let state = await buildWithParks(config.providers, resolveParkSpec(config))
+  let appliedFacts = providersFacts(config.providers)
 
   const reportWriteFailure = (error: unknown): void => {
     ctx.logger.error(
       'llm-key-rotation: could not persist park state to %s: %s;'
       + ' rotation continues on in-memory state until this is fixed',
-      parkFile.filename,
+      resolveParkSpec(current()).filename,
       describeError(error),
     )
   }
+  const recordsOf = (): ParkRecord[] =>
+    [...state.pools.values()].flatMap(pool => parkRecordsOf(pool, Date.now()))
+  let lastPersisted = renderParkState(recordsOf())
   const persistParks = async (): Promise<void> => {
     const records = recordsOf()
     const json = renderParkState(records)
     if (json === lastPersisted) return
-    await writeParkState(parkFile.filename, records)
+    await writeParkState(resolveParkSpec(current()).filename, records)
     lastPersisted = json
   }
 
-  const servePoolMember = async (pool: KeyPool): Promise<string> => {
+  const servePoolMember = async (provider: string, pool: KeyPool | undefined): Promise<string> => {
+    if (pool === undefined) {
+      // An in-flight dispatch started before a settings swap withdrew the
+      // route; there is no pool left to serve a credential from.
+      throw new LlmError(
+        `llm-key-rotation: provider route "${provider}" was withdrawn while a request was in flight`,
+        'MISSING_CREDENTIAL',
+      )
+    }
     const { member } = currentUsable(pool, Date.now())
     // Serving may lazily expire stamps; prune the file to match. The write is
     // fire-and-forget because memory already holds the authoritative state.
@@ -209,9 +263,19 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
     if (member.value !== undefined) return member.value
     const ref = member.ref as NonNullable<typeof member.ref>
     const credentials = ctx.get('credentials')
-    const hit = credentials !== undefined
-      ? (await credentials.resolve(ref))?.value
-      : launchEnvironmentOf(ctx).get(ref)?.value
+    const resolved = credentials !== undefined
+      ? await credentials.resolve(ref)
+      : launchEnvironmentOf(ctx).get(ref)
+    // A committed settings change may withdraw or rebuild this route while
+    // the credential read was in flight; serving the stale pool's key would
+    // authenticate against a configuration that no longer exists.
+    if (state.pools.get(provider) !== pool) {
+      throw new LlmError(
+        `llm-key-rotation: provider route "${provider}" changed while a request was in flight`,
+        'MISSING_CREDENTIAL',
+      )
+    }
+    const hit = resolved?.value
     if (hit !== undefined && hit.length > 0) return assertUsableApiKey(hit, 'llm-key-rotation', ref)
     throw new LlmError(
       `llm-key-rotation: no credential for provider route "${pool.route}"; pool key "${member.label}"`
@@ -222,17 +286,16 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
   }
 
   const adapter = new PiAiAdapter({
-    profiles: () => profiles,
-    resolveApiKey: async provider => servePoolMember(pools.get(provider) as KeyPool),
+    profiles: () => state.profiles,
+    resolveApiKey: async provider => servePoolMember(provider, state.pools.get(provider)),
     auth: { credentials: credentialStoreFrom(ctx), authContext: authContextFrom(ctx) },
   })
-  const registration = ctx.llm.registerAdapter([...pools.keys()], adapter)
 
   async function recover(
     { provider, failure }: { provider: string; failure: LlmFailure },
     next: () => Promise<RequestErrorAction>,
   ): Promise<RequestErrorAction> {
-    const pool = pools.get(provider)
+    const pool = state.pools.get(provider)
     // Single-member pools keep today's behavior exactly: every failure reaches
     // downstream recovery untouched, including its backoff waits.
     if (pool === undefined || pool.members.length < 2) return next()
@@ -266,10 +329,61 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
 
   const disposeListener = ctx.on('agent/request-error', recover, { prepend: true })
 
-  const state: LlmKeyRotationState = {
+  let registration: AdapterRegistrationHandle | undefined
+  /**
+   * Swap the registry onto `candidate`'s routes atomically, then commit
+   * `candidate` as the serving state. The registry validates the whole set
+   * before anything moves, so a conflicting candidate leaves the previous
+   * pools serving and this throw propagates to the loud refusal log.
+   * @param candidate - the rebuilt state to register and serve.
+   */
+  const swapRoutes = (candidate: ResolvedPools): void => {
+    const routes = [...candidate.pools.keys()]
+    if (registration === undefined) {
+      // Dormant bare mount: nothing is registered until a section supplies
+      // routes, and an empty section keeps it that way.
+      if (routes.length === 0) {
+        state = candidate
+        return
+      }
+      registration = ctx.llm.registerAdapter(routes, adapter)
+    } else {
+      registration.replace(routes)
+    }
+    state = candidate
+    lastPersisted = renderParkState(recordsOf())
+  }
+
+  let rebuildTail: Promise<void> = Promise.resolve()
+  /**
+   * Queue one rebuild from the current resolved section. Rebuilds serialize on
+   * one tail so two rapid writes apply in commit order; a refused candidate
+   * (malformed section, or a route a plain pi-ai section also owns) logs loud
+   * and leaves the previous routes serving, mirroring the pi-ai swap policy.
+   */
+  const scheduleRebuild = (): void => {
+    rebuildTail = rebuildTail.then(async () => {
+      const entry = current()
+      const facts = providersFacts(entry.providers)
+      if (facts === appliedFacts) return
+      const candidate = await buildWithParks(entry.providers, resolveParkSpec(entry))
+      swapRoutes(candidate)
+      appliedFacts = facts
+    }).catch((error: unknown) => {
+      ctx.logger.error('llm-key-rotation: keeping the previously registered routes after a refused update')
+      ctx.logger.error(error)
+    })
+  }
+
+  // Initial posture: whatever the composition entry configures registers now,
+  // exactly as it did before the settings section existed; a dormant entry
+  // mounts bare and waits for a section to supply routes.
+  swapRoutes(state)
+
+  const stateFace: LlmKeyRotationState = {
     snapshot: () => {
       const now = Date.now()
-      return [...pools.values()].map(pool => ({
+      return [...state.pools.values()].map(pool => ({
         provider: pool.route,
         activeLabel: (pool.members[pool.index] as PoolMember).label,
         keys: pool.members.map((member, index) => {
@@ -288,10 +402,19 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
       }))
     },
   }
-  ctx.provide('llmKeyRotation', state)
+  ctx.provide('llmKeyRotation', stateFace)
 
   ctx.effect(() => () => {
     disposeListener()
-    registration()
+    registration?.()
   }, 'llm-key-rotation: withdraw rotated routes')
+
+  installSettingsSection<ConfigType>(ctx, NS, Config, config, {
+    // Refuse an unserviceable section where it is written: without this a
+    // schema-valid providers dict the resolver cannot serve would be stored
+    // and then silently disable every rotated route.
+    validate: (value) => { resolvePools(value.providers) },
+    setSource: (source) => { current = source },
+    onChange: scheduleRebuild,
+  })
 }

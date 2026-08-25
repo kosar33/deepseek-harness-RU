@@ -281,6 +281,9 @@ function fakeApi(overrides: Partial<{ muxFrames: MuxFrame[]; hostFrames: HostFra
       async discoverModels(request) {
         return { rpcId: request.rpcId, result: { ok: true, value: { models: [] } } }
       },
+      async keyRotation(request) {
+        return { rpcId: request.rpcId, result: { ok: true, value: { configured: false, routes: [] } } }
+      },
     },
     events: {
       mux: (_request, signal) => stream(muxFrames, signal),

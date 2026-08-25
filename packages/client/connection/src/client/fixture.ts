@@ -3055,6 +3055,33 @@ function createFixtureWorld(options: FixtureOptions): FixtureWorld {
       discoverModels: request => ok(request, {
         models: fixtureModelGroups().flatMap(group => group.models.map(model => ({ id: model.id, name: model.name }))),
       }),
+      // One parked key so a rotation surface meets both status shapes without
+      // a live pool behind the fixture.
+      keyRotation: request => ok(request, {
+        configured: true,
+        routes: [{
+          provider: 'openrouter',
+          activeLabel: 'OPENROUTER_KEYROTATION_2',
+          keys: [
+            {
+              label: 'OPENROUTER_KEYROTATION_1',
+              source: 'reference',
+              reference: 'OPENROUTER_KEYROTATION_1',
+              status: {
+                state: 'parked',
+                parkedAt: new Date(Date.now() - 3_600_000).toISOString(),
+                resetAt: new Date(Date.now() + 5 * 3_600_000).toISOString(),
+              },
+            },
+            {
+              label: 'OPENROUTER_KEYROTATION_2',
+              source: 'reference',
+              reference: 'OPENROUTER_KEYROTATION_2',
+              status: { state: 'usable' },
+            },
+          ],
+        }],
+      }),
     },
     respond(message: ClientResponse): Promise<RpcReceipt> {
       // Same routing discipline as the host: rpcId first, then the payload's
@@ -3227,6 +3254,7 @@ export class FixtureApiClient extends AbstractApiClient {
       case 'llm.providers': return this.api.llm.providers(request)
       case 'llm.models': return this.api.llm.models(request)
       case 'llm.discoverModels': return this.api.llm.discoverModels(request, signal)
+      case 'llm.keyRotation': return this.api.llm.keyRotation(request)
     }
   }
 

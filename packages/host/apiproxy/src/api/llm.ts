@@ -31,6 +31,33 @@ export interface ConfigurableProviderView {
   declared?: boolean
 }
 
+/** Wire view of one rotated key's status. */
+export type KeyRotationKeyStatusView =
+  | { readonly state: 'usable' }
+  | { readonly state: 'parked'; readonly parkedAt: string; readonly resetAt: string }
+
+/** Wire view of one key in a rotation pool; values and credential material never ride. */
+export interface KeyRotationKeyView {
+  /** Stable label from configuration; named in logs and diagnostics too. */
+  label: string
+  /** Whether the key resolves a credential reference or was configured as a literal dev-only value. */
+  source: 'reference' | 'literal'
+  /** The credential reference name for `reference` sources. */
+  reference?: string
+  /** Current status, with ISO 8601 UTC instants when parked. */
+  status: KeyRotationKeyStatusView
+}
+
+/** Wire view of one provider route's rotation pool. */
+export interface KeyRotationRouteView {
+  /** The provider route this pool serves. */
+  provider: string
+  /** Label at the sticky position the next request authenticates with. */
+  activeLabel: string
+  /** Every configured key in configuration order. */
+  keys: KeyRotationKeyView[]
+}
+
 /** Llm-domain unary methods (the map keys llm.* of RpcMethodMap). */
 export interface LlmApi {
   /**
@@ -74,6 +101,17 @@ export interface LlmApi {
     }>,
     signal?: AbortSignal,
   ): Promise<RpcResponse<{ models: DiscoveredModelView[] }>>
+
+  /**
+   * Snapshot the multi-key rotation plugin's pools (`llmKeyRotation` state
+   * face): per route, the active key label and every key's usable/parked
+   * status with reset instants, so a configuration surface can render live
+   * per-key health and «лимит откатится через Nч Mм» countdowns. `configured`
+   * is false when no composition mounts `@deepseek-ai/dsh-llm-key-rotation`;
+   * a composed-but-dormant plugin answers true with an empty list. Labels and
+   * reference names ride; key values never exist in the snapshot.
+   */
+  keyRotation(request: RpcRequest<{}>): Promise<RpcResponse<{ configured: boolean; routes: KeyRotationRouteView[] }>>
 }
 
 /** Wire view of one model an interrogated endpoint advertises. */

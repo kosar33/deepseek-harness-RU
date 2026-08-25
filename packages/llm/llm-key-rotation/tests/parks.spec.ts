@@ -373,10 +373,10 @@ describe('rotation state face', () => {
     expect('resetAt' in literalStatus && /^\d{4}-\d{2}-\d{2}T/.test(literalStatus.resetAt)).toBe(true)
   })
 
-  it('provides no state face while dormant', async () => {
+  it('snapshots an empty list while dormant', async () => {
     home = await mkdtemp(join(tmpdir(), 'dsh-key-face-'))
     await writeCredentials()
     const ctx = await boot({ dshHome: home })
-    expect(ctx.get('llmKeyRotation')).toBeUndefined()
+    expect(stateFace(ctx).snapshot()).toEqual([])
   })
 })

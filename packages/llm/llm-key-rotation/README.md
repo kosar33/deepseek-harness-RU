@@ -1,5 +1,7 @@
 # `@deepseek-ai/dsh-llm-key-rotation`
 
+English | [中文](README.zh.md) | [Русский](README.ru.md)
+
 Function plugin that lets one provider route survive per-key 429 rate limits by rotating across several API keys. It owns the routes listed in its configuration, serves each request's credential from an ordered key pool, and recovers a rate-limited request on the agent loop's `agent/request-error` waterfall ahead of any retry policy.
 
 Each entry under `providers` carries the same fields as a dsh-llm-pi-ai provider profile, except `apiKeyEnv`, which is replaced by the ordered `keys` list. Each key names exactly one source: a credential reference (`apiKeyEnv`) resolved per request through the credentials seam, or a literal `value` that lands verbatim in the composition file and is meant for development only. An optional `label` names the key in logs; it defaults to the reference name or the one-based position. A route registered here must not also be declared in a plain dsh-llm-pi-ai section, because two registrations cannot own one route. Resolution validates every route at plugin load: missing or doubled key sources, duplicate labels, malformed references, blank literals, and unserviceable protocols all fail the mount.

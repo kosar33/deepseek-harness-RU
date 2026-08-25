@@ -6,7 +6,10 @@
 import { z } from 'zod'
 import type { RequestPayload, ResponseValue } from './rpc-map.ts'
 import type { Wire } from './rpc.schema.ts'
-import type { ConfigurableProviderView, DiscoveredModelView } from './llm.ts'
+import type {
+  ConfigurableProviderView, DiscoveredModelView, KeyRotationKeyStatusView, KeyRotationKeyView,
+  KeyRotationRouteView,
+} from './llm.ts'
 import { modelCatalogFailureSchema, modelProviderGroupSchema } from './sessions.schema.ts'
 
 /** ConfigurableProviderView row of llm.providers. */
@@ -62,3 +65,37 @@ export const llmDiscoverModelsRequestSchema = z.object({
 export const llmDiscoverModelsValueSchema = z.object({
   models: z.array(discoveredModelViewSchema),
 }) satisfies z.ZodType<Wire<ResponseValue<'llm.discoverModels'>>>
+
+/** KeyRotationKeyStatusView row of a KeyRotationKeyView. */
+export const keyRotationKeyStatusViewSchema = z.union([
+  z.object({ state: z.literal('usable') }),
+  z.object({
+    state: z.literal('parked'),
+    parkedAt: z.string().min(1),
+    resetAt: z.string().min(1),
+  }),
+]) satisfies z.ZodType<Wire<KeyRotationKeyStatusView>>
+
+/** KeyRotationKeyView row of llm.keyRotation. */
+export const keyRotationKeyViewSchema = z.object({
+  label: z.string().min(1),
+  source: z.enum(['reference', 'literal']),
+  reference: z.string().min(1).optional(),
+  status: keyRotationKeyStatusViewSchema,
+}) satisfies z.ZodType<Wire<KeyRotationKeyView>>
+
+/** KeyRotationRouteView row of llm.keyRotation. */
+export const keyRotationRouteViewSchema = z.object({
+  provider: z.string().min(1),
+  activeLabel: z.string().min(1),
+  keys: z.array(keyRotationKeyViewSchema),
+}) satisfies z.ZodType<Wire<KeyRotationRouteView>>
+
+/** llm.keyRotation request payload. */
+export const llmKeyRotationRequestSchema = z.object({}) satisfies z.ZodType<Wire<RequestPayload<'llm.keyRotation'>>>
+
+/** llm.keyRotation response value. */
+export const llmKeyRotationValueSchema = z.object({
+  configured: z.boolean(),
+  routes: z.array(keyRotationRouteViewSchema),
+}) satisfies z.ZodType<Wire<ResponseValue<'llm.keyRotation'>>>

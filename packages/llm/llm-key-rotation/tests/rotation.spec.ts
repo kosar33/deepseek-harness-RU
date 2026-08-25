@@ -301,7 +301,10 @@ describe('multi-key rotation through the real loop', () => {
       config: {},
     })
     expect(dormant.llm.listProviders()).toEqual([])
-    expect(dormant.get('llmKeyRotation')).toBeUndefined()
+    // The face exists whenever the plugin is composed; a dormant mount
+    // snapshots as an empty list.
+    expect(dormant.get('llmKeyRotation')).toBeDefined()
+    expect((dormant.get('llmKeyRotation') as KeyRotation.LlmKeyRotationState).snapshot()).toEqual([])
 
     let configured: Context | undefined
     let configuredDisposed = false

@@ -1,28 +1,43 @@
-/* Provider-card credential seat: semantic aliases only, no literal colors. */
+/* Provider-card credential seat, drawn in the Models-section design language
+ * (ModelsSection.module.css): 12/18 captions, 32px fields over `border-l2`
+ * hairlines, capsule controls (h36 r18), square glyph affordances, and every
+ * color through a `--dsw-alias-*` token. The sibling stylesheet cannot be
+ * imported across packages, so its declarations are mirrored here; class
+ * names stay this package's own because the component specs assert
+ * `chipActive` / `chipParked`. */
 
 .seat {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   min-width: 0;
 }
 
+/* Mirrors ModelsSection `.fieldLabel`. */
 .label {
-  color: var(--dsw-alias-label-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-size: 12px;
-  line-height: 1.4;
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--dsw-alias-label-secondary);
 }
 
+/* Mirrors ModelsSection `.error`. */
 .error {
   margin: 0;
+  font-size: 12px;
+  line-height: 18px;
   color: var(--dsw-alias-state-error-primary);
-  font-size: 13px;
 }
 
+/* Mirrors ModelsSection `.advancedHint`. */
 .hint {
   margin: 0;
-  color: var(--dsw-alias-label-secondary);
-  font-size: 13px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-tertiary);
 }
 
 .chips {
@@ -37,6 +52,7 @@
   align-items: center;
   gap: 5px;
   font-size: 12px;
+  line-height: 18px;
   color: var(--dsw-alias-label-secondary);
 }
 
@@ -49,11 +65,11 @@
 }
 
 .chipParked .dot {
-  background: var(--dsw-alias-state-warning-primary);
+  background: var(--dsw-alias-state-warn-primary);
 }
 
 .chipActive {
-  color: var(--dsw-alias-text-primary);
+  color: var(--dsw-alias-label-primary);
   font-weight: 600;
 }
 
@@ -64,7 +80,7 @@
 .rows {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   margin: 2px 0 0;
 }
 
@@ -79,43 +95,86 @@
   width: 18px;
   text-align: right;
   font-size: 12px;
+  line-height: 18px;
   color: var(--dsw-alias-label-secondary);
-  font-family: var(--dsw-font-family-code);
+  font-family: var(--ds-font-family-code);
 }
 
 .ref {
   flex: none;
   max-width: 45%;
   font-size: 12px;
+  line-height: 18px;
   color: var(--dsw-alias-label-secondary);
-  font-family: var(--dsw-font-family-code);
+  font-family: var(--ds-font-family-code);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+/* Mirrors ModelsSection `.input`; the sizing fields come from the row's flex
+ * layout instead of the column field it sits in there. */
 .value {
+  box-sizing: border-box;
   flex: 1 1 auto;
   min-width: 0;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 22px;
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-primary);
 }
 
+.value:focus {
+  outline: none;
+  border-color: var(--dsw-alias-brand-primary);
+}
+
+.value::placeholder {
+  color: var(--dsw-alias-label-dimmed);
+}
+
+.value:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Mirrors ModelsSection `.iconButton`: square, label-free affordances that
+ * announce themselves through aria-label. */
 .rowAction {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex: none;
-  padding: 4px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
   border: none;
-  background: none;
-  cursor: pointer;
-  color: var(--dsw-alias-label-secondary);
   border-radius: 6px;
+  background: transparent;
+  color: var(--dsw-alias-label-tertiary);
+  font: inherit;
+  cursor: pointer;
 }
 
 .rowAction:hover:not(:disabled) {
-  color: var(--dsw-alias-text-primary);
+  background: var(--dsw-alias-interactive-bg-hover);
+  color: var(--dsw-alias-label-primary);
+}
+
+.rowAction:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--dsw-alias-border-l3);
 }
 
 .rowAction:disabled {
   cursor: default;
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
 .actions {
@@ -125,24 +184,52 @@
   margin-top: 2px;
 }
 
-.addButton {
-  composes: rowAction;
-  padding: 4px 8px;
-  font-size: 13px;
+/* Mirrors ModelsSection `.primaryButton` / `.secondaryButton`: the capsule
+ * pair the surrounding card already uses for its own actions. */
+.addButton,
+.saveButton {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 22px;
+  cursor: pointer;
 }
 
 .saveButton {
   margin-left: auto;
-  padding: 6px 14px;
-  border: 1px solid var(--dsw-alias-border-l2);
-  border-radius: 8px;
-  background: var(--dsw-alias-bg-module-platform);
-  color: var(--dsw-alias-text-primary);
-  cursor: pointer;
-  font-size: 13px;
+  border: none;
+  background: var(--dsw-alias-button-primary-fill);
+  color: var(--dsw-alias-label-primary-foreground);
 }
 
+.saveButton:hover:not(:disabled) {
+  background: var(--dsw-alias-button-primary-hover);
+}
+
+.addButton {
+  border: 1px solid var(--dsw-alias-border-l2);
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+}
+
+.addButton:hover:not(:disabled) {
+  background: var(--dsw-alias-interactive-bg-hover-solid);
+}
+
+.addButton:disabled,
 .saveButton:disabled {
+  opacity: 0.4;
   cursor: default;
-  opacity: 0.5;
+}
+
+.addButton:focus-visible,
+.saveButton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--dsw-alias-border-l3);
 }

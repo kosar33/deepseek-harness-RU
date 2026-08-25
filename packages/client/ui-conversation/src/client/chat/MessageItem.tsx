@@ -326,6 +326,22 @@ export const RetryNodeView = memo(function RetryNodeView({ node, t }: ChatNodeVi
   return <ModelRetryItem node={data.current} active={data.current.retryState === 'scheduled'} t={t} />
 })
 
+/** Rotating-pool advance keyed Chat renderer: one slim marker line per switch. */
+export const KeyRotatedNodeView = memo(function KeyRotatedNodeView({ node, t }: ChatNodeViewProps<'key-rotated'>) {
+  const data = node.data
+  const details = [
+    data.cause === 'rate-limit' && data.resetAt !== undefined
+      ? new Date(data.resetAt).toLocaleString()
+      : undefined,
+    data.reason,
+  ].filter((part): part is string => part !== undefined && part !== '')
+  return (
+    <div className={css.contextRow} title={details.length === 0 ? undefined : details.join(' · ')}>
+      <span>{t('message.keyRotated', { from: data.from, to: data.to })}</span>
+    </div>
+  )
+})
+
 /** Terminal turn-error keyed Chat renderer. */
 export const TurnErrorNodeView = memo(function TurnErrorNodeView({ node, t }: ChatNodeViewProps<'turn-error'>) {
   return <TurnErrorItem node={node.data} t={t} />

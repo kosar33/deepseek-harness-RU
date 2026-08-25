@@ -15,6 +15,9 @@ import { SessionId } from '@deepseek-ai/dsh-session'
 import * as KeyRotation from '../src/index.ts'
 import type { LlmKeyRotationState } from '../src/index.ts'
 import type { Config as RotationConfig, RotationKeyConfig } from '../src/config.ts'
+// The augmentation lives in ./types; a value-only import of the root never
+// pulls it into artifact-plane programs that compile this spec.
+import type {} from '../src/types.ts'
 
 const MOCK_TEXT = 'mock response recovered'
 

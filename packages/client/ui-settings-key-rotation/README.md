@@ -20,4 +20,4 @@ None; this package neither assembles nor sends a provider request.
 
 - **Only keys are editable here** — identity fields (endpoint, protocol, models) stay on the card's native fields under their home sections; the seat writes the `llm-key-rotation` namespace alone.
 - **Literal dev-only keys have no editor** — the UI only creates reference-backed keys; a composition may still declare `value:` keys, which render as `literal` chips in the status row.
-- **Status freshness is pull-based** — park changes do not push events; chips refresh through the shared invalidations and post-save reloads, while countdowns age locally between refreshes.
+- **Countdowns age locally** — park and reset changes push `llm/adapters-updated`, so pills converge immediately; the ticking clock between pushes stays a local 30-second interval.

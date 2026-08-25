@@ -1367,14 +1367,12 @@ function compareSearchCandidates(a: FixtureSearchCandidate, b: FixtureSearchCand
 
 /**
  * Current plan projection over the full log (host parallel: latest todo/write
- * with no later turn/start; a new turn retires the previous plan).
+ * surviving turn boundaries — only a newer write replaces it).
  */
 function backscanTodos(log: readonly SessionEvent[]): TodoItem[] | undefined {
   for (let i = log.length - 1; i >= 0; i--) {
     const event = log[i]
-    if (event === undefined) continue
-    if (event.type === 'turn/start') return undefined
-    if (event.type === 'todo/write') return event.data.todos
+    if (event?.type === 'todo/write') return event.data.todos
   }
   return undefined
 }

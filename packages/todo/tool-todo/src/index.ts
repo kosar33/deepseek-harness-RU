@@ -129,9 +129,10 @@ export function apply(ctx: Context, config: Config): void {
   const allowParallel = config.allowParallelInProgress
   // The unit child activates only when a projection registry is composed
   // (headless assemblies without the seam stay unaffected). Standing-plan fold:
-  // latest whole todo/write list, cleared by the next turn/start (turn/end keeps
-  // the finished checklist visible); null before the first write or after a
-  // later turn begins; every other event returns the same state reference.
+  // session-long last-write-wins — every turn boundary keeps the last written
+  // list (an errored or paused turn must not wipe the operator's checklist);
+  // null before the first write; every other event returns the same state
+  // reference.
   ctx.inject(['sessionProjections'], (projectionCtx) => {
     projectionCtx.sessionProjections.register<'todos', TodoItem[] | null>({
       key: 'todos',
@@ -139,11 +140,10 @@ export function apply(ctx: Context, config: Config): void {
       init: () => null,
       apply: (state, event) => {
         if (event.type === 'todo/write') return event.data.todos
-        if (event.type === 'turn/start') return null
         return state
       },
       wire: { viewSchema: todosProjectionSchema, view: state => state },
-      stateVersion: 2,
+      stateVersion: 3,
     })
   })
   ctx.tools.register(defineTool({

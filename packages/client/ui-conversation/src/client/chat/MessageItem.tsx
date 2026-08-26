@@ -326,18 +326,22 @@ export const RetryNodeView = memo(function RetryNodeView({ node, t }: ChatNodeVi
   return <ModelRetryItem node={data.current} active={data.current.retryState === 'scheduled'} t={t} />
 })
 
-/** Rotating-pool advance keyed Chat renderer: one slim marker line per switch. */
+/** Rotating-pool advance keyed Chat renderer: one boundary chip per switch, never assistant prose. */
 export const KeyRotatedNodeView = memo(function KeyRotatedNodeView({ node, t }: ChatNodeViewProps<'key-rotated'>) {
   const data = node.data
-  const details = [
-    data.cause === 'rate-limit' && data.resetAt !== undefined
-      ? new Date(data.resetAt).toLocaleString()
-      : undefined,
-    data.reason,
-  ].filter((part): part is string => part !== undefined && part !== '')
+  const cause = data.cause === 'rate-limit'
+    ? (data.resetAt !== undefined
+      ? t('message.keyRotatedUntil', { time: new Date(data.resetAt).toLocaleTimeString() })
+      : undefined)
+    : t('message.keyRotatedRetries')
+  const title = [cause, data.reason].filter((part): part is string => part !== undefined && part !== '').join(' · ')
   return (
-    <div className={css.contextRow} title={details.length === 0 ? undefined : details.join(' · ')}>
-      <span>{t('message.keyRotated', { from: data.from, to: data.to })}</span>
+    <div className={css.keySwitchRow} title={title === '' ? undefined : title}>
+      <span className={css.keySwitchGlyph} aria-hidden="true">⇄</span>
+      <span>
+        {t('message.keyRotated', { from: data.from, to: data.to })}
+        {cause === undefined ? '' : ` · ${cause}`}
+      </span>
     </div>
   )
 })

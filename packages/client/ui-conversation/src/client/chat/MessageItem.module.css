@@ -37,6 +37,27 @@
   padding: 2px 0;
 }
 
+/* Key-rotation marker: a boundary notice in the compaction-row family, not
+   conversation content — tertiary label, fixed-height inline chip with the
+   swap glyph so it can never read as an assistant message. */
+.keySwitchRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  height: 22px;
+  padding: 0 8px;
+  margin: 2px 0;
+  border-radius: 6px;
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.keySwitchGlyph {
+  flex: none;
+}
+
 /* Compaction marker: one dim 24px row with a context icon at rest and a
    hover/focus disclosure for the summary body. Dimmed title (not
    label-primary) — the row is a boundary notice, not conversation content. */

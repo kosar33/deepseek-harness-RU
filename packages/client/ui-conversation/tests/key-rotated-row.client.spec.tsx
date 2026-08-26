@@ -6,6 +6,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, render } from '@testing-library/react'
+import type { ChatNodeViewProps } from '../src/client/contract/slots.ts'
 import { KeyRotatedNodeView } from '../src/client/chat/MessageItem.tsx'
 
 const t = (key: string, vars?: Record<string, unknown>) => {
@@ -27,7 +28,7 @@ const baseData = {
 } as const
 
 const renderRow = (data: Record<string, unknown>) =>
-  render(<KeyRotatedNodeView node={{ kind: 'key-rotated', data } as never} t={t} />)
+  render(<KeyRotatedNodeView {...({ node: { kind: 'key-rotated', data }, t }) as unknown as ChatNodeViewProps<'key-rotated'>} />)
 
 describe('KeyRotatedNodeView', () => {
   beforeEach(() => {

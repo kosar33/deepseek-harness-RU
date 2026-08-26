@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, statSync, unlinkSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, statSync, unlinkSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
@@ -537,6 +537,21 @@ describe('OutputCollector', () => {
     expect(out!.text).toBe('bbbb')
     expect(out!.truncated).toBe(true)
     expect(out!.spillPath).toBeUndefined()
+  })
+
+  it('recreates a spill directory deleted by an external temp cleaner mid-stream', () => {
+    const volatile = mkdtempSync(join(tmpdir(), 'dsh-subprocess-volatile-'))
+    const collector = new OutputCollector(4, 100, 'volatile', volatile)
+    collector.push(Buffer.from('aaaa'))
+    expect(collector.readFrom(0).spillPath).toBeDefined()
+
+    rmSync(volatile, { recursive: true, force: true })
+    expect(() => { collector.push(Buffer.from('bbbb')) }).not.toThrow()
+
+    const out = collector.finalize()
+    expect(out.text).toBe('bbbb')
+    expect(out.truncated).toBe(true)
+    expect(readFileSync(out.spillPath!, 'utf8')).toBe('aaaabbbb')
   })
 
   it('discards a spill that exceeds its configured cap', () => {

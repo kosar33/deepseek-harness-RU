@@ -589,7 +589,7 @@ export const ru = {
   'terminal.collapseAria': 'Свернуть вывод',
   'terminal.expandAria': 'Развернуть остальные строки вывода ({n})',
   'terminal.expandRest': '… ещё {n}',
-  'status.diving': 'Глубокое погружение...',
+  'status.diving': 'Вникаю...',
   'diff.collapseAria': 'Свернуть различия',
   'diff.expandAria': 'Развернуть остальные строки различий ({n})',
   'diff.expandRest': '… ещё {n}',

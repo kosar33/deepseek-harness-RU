@@ -128,7 +128,10 @@ export function nextUtcMidnight(nowMs: number): number {
  * Read the reset hint a failure carries, if any. Adapters surface a validated
  * positive `providerRetryAfterMs`; through the pi-ai path it is absent today,
  * because pi-ai flattens wire errors to message text before they reach the
- * recovery seam.
+ * recovery seam. Flattened bodies still carry machine-readable reset hints
+ * from providers that put them in the error payload, so the message is scanned
+ * next; anything unparsable or implausible falls through and lets the caller
+ * use its daily-quota fallback.
  * @param failure - the failed attempt's normalized facts.
  * @param nowMs - current time in epoch milliseconds.
  * @returns the absolute reset epoch milliseconds, or undefined when the failure carries none.
@@ -138,6 +141,47 @@ export function resetFromFailure(failure: LlmFailure, nowMs: number): number | u
     && Number.isFinite(failure.providerRetryAfterMs)
     && failure.providerRetryAfterMs > 0) {
     return nowMs + failure.providerRetryAfterMs
+  }
+  return resetFromBodyHint(failure.message, nowMs)
+}
+
+/** Upper sanity bound on a body-derived park: one week. Longer hints are garbage. */
+const BODY_HINT_MAX_AHEAD_MS = 7 * 24 * 60 * 60 * 1000
+
+/**
+ * Body reset-hint patterns with real provider precedent, most specific first:
+ * an ISO reset stamp (`reset_at`, `x-ratelimit-reset`), a `retry-after` style
+ * seconds value (bare numbers in JSON payloads are seconds by convention), and
+ * OpenAI's "try again in Ns" phrasing.
+ */
+const BODY_RESET_HINTS: readonly { readonly re: RegExp; readonly unit: 'iso' | 'seconds' }[] = [
+  { re: /(?:reset[_-]?at|x-ratelimit-reset)["']?\s*[:=]\s*"?(\d{4}-\d{2}-\d{2}T[^"\s},]+)/i, unit: 'iso' },
+  { re: /(?:retry[_-]?after|x-ratelimit-reset-requests?)["']?\s*[:=]\s*"(\d+(?:\.\d+)?)(ms\b|s\b| seconds?\b)/i, unit: 'seconds' },
+  { re: /(?:retry[_-]?after|x-ratelimit-reset-requests?)["']?\s*[:=]\s*(\d+(?:\.\d+)?)(?:ms\b|s\b| seconds?\b)?/i, unit: 'seconds' },
+  { re: /\btry again in (\d+(?:\.\d+)?)\s*s(?:econds?)?\b/i, unit: 'seconds' },
+]
+
+/**
+ * Scan one flattened upstream body for the first parsable reset hint.
+ * @param message - the flattened failure text pi-ai hands the recovery seam.
+ * @param nowMs - current time in epoch milliseconds.
+ * @returns the absolute reset epoch milliseconds, or undefined when nothing credible is found.
+ */
+function resetFromBodyHint(message: string, nowMs: number): number | undefined {
+  for (const hint of BODY_RESET_HINTS) {
+    const match = hint.re.exec(message)
+    const value = match?.[1]
+    if (match === null || match === undefined || value === undefined) continue
+    let parsed = Number.NaN
+    if (hint.unit === 'iso') {
+      parsed = Date.parse(value)
+    } else {
+      const unitMs = match[2]?.trim().startsWith('ms') === true ? 1 : 1000
+      parsed = nowMs + Number.parseFloat(value) * unitMs
+    }
+    if (Number.isFinite(parsed) && parsed > nowMs && parsed <= nowMs + BODY_HINT_MAX_AHEAD_MS) {
+      return parsed
+    }
   }
   return undefined
 }

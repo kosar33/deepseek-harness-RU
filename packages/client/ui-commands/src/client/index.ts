@@ -16,6 +16,7 @@ import { CommandUiRuntime } from './service.ts'
 import type { PopupSelectInjected } from './PopupSelectView.tsx'
 import { PopupSelectView } from './PopupSelectView.tsx'
 import { en, ru, zh, type CommandKey } from './locales.ts'
+import { descriptionEn, descriptionRu, descriptionZh, type CommandDescriptionKey } from './locales.ts'
 
 export { CommandUiRuntime } from './service.ts'
 export { CommandDirectory } from './directory.ts'
@@ -38,11 +39,16 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
     /** The popupSelect shell's copy. */
     command: CommandKey
+    /** Localized slash-menu descriptions for known host commands. */
+    'command.description': CommandDescriptionKey
   }
 }
 
 /** Dictionary namespace owned by this plugin. */
 const NS = 'command'
+
+/** Description namespace owned by this plugin (host-command menu rows). */
+const DESCRIPTION_NS = 'command.description'
 
 /** Required services: the '/' source registry, session scopes, commands Remote, and locale registry. */
 export const inject = ['inputTriggers', 'sessions', 'remote', 'remote.commands', 'locale']
@@ -54,6 +60,10 @@ export const inject = ['inputTriggers', 'sessions', 'remote', 'remote.commands',
  */
 export function apply(ctx: ClientContext): void {
   ctx.effect(() => ctx.locale.register(NS, { zh, en, ru }), 'ui-commands: dictionaries')
+  ctx.effect(
+    () => ctx.locale.register(DESCRIPTION_NS, { zh: descriptionZh, en: descriptionEn, ru: descriptionRu }),
+    'ui-commands: command-description dictionaries',
+  )
   ctx.plugin(CommandUiRuntime)
   ctx.inject(['slots', 'commandUi', 'sessions'], (scope: ClientContext) => {
     const command = scope.commandUi

@@ -37,6 +37,48 @@ export interface SearchFileGroup {
   matches: SearchBlockLineMatch[]
 }
 
+/**
+ * Display copy for the search surface; the owner passes localized labels
+ * (this package is cordis-free, so copy arrives via props). Every field
+ * defaults to the current built-in value, so existing consumers render
+ * unchanged.
+ */
+export interface SearchBlockLabels {
+  /** Banner count clause for a capped result: retained vs pre-cap total. */
+  summaryCapped: (shown: number, total: number) => string
+  /** Banner text for a paths card, over the composed count clause. */
+  summaryPaths: (count: string) => string
+  /** Banner text for a matches card, over the composed count clause and file count. */
+  summaryMatches: (count: string, fileCount: number) => string
+  /** Placeholder when the search produced no results. */
+  empty: string
+  /** Copy-button idle label. */
+  copy: string
+  /** Copy-button label during the post-copy confirmation window. */
+  copied: string
+  /** Expand-toggle aria label while capped, given the hidden row count. */
+  expandAria: (hidden: number) => string
+  /** Collapse-toggle aria label while expanded. */
+  collapseAria: string
+  /** Toggle text while expanded. */
+  collapse: string
+  /** Toggle text while capped, given the hidden row count. */
+  expand: (hidden: number) => string
+}
+
+const DEFAULT_LABELS: SearchBlockLabels = {
+  summaryCapped: (shown, total) => `显示 ${shown} / 共 ${total}`,
+  summaryPaths: count => `${count} 个路径`,
+  summaryMatches: (count, fileCount) => `${count} 处匹配 · ${fileCount} 个文件`,
+  empty: '无结果',
+  copy: '复制',
+  copied: '复制成功',
+  expandAria: hidden => `展开其余 ${hidden} 行结果`,
+  collapseAria: '收起结果',
+  collapse: '收起',
+  expand: hidden => `… 其余 ${hidden} 行`,
+}
+
 /** Fields both search shapes carry (the render site positions; this component draws). */
 interface SearchBlockCommon {
   /**
@@ -52,6 +94,8 @@ interface SearchBlockCommon {
   maxLines?: number | undefined
   /** Extra class merged onto the wrapper. */
   className?: string | undefined
+  /** Localized display copy; absent fields fall back to the built-in defaults. */
+  labels?: Partial<SearchBlockLabels> | undefined
 }
 
 /** Props for the grouped-matches (`grep`) shape. */
@@ -111,22 +155,22 @@ function shownCount(props: SearchBlockProps): number {
 }
 
 /**
- * The banner summary. When the search was capped it reads `显示 X / 共 N …` so
- * the retained count and the pre-cap total sit in one clause (mirroring the read
- * card's `显示 X / Y 行`); when it was not capped it is a plain count of what the
- * card holds. The unit — `处匹配 · K 个文件` for grep, `个路径` for glob — trails
- * the count either way.
+ * The banner summary. When the search was capped it folds the pre-cap total in
+ * so the retained count and the pre-cap total sit in one clause (mirroring the
+ * read card's window note); when it was not capped it is a plain count of what
+ * the card holds. The unit trails the count either way.
  * @param props - the card's props.
+ * @param L - the resolved display copy.
  * @param shown - the retained result count from {@link shownCount}.
  * @param truncated - whether the search was capped.
  * @param total - the pre-cap total the truncation clause reports.
  * @returns the summary text.
  */
-function summaryText(props: SearchBlockProps, shown: number, truncated: boolean, total: number): string {
-  const count = truncated ? `显示 ${shown} / 共 ${total}` : `${shown}`
+function summaryText(props: SearchBlockProps, L: SearchBlockLabels, shown: number, truncated: boolean, total: number): string {
+  const count = truncated ? L.summaryCapped(shown, total) : `${shown}`
   return props.kind === 'paths'
-    ? `${count} 个路径`
-    : `${count} 处匹配 · ${props.files.length} 个文件`
+    ? L.summaryPaths(count)
+    : L.summaryMatches(count, props.files.length)
 }
 
 /**
@@ -172,6 +216,7 @@ function rowKey(row: SearchRow): string {
  */
 export function SearchBlock(props: SearchBlockProps) {
   const { truncated, total, maxLines = DEFAULT_SEARCH_MAX_LINES, className } = props
+  const L: SearchBlockLabels = { ...DEFAULT_LABELS, ...props.labels }
   const [expanded, setExpanded] = useState(false)
   const [collapsed, setCollapsed] = useState<ReadonlySet<number>>(() => new Set())
 
@@ -239,15 +284,15 @@ export function SearchBlock(props: SearchBlockProps) {
   return (
     <div className={clsx(css.block, className)} data-search={props.kind}>
       <div className={css.header}>
-        <span className={css.summary}>{summaryText(props, shown, truncated, total)}</span>
+        <span className={css.summary}>{summaryText(props, L, shown, truncated, total)}</span>
         {!empty && (
           <button type="button" className={css.copyButton} onClick={onCopy}>
-            {copied ? '复制成功' : '复制'}
+            {copied ? L.copied : L.copy}
           </button>
         )}
       </div>
       {empty
-        ? <div className={css.empty}>无结果</div>
+        ? <div className={css.empty}>{L.empty}</div>
         : (
           <div className={css.body}>
             {head.map(row => (
@@ -258,10 +303,10 @@ export function SearchBlock(props: SearchBlockProps) {
                 type="button"
                 className={css.expand}
                 aria-expanded={expanded}
-                aria-label={expanded ? '收起结果' : `展开其余 ${hidden} 行结果`}
+                aria-label={expanded ? L.collapseAria : L.expandAria(hidden)}
                 onClick={onToggle}
               >
-                {expanded ? '收起' : `… 其余 ${hidden} 行`}
+                {expanded ? L.collapse : L.expand(hidden)}
               </button>
             )}
             {tailHeader !== undefined && (

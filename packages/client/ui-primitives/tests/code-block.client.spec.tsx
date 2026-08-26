@@ -41,13 +41,17 @@ describe('highlightToHtml', () => {
     'xml', 'lua',
   ]
 
-  it('lazily loads every read-card grammar: plain first, highlighted after load', async () => {
+  // The budgets are generous on purpose: under a fully loaded parallel lane
+  // the 23 dynamic grammar imports plus their synchronous shiki registrations
+  // compete with other workers for CPU, and the point of the test is that the
+  // loads EVENTUALLY land - never how fast.
+  it('lazily loads every read-card grammar: plain first, highlighted after load', { timeout: 120_000 }, async () => {
     // First touch returns the plain fallback (undefined) and starts the import.
     for (const alias of LAZY_ALIASES) expect(highlightToHtml('x', alias)).toBeUndefined()
     // Once every grammar has registered, the same call highlights.
     await vi.waitFor(() => {
       for (const alias of LAZY_ALIASES) expect(highlightToHtml('x', alias)).toContain('shiki')
-    }, { timeout: 5_000 })
+    }, { timeout: 90_000, interval: 250 })
   })
 })
 

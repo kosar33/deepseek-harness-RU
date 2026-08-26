@@ -232,7 +232,7 @@ export const CLIENT_SLOT_API: readonly ClientSlotEntry[] = [
       'useInput: SnapshotSelectorHook<InputState>',
       'inputActions: InputActions',
     ],
-    keyDomain: 'fixed by the owner\'s key table { [Kind in ChatNodeKind]: { node: ChatNode<Kind> } }, already taken: assistant-step, command, command-input, compaction, context, manual-compaction, model-retry, steering, tool-call, turn-error, turn-max-tokens, turn-tail, unknown, user, workflow-run',
+    keyDomain: 'fixed by the owner\'s key table { [Kind in ChatNodeKind]: { node: ChatNode<Kind> } }, already taken: assistant-step, command, command-input, compaction, context, key-rotated, manual-compaction, model-retry, steering, tool-call, turn-error, turn-max-tokens, turn-tail, unknown, user, workflow-run',
     hookContext: 'string',
     slotInject: 'ChatNodeTurnDataInjected',
     declaredBy: 'an entry in \'conversation.view\' (client-ui-conversation), so it exists while that entry is mounted',
@@ -245,6 +245,7 @@ export const CLIENT_SLOT_API: readonly ClientSlotEntry[] = [
       'client-ui-conversation ManualCompactionNodeView key \'manual-compaction\'',
       'client-ui-conversation CompactionNodeView key \'compaction\'',
       'client-ui-conversation RetryNodeView key \'model-retry\'',
+      'client-ui-conversation KeyRotatedNodeView key \'key-rotated\'',
       'client-ui-conversation TurnErrorNodeView key \'turn-error\'',
       'client-ui-conversation TurnMaxTokensNodeView key \'turn-max-tokens\'',
       'client-ui-conversation TurnTailNodeView key \'turn-tail\'',
@@ -1354,7 +1355,7 @@ export const CLIENT_SLOT_API: readonly ClientSlotEntry[] = [
     doc: 'The credential editor seat inside one provider card of the Models\nsection, rendered exactly where the single API-key input would sit.\nThe section dispatches with the edited route and keeps its native\nkey field as the dispatch fallback, so a feature replaces the field\nfor every provider only while it is actually mounted. Declared at\nruntime by the feature that owns the Models section; the type lives\nhere so feature plugins collaborate without depending on one another.',
     registerOptions: [],
     ownerProps: [
-      '/** Owner share of a provider card\'s credential seat (the section names the route). */\nexport interface SettingsModelsCredentialOwnerProps {\n  /** Provider route id whose credentials the seat edits. */\n  provider: string\n  /** Marker field: the owner passes no children. */\n  children?: never\n}',
+      '/** Owner share of a provider card\'s credential seat (the section names the route). */\nexport interface SettingsModelsCredentialOwnerProps {\n  /** Provider route id whose credentials the seat edits. */\n  provider: string\n  /**\n   * Mutable commit-hook holder the bound seat fills in: the card\'s Apply\n   * awaits `current` first and treats a returned string as the card\'s own\n   * failure message, so one Apply press lands the keys and the section\n   * fields together or neither. The holder object is created once per\n   * mounted editor; `current` stays undefined while no seat is bound (the\n   * native field path) and after the seat unmounts.\n   */\n  commitSeat?: { current?: (() => Promise<string | undefined>) | undefined }\n  /** Marker field: the owner passes no children. */\n  children?: never\n}',
     ],
     ownerPropsReferences: [],
     standardProps: [

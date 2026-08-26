@@ -2047,8 +2047,8 @@
     },
     "docs/event-producer-consumer.ru.md": {
       "source": "docs/event-producer-consumer.md",
-      "sourceBlob": "7ea6efe74c4f969c4e03bbe98b4340a35fc0cb3f",
-      "ruBlob": "6b8a3a3649b7291e1a01f681b3861b6ca1ee2d4f"
+      "sourceBlob": "bbce1f09b0d01a4fad6b42f6b32728c20ebc7be2",
+      "ruBlob": "898b4d1a926d43b726e295a0d659b6b4bd7bb38a"
     },
     "docs/graph-atlas.ru.md": {
       "source": "docs/graph-atlas.md",
@@ -2057,8 +2057,8 @@
     },
     "packages/llm/llm-key-rotation/README.ru.md": {
       "source": "packages/llm/llm-key-rotation/README.md",
-      "sourceBlob": "b0ca224a35a7266d0b6546b4f2418b5df9ebb5f9",
-      "ruBlob": "ecb7f39b27f9cd17bcd317eb18abf4993c992369"
+      "sourceBlob": "fb25e90c23754935e35183e51195b8ebc466d155",
+      "ruBlob": "14973eaa416fc0fff6d5453dd27d51d30334ec55"
     },
     "docs/module-graph.ru.md": {
       "source": "docs/module-graph.md",
@@ -2067,8 +2067,8 @@
     },
     "docs/persistence-catalog.ru.md": {
       "source": "docs/persistence-catalog.md",
-      "sourceBlob": "aaedabf93db497dc3e760ea5609497151569a3a4",
-      "ruBlob": "37f0e6a5f86027999be105dad02d3cd388392cda"
+      "sourceBlob": "0137eb80f2679308d05b25d0fff747d8949508e5",
+      "ruBlob": "d3794f55e90dc7976bdebf648923f283582c2f9e"
     },
     "docs/tool-catalog.ru.md": {
       "source": "docs/tool-catalog.md",
@@ -2082,8 +2082,8 @@
     },
     "packages/client/ui-settings-key-rotation/README.ru.md": {
       "source": "packages/client/ui-settings-key-rotation/README.md",
-      "sourceBlob": "81ed3b167073cc785dddba9aaa374bcf87ed56a4",
-      "ruBlob": "d1b301c01b79029f0a41d4891d844067c6859c72"
+      "sourceBlob": "6cf6d9f6a3cb55832110221e65483fceed91811d",
+      "ruBlob": "8f549be00a6b910e9ea8cdb0a9679866261bfd73"
     }
   }
 }

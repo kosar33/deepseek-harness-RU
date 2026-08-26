@@ -13,6 +13,7 @@ import { LocalCredentialProvider } from '@deepseek-ai/dsh-credentials-local'
 import * as Retry from '@deepseek-ai/dsh-llm-retry'
 import { SessionId } from '@deepseek-ai/dsh-session'
 import * as KeyRotation from '../src/index.ts'
+import { resetFromFailure as poolResetFromFailure } from '../src/pool.ts'
 import type { LlmKeyRotationState } from '../src/index.ts'
 import type { Config as RotationConfig, RotationKeyConfig } from '../src/config.ts'
 // The augmentation lives in ./types; a value-only import of the root never
@@ -162,6 +163,39 @@ async function sendAndWait(agent: Agent): Promise<void> {
   }))
   await idle
 }
+
+describe('reset hints from flattened provider bodies', () => {
+  const NOW = Date.UTC(2026, 7, 26, 12, 0, 0)
+  const failureWith = (message: string, providerRetryAfterMs?: number) =>
+    (providerRetryAfterMs === undefined
+      ? { code: 'RATE_LIMIT', message }
+      : { code: 'RATE_LIMIT', message, providerRetryAfterMs })
+
+  it('prefers a validated adapter-surfaced retry hint over any body marker', () => {
+    const failure = failureWith('"reset_at": "2030-01-01T00:00:00Z"', 5_000)
+    expect(poolResetFromFailure(failure, NOW)).toBe(NOW + 5_000)
+  })
+
+  it.each([
+    ['an ISO reset_at stamp', '"error":{"metadata":{"reset_at":"2026-08-27T03:00:00Z"}}', Date.parse('2026-08-27T03:00:00Z')],
+    ['an x-ratelimit-reset stamp', 'x-ratelimit-reset: "2026-08-26T18:30:00+02:00"', Date.parse('2026-08-26T18:30:00+02:00')],
+    ['a bare retry_after seconds field', 'rate limited; "retry_after": 23', NOW + 23_000],
+    ['a quoted retry-after with an s suffix', '{"retry-after":"2.5s"}', NOW + 2_500],
+    ['an milliseconds retry-after', '"retry_after":"1500ms"', NOW + 1_500],
+    ['OpenAI try-again phrasing', 'Rate limit reached. Please try again in 12.5s.', NOW + 12_500],
+  ])('parses %s', (_label, body, expected) => {
+    expect(poolResetFromFailure(failureWith(body), NOW)).toBe(expected)
+  })
+
+  it.each([
+    ['an unparsable stamp', '"reset_at": "whenever"'],
+    ['a hint beyond the one-week sanity bound', '"retry_after": 100000000'],
+    ['a past stamp', '"reset_at": "2001-01-01T00:00:00Z"'],
+    ['plain prose without markers', 'daily quota exhausted'],
+  ])('ignores %s', (_label, body) => {
+    expect(poolResetFromFailure(failureWith(body), NOW)).toBeUndefined()
+  })
+})
 
 describe('multi-key rotation through the real loop', () => {
   it('retries the same request on the next key after a 429 and keeps the new key sticky', async () => {

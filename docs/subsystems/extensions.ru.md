@@ -16,7 +16,7 @@ Generated from source by `scripts/gen-cordis-catalog.ts` (verified fresh by `pnp
 
 ### `ctx.cordisInspect` — `CordisInspectRegistryService`
 
-Registry and cross-page router behind the two model-facing inspect tools.
+Реестр и межстраничный маршрутизатор за двумя видимыми модели inspect-инструментами.
 
 ```ts cordis-catalog
 /**
@@ -315,7 +315,7 @@ Source: [`packages/extensions/cordis-host-runner/src/types.ts`](../../packages/e
 
 #### `cordis/inspect-query-resolved` — emit
 
-Notify every Client that an inspect query has settled or been cancelled.
+Уведомляет каждого Client о фиксации итога inspect-запроса либо его отмене.
 
 ```ts cordis-catalog
 /**

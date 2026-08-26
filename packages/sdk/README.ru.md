@@ -2,7 +2,7 @@
 
 [English](README.md) | [中文](README.zh.md) | Русский
 
-Эта группа содержит стек протоколов для управления рантаймом Harness из другого процесса. Вызывающая сторона поставляет исполняемый файл рантайма и его `cordis.yml`; группа не создаёт, не конфигурирует, не собирает и не запускает проекты разработчиков. Клиентским контрактом владеет решение о [TypeScript SDK](../../.agents/notes/implemented/feature/2026-07-27-typescript-sdk-and-sdk-subagent-backend.md), а продуктовой границей — решение об [удалении тулчейна проектов](../../.agents/notes/implemented/simplification/2026-08-11-remove-sdk-project-toolchain.md).
+Эта группа содержит стек протоколов для управления рантаймом Harness из другого процесса. Вызывающая сторона поставляет исполняемый файл рантайма и его `cordis.yml`; группа не создаёт, не конфигурирует, не собирает и не запускает проекты разработчиков. Клиентским контрактом владеет [решение о TypeScript SDK](../../.agents/notes/implemented/feature/2026-07-27-typescript-sdk-and-sdk-subagent-backend.md), а продуктовой границей — [решение об удалении тулчейна проектов](../../.agents/notes/implemented/simplification/2026-08-11-remove-sdk-project-toolchain.md).
 
 | Пакет | Роль |
 |---|---|

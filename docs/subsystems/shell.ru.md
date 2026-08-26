@@ -162,7 +162,7 @@ interface ShellSandboxInfo {
 }
 ```
 
-Код ошибки `SANDBOX_UNAVAILABLE` (принадлежит [seam'у песочницы](sandbox.md)) — то, что бросает провайдер `ctx.sandbox` и что прокидывает исполнитель, когда у ограничивающего режима нет пригодного бэкенда. Выбранный раннер, отвергающий свой профиль, приводит к той же fail-closed ошибке на переднем плане; завершившаяся фоновая задача записывает `runnerFailed`. Модель получает факты об отказах и раннере в результатах, узнаёт эффективный режим, только когда маркер отказа его называет, и может запросить однократный строго более широкий повтор через `sandbox_permissions` плюс `justification`; прежде чем что-либо исполнится, `ctx.approval` **ДОЛЖЕН** подтвердить именно этот вызов. Полная политика и дизайн переключения — в [Agent Note о песочнице](../../.agents/notes/implemented/feature/2026-07-06-sandbox.md).
+Код ошибки `SANDBOX_UNAVAILABLE` (принадлежит [seam'у песочницы](sandbox.md)) — то, что бросает провайдер `ctx.sandbox` и что прокидывает исполнитель, когда у ограничивающего режима нет пригодного бэкенда. Выбранный раннер, отвергающий свой профиль, приводит к той же fail-closed ошибке на переднем плане; завершившаяся фоновая задача записывает `runnerFailed`. Модель получает факты об отказах и раннере в результатах, узнаёт эффективный режим, только когда маркер отказа его называет, и может запросить однократный строго более широкий повтор через `sandbox_permissions` плюс `justification`; прежде чем что-либо исполнится, `ctx.approval` ДОЛЖЕН подтвердить именно этот вызов. Полная политика и дизайн переключения — в [Agent Note о песочнице](../../.agents/notes/implemented/feature/2026-07-06-sandbox.md).
 
 ## Фоновые процессы: `ShellProcess`
 
@@ -234,7 +234,7 @@ Generated from source by `scripts/gen-cordis-catalog.ts` (verified fresh by `pnp
 
 Abstract bash execution service. Subclass, implement the abstract methods, and load the subclass as a plugin — it registers as `ctx.shell` (one implementation per context; loading a second throws, which is cordis' standard duplicate-service behavior).
 
-Implementations must honor these semantics:
+Реализации обязаны соблюдать эту семантику:
 
 - run rejects only for infrastructure failures. Nonzero exits, timeout kills, and abort kills resolve with a ShellRunResult.
 - start returns immediately; no timeout applies to background processes. `done` settles at process close and never rejects; spawn failures settle as `killed` with the error on stderr.

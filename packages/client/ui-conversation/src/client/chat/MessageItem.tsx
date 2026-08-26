@@ -326,18 +326,48 @@ export const RetryNodeView = memo(function RetryNodeView({ node, t }: ChatNodeVi
   return <ModelRetryItem node={data.current} active={data.current.retryState === 'scheduled'} t={t} />
 })
 
-/** Rotating-pool advance keyed Chat renderer: one slim marker line per switch. */
+/** Remaining time as a locale-neutral HH:MM:SS countdown; clamps at zero. */
+function formatRemaining(ms: number): string {
+  const total = Math.max(0, Math.ceil(ms / 1000))
+  const part = (value: number) => String(value).padStart(2, '0')
+  return `${part(Math.floor(total / 3600))}:${part(Math.floor((total % 3600) / 60))}:${part(total % 60)}`
+}
+
+/**
+ * Seconds-resolution now-tick for one pending reset instant. Component-internal
+ * timer only — it subscribes to nothing external and stops mattering once the
+ * instant passes, so the interval runs at one second while the row is mounted.
+ */
+function useResetCountdown(resetAtMs: number): number {
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 1_000)
+    return () => window.clearInterval(timer)
+  }, [resetAtMs])
+  return resetAtMs - now
+}
+
+/** Rotating-pool advance keyed Chat renderer: one boundary chip per switch with a live countdown, never assistant prose. */
 export const KeyRotatedNodeView = memo(function KeyRotatedNodeView({ node, t }: ChatNodeViewProps<'key-rotated'>) {
   const data = node.data
-  const details = [
-    data.cause === 'rate-limit' && data.resetAt !== undefined
-      ? new Date(data.resetAt).toLocaleString()
-      : undefined,
-    data.reason,
-  ].filter((part): part is string => part !== undefined && part !== '')
+  const resetAtMs = data.resetAt === undefined ? undefined : Date.parse(data.resetAt)
+  const remainingMs = useResetCountdown(resetAtMs ?? 0)
+  const expired = resetAtMs !== undefined && remainingMs <= 0
+  const cause = data.cause === 'rate-limit'
+    ? (resetAtMs === undefined
+      ? undefined
+      : expired
+        ? t('message.keyRotatedExpired')
+        : t('message.keyRotatedUntilIn', { duration: formatRemaining(remainingMs) }))
+    : t('message.keyRotatedRetries')
+  const title = [cause, data.reason].filter((part): part is string => part !== undefined && part !== '').join(' · ')
   return (
-    <div className={css.contextRow} title={details.length === 0 ? undefined : details.join(' · ')}>
-      <span>{t('message.keyRotated', { from: data.from, to: data.to })}</span>
+    <div className={css.keySwitchRow} title={title === '' ? undefined : title}>
+      <span className={css.keySwitchGlyph} aria-hidden="true">⇄</span>
+      <span>
+        {t('message.keyRotated', { from: data.from, to: data.to })}
+        {cause === undefined ? '' : ` · ${cause}`}
+      </span>
     </div>
   )
 })

@@ -63,7 +63,7 @@ Track every background job id you start. You are notified in-session when a job 
 
 #### Что видит модель
 
-Сгенерированные [схемы `job_output`, `job_list` и `job_kill`](../../../docs/tool-catalog.md#deepseek-aidsh-tool-jobs), пока этот набор инструментов видим.
+Сгенерированные [схемы `job_output`, `job_list` и `job_kill`](../../../docs/tool-catalog.ru.md#deepseek-aidsh-tool-jobs), пока этот набор инструментов видим.
 
 #### Влияние на токены
 

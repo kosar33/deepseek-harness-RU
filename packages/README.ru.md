@@ -63,7 +63,7 @@
 
 ## Зависимости
 
-Граф зависимостей генерируется: [docs/module-graph.md](../docs/module-graph.md) (`pnpm run gen-module-graph`, гейт свежести в CI).
+Граф зависимостей генерируется: [docs/module-graph.md](../docs/module-graph.ru.md) (`pnpm run gen-module-graph`, гейт свежести в CI).
 
 **Расширяющие плагины зависят от Service Definitions, никогда от конкретных провайдеров.** `dsh-agent-loop` заменяем; UI-, hook- и tool-плагины используют `dsh-agent`. Композиционные бандлы, включая `dsh-agent-spine-demo`, могут зависеть от плагинов стержня. Возможности разделяют роли Service Definition / Service Provider / Consumer, когда те эволюционируют независимо; см. [capability seams](../.agents/notes/implemented/architecture/2026-06-13-capability-seams.md).
 

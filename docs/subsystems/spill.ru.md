@@ -82,7 +82,7 @@ type SpillLocator = Branded<'SpillLocator'>
 
 `SpillStore` (`ctx.spillStore`, определён в [`packages/spill/spill/src/index.ts`](../../packages/spill/spill/src/index.ts)) — абстрактный сервис из одного метода: `saveText(input) → Promise<SpillRef>`. Он сохраняет ПОЛНЫЙ `content` и ОТКЛОНЯЕТСЯ при реальной ошибке хранилища (права доступа, ENOSPC, недоступность бэкенда). Seam владеет только хранением: ни политики удержания, ни замещения результата инструмента, ни API извлечения или поиска.
 
-Локальный бэкенд ([dsh-spill-local](../../packages/spill/spill-local)) пишет под `<root>/session-<hash>/<random>-<safeName>` — настраиваемый или лениво создаваемый приватный (0700) корень, поддиректорию сессии `sha256(sessionId)` и эксклюзивную запись только для владельца (`open(path, 'wx', 0o600)`), чтобы подложенный symlink не мог перенаправить запись. Его `locator` — локальный путь, а `retrievalHint` предписывает модели применить к этому пути `read` или `grep`. Потребитель-политика ([dsh-spill-policy](../../packages/spill/spill-policy)) заменяет превышающий `maxInlineBytes` итоговый текстовый результат на head/tail-предпросмотр из библиотеки удержания плюс ссылку на spill, действуя как best-effort: отказ сохранения оставляет исходный встроенный результат, а не превращает удавшийся вызов в `isError`.
+Локальный бэкенд ([dsh-spill-local](../../packages/spill/spill-local)) пишет под `<root>/session-<hash>/<random>-<safeName>` — настраиваемый или лениво создаваемый приватный (0700) корень, подкаталог сессии `sha256(sessionId)` и эксклюзивную запись только для владельца (`open(path, 'wx', 0o600)`), чтобы подложенный symlink не мог перенаправить запись. Его `locator` — локальный путь, а `retrievalHint` предписывает модели применить к этому пути `read` или `grep`. Потребитель-политика ([dsh-spill-policy](../../packages/spill/spill-policy)) заменяет превышающий `maxInlineBytes` итоговый текстовый результат на head/tail-предпросмотр из библиотеки удержания плюс ссылку на spill в режиме best-effort: отказ сохранения оставляет исходный встроенный результат, а не превращает удавшийся вызов в `isError`.
 
 <!-- BEGIN GENERATED cordis-surface (gen-cordis-catalog.ts) — do not edit between markers -->
 
@@ -98,7 +98,7 @@ Generated from source by `scripts/gen-cordis-catalog.ts` (verified fresh by `pnp
 
 Abstract spill storage service. Subclass, implement saveText, and load the subclass as a plugin — it registers as `ctx.spillStore` (one implementation per context; loading a second throws, cordis' standard duplicate-service behavior).
 
-Semantics every implementation must honor:
+Семантика, которую обязаны соблюдать все реализации:
 
 - saveText persists the FULL `content` verbatim and returns an opaque locator, exact byte length, and model-facing retrieval guidance.
 - Storage is scoped by the request's SaveTextSpill.owner session; the backend chooses a private (not world-readable) location and a collision-free name derived from — never equal to — the caller's `suggestedName`.

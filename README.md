@@ -48,6 +48,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Development
 
+Browse the documentation site locally: `pnpm run docs:dev` serves it at http://localhost:5173, and `pnpm run docs:build && pnpm run docs:preview` builds and serves the production build at http://localhost:4173.
+
 Start with the [development guide](docs/development.md) and [architecture documentation](docs/architecture.md).
 
 For agents, follow [AGENTS.md](AGENTS.md).

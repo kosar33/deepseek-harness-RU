@@ -719,7 +719,10 @@ describe('session.search', () => {
     }
   })
 
-  it('keeps visibility sets above SQLite variable limits out of provider bindings', async () => {
+  // The 32_751-entry visibility set is built and collected in-process; under
+  // a fully loaded parallel lane that construction alone can outlast the
+  // default budget. The assertion is about bindings, never speed.
+  it('keeps visibility sets above SQLite variable limits out of provider bindings', { timeout: 120_000 }, async () => {
     const ctx = await baseContext()
     const cold = Array.from(
       { length: 32_751 },

@@ -6,11 +6,11 @@
 
 | Пакет | Роль | ctx-ключ |
 |---|---|---|
-| [`commands/`](commands/README.ru.md) | Регистрирует и диспетчеризует человеческие команды для интерактивных адаптеров. | `ctx.commands` |
+| [`commands/`](commands/README.ru.md) | Регистрирует и диспетчеризует команды от человека для интерактивных адаптеров. | `ctx.commands` |
 | [`user-approval/`](user-approval/README.ru.md) | Координирует одноразовые решения об одобрении. | `ctx.approval` |
-| [`permission/`](permission-presets/README.ru.md) | Показывает и сохраняет обращённые к пользователю пресеты разрешений. | `ctx.permissionPresets` |
-| [`user-questions/`](user-questions/README.ru.md) | Определяет независимый от провайдера seam человеческих вопросов и ответов. | `ctx.userQuestions` |
-| [`tool-ask-user/`](tool-ask-user/README.ru.md) | Открывает человеческие вопросы модели. | (регистрируется на `ctx.tools`) |
+| [`permission/`](permission-presets/README.ru.md) | Показывает и сохраняет пользовательские пресеты разрешений. | `ctx.permissionPresets` |
+| [`user-questions/`](user-questions/README.ru.md) | Определяет независимый от провайдера seam вопросов и ответов с человеком. | `ctx.userQuestions` |
+| [`tool-ask-user/`](tool-ask-user/README.ru.md) | Предоставляет модели возможность задавать вопросы человеку. | (регистрируется на `ctx.tools`) |
 
 Эти пакеты интегрируются через существующие контракты агента и сессии, а не меняют цикл. Интерактивные приложения предоставляют конкретные адаптеры команд, одобрений и вопросов; автоматизация использует [`acp/`](../acp/README.ru.md), а запускаемые демо-бандлы живут в [`examples/`](../examples/README.ru.md). Продуктовый CLI [`dsh`](../../apps/cli/README.md) компонует эти пакеты напрямую.
 

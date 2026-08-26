@@ -12,8 +12,10 @@
  *
  * On a `RATE_LIMIT` failure of a multi-key route, this plugin's listener —
  * registered ahead of ordinary recovery policies — parks the served key until
- * its reset instant (the failure's `providerRetryAfterMs` when surfaced,
- * otherwise the coming UTC midnight that bounds daily quotas), advances the
+ * its reset instant (the adapter's `providerRetryAfterMs` when surfaced, else
+ * the first parsable body hint - a `reset_at` stamp, a `retry-after` seconds
+ * value, or OpenAI's "try again in Ns" phrasing - otherwise the coming UTC
+ * midnight that bounds daily quotas), advances the
  * sticky position onto the first non-parked key, and returns
  * `{ kind: 'retry' }` so the loop re-issues the identical request immediately
  * under the next key. When no key is left, the thrown error names every key

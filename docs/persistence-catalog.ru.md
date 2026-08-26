@@ -3,11 +3,11 @@
 
 # Каталог событий персистентности сессии
 
-Каждый тип событий, который может появиться в долговечном журнале событий сессии: полный сохраняемый конверт `SessionEvent` и каждый член расширяемого слиянием `SessionEventMap` — собственный набор типов в `@deepseek-ai/dsh-session` плюс объявления всех плагинов репозитория, сливаемые в `@deepseek-ai/dsh-session/types` — с исходным JSDoc, полным объявлением полезной нагрузки, меткой surface и местом объявления. Документ дополняет [session.md](subsystems/session.ru.md) (порядок на поверхности и проекцию `deriveMessages()`), [persistence.md](subsystems/persistence.ru.md) (как журнал становится долговечным) и сгенерированный регион [session.md](subsystems/session.ru.md#cordis-surface) (разводку живой шины — событие журнала НЕ является cordis-событием; к слушателям оно приходит через единственный emit `session/event`).
+Каждый тип событий, который может появиться в долговечном журнале событий сессии: полный сохраняемый конверт `SessionEvent` и каждый член расширяемого слиянием `SessionEventMap` — собственный набор типов в `@deepseek-ai/dsh-session` плюс объявления всех плагинов репозитория, сливаемые в `@deepseek-ai/dsh-session/types` — с исходным JSDoc, полным объявлением полезной нагрузки, бейджем поверхности и местом объявления. Документ дополняет [session.md](subsystems/session.ru.md) (порядок на поверхности и проекцию `deriveMessages()`), [persistence.md](subsystems/persistence.ru.md) (как журнал становится долговечным) и сгенерированный регион [session.md](subsystems/session.ru.md#cordis-surface) (разводку живой шины — событие журнала НЕ является cordis-событием; к слушателям оно приходит через единственный emit `session/event`).
 
-Этот файл СГЕНЕРИРОВАН из исходного кода (`scripts/gen-persistence-catalog.ts`) и проверяется на актуальность гейтом `pnpm run verify-persistence-catalog` (часть `doc-sync`) — не редактируйте его вручную. Блоки объявлений сохраняют исходное объявление и JSDoc вложенных свойств, убирая лишь отступы, навязанные объёмлющим интерфейсом или модулем, и используют фенс `ts persistence-catalog` (doc-typecheck его пропускает, потому что объявления ссылаются на типы из своих родных модулей). Имена типов в полезной нагрузке ссылаются на документирующую их страницу. См. [Agent Note о каталоге журнала персистентности](../.agents/notes/archived/process/2026-07-04-persistence-log-catalog.md).
+Этот файл СГЕНЕРИРОВАН из исходного кода (`scripts/gen-persistence-catalog.ts`) и проверяется на актуальность гейтом `pnpm run verify-persistence-catalog` (часть `doc-sync`) — не редактируйте его вручную. Блоки объявлений сохраняют исходное объявление и JSDoc вложенных свойств, убирая лишь отступы, навязанные объёмлющим интерфейсом или модулем, и используют fence `ts persistence-catalog` (doc-typecheck его пропускает, потому что объявления ссылаются на типы из своих родных модулей). Имена типов в полезной нагрузке ссылаются на документирующую их страницу. См. [Agent Note о каталоге журнала персистентности](../.agents/notes/archived/process/2026-07-04-persistence-log-catalog.md).
 
-Объявления конверта ниже описывают каждое событие: поле `type`, монотонный `seq`, `time` в миллисекундах эпохи Unix, `data`, необязательный маркер пропуска неизвестного типа `ignorable` и условные поля `surfaceOp`/`sourceEventSeqs`. Метка **surface** (поверхность) отмечает члена `SurfaceEventType`: он порождает сообщение LLM и объявляет, как встаёт в список поверхности. Метка **log-only** (только журнал) отмечает всё остальное: долговечную воспроизводимую запись без вклада в производную историю. Полезная нагрузка любого события сериализуема в JSON (проверяется в `Session.append`), а весь формат зафиксирован на `SESSION_FORMAT_VERSION = 0` — предрелизный этап, совместимость не подразумевается ([позиция по версиям](subsystems/persistence.ru.md)). Объём каталога: пакеты этого репозитория; сторонний плагин может слить дополнительные типы событий — по построению они остаются за пределами этого каталога.
+Объявления конверта ниже описывают каждое событие: поле `type`, монотонный `seq`, `time` в миллисекундах эпохи Unix, `data`, необязательный маркер пропуска неизвестного типа `ignorable` и условные поля `surfaceOp`/`sourceEventSeqs`. Бейдж **surface** (поверхность) отмечает члена `SurfaceEventType`: он порождает сообщение LLM и объявляет, как встаёт в список поверхности. Бейдж **log-only** (только журнал) отмечает всё остальное: долговечную воспроизводимую запись без вклада в производную историю. Полезная нагрузка любого события сериализуема в JSON (проверяется в `Session.append`), а весь формат зафиксирован на `SESSION_FORMAT_VERSION = 0` — предрелизный этап, совместимость не подразумевается ([позиция по версиям](subsystems/persistence.ru.md)). Объём каталога: пакеты этого репозитория; сторонний плагин может слить дополнительные типы событий — по построению они остаются за пределами этого каталога.
 
 ## Конверт события
 
@@ -475,6 +475,20 @@ export type SessionEvent<T extends SessionEventType = SessionEventType> = {
 Источник: [`packages/hooks/hook-protocol/src/types.ts:31`](../packages/hooks/hook-protocol/src/types.ts)
 
 ### `llm/*`
+
+<a id="llmkey-rotated--log-only"></a>
+
+#### `llm/key-rotated` — log-only
+
+```ts persistence-catalog
+/**
+ * Durable record written when the sticky position of one rotating pool
+ * advances onto its next credential after a failed request attempt.
+ */
+'llm/key-rotated': LlmKeyRotatedEventData
+```
+
+Источник: [`packages/llm/llm-key-rotation/src/types.ts:13`](../packages/llm/llm-key-rotation/src/types.ts)
 
 <a id="llmretry--log-only"></a>
 

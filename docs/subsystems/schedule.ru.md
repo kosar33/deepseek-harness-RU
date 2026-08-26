@@ -149,7 +149,7 @@ type ScheduleDispatchChange = OneShotScheduleDispatchChange | EveryScheduleDispa
 type ScheduleChange = ScheduleCreateChange | ScheduleDeleteChange | ScheduleDispatchChange
 ```
 
-Строгий декодер и свёртка отвергают неизвестные версии, лишние поля, переиспользованные id, несоответствующие формы диспетчеризации one-shot или Every, а также переходы delete или dispatch против неактивных записей. Обычная Session свёртывает весь свой поток событий. Fork свёртывает только события начиная с `SessionHeader.seedLength` и позже, поэтому он сохраняет историю, не принимая активные напоминания родительской Session. Объявление `schedule/change` и его расположение в исходниках также индексируются в [каталоге персистентности](../persistence-catalog.md#schedulechange--log-only).
+Строгий декодер и свёртка отвергают неизвестные версии, лишние поля, переиспользованные id, несоответствующие формы диспетчеризации one-shot или Every, а также переходы delete или dispatch против неактивных записей. Обычная Session свёртывает весь свой поток событий. Fork свёртывает только события начиная с `SessionHeader.seedLength` и позже, поэтому он сохраняет историю, не принимая активные напоминания родительской Session. Объявление `schedule/change` и его расположение в исходниках также индексируются в [каталоге персистентности](../persistence-catalog.ru.md#schedulechange--log-only).
 
 ## Активные представления и управление
 
@@ -175,7 +175,7 @@ type ScheduleView = ScheduleRecord & {
 }
 ```
 
-Сгенерированный [каталог инструментов](../tool-catalog.md#deepseek-aidsh-schedule) владеет схемами аргументов и результатов для `schedule_create`, `schedule_list` и `schedule_delete`. Управляющие вызовы сериализуются с подошедшей работой в одной очереди уровня агента. Каждое чтение или решение сперва ждёт общего барьера персистентности Session; создание и фактическое удаление ждут снова после дописывания. Сбой барьера сообщает `persistence_uncertain`, вместо того чтобы гадать, зафиксировалась ли упреждающая запись. Остальные стабильные коды ошибок: `invalid_prompt`, `invalid_selector`, `invalid_rule`, `invalid_time_zone`, `not_future`, `time_out_of_range`, `frequency_too_high`, `corrupt_schedule_log` и `internal_error`.
+Сгенерированный [каталог инструментов](../tool-catalog.ru.md#deepseek-aidsh-schedule) владеет схемами аргументов и результатов для `schedule_create`, `schedule_list` и `schedule_delete`. Управляющие вызовы сериализуются с подошедшей работой в одной очереди уровня агента. Каждое чтение или решение сперва ждёт общего барьера персистентности Session; создание и фактическое удаление ждут снова после дописывания. Сбой барьера сообщает `persistence_uncertain`, вместо того чтобы гадать, зафиксировалась ли упреждающая запись. Остальные стабильные коды ошибок: `invalid_prompt`, `invalid_selector`, `invalid_rule`, `invalid_time_zone`, `not_future`, `time_out_of_range`, `frequency_too_high`, `corrupt_schedule_log` и `internal_error`.
 
 ## Живая доставка
 

@@ -7,7 +7,7 @@ export const NS = 'conversation'
 // string: both describe the same next action.
 const PLAN_NEXT_ACTION_ZH = '描述你的任务以生成计划'
 const PLAN_NEXT_ACTION_EN = 'describe your task to generate plan'
-const PLAN_NEXT_ACTION_RU = 'опишите задачу для создания плана'
+const PLAN_NEXT_ACTION_RU = '\'опишите задачу для создания плана'
 
 /** Simplified Chinese dictionary (the key-set source of truth). */
 export const zh = {
@@ -122,6 +122,9 @@ export const zh = {
   'message.compaction.unavailable': '压缩摘要不可用',
   'message.unknownSurface': '未知 surface 事件：{type}',
   'message.keyRotated': '已切换 API 密钥：{from} → {to}',
+  'message.keyRotatedUntilIn': '限流剩余 {duration}',
+  'message.keyRotatedExpired': '限流已过期，密钥重新可用',
+  'message.keyRotatedRetries': '重试已穷尽',
   'message.unknownBlock': '未知内容块',
   'message.stopped': '已停止',
   'message.branch': '在新对话中分支',
@@ -322,6 +325,9 @@ export const en = {
   'message.compaction.unavailable': 'Compaction summary unavailable',
   'message.unknownSurface': 'Unknown surface event: {type}',
   'message.keyRotated': 'Switched API key: {from} → {to}',
+  'message.keyRotatedUntilIn': 'rate-limited for {duration}',
+  'message.keyRotatedExpired': 'rate limit expired, key usable again',
+  'message.keyRotatedRetries': 'provider retries exhausted',
   'message.unknownBlock': 'Unknown content block',
   'message.stopped': 'Stopped',
   'message.branch': 'Branch into a new conversation',
@@ -519,6 +525,9 @@ export const ru = {
   'message.compaction.unavailable': 'Сводка сжатия недоступна',
   'message.unknownSurface': 'Неизвестное событие surface: {type}',
   'message.keyRotated': 'Сменён API-ключ: {from} → {to}',
+  'message.keyRotatedUntilIn': 'лимит ещё {duration}',
+  'message.keyRotatedExpired': 'лимит истёк, ключ снова в строю',
+  'message.keyRotatedRetries': 'ретраи провайдера исчерпаны',
   'message.unknownBlock': 'Неизвестный блок содержимого',
   'message.stopped': 'Остановлено',
   'message.branch': 'Ответвить в новый чат',

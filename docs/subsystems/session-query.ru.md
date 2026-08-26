@@ -370,7 +370,7 @@ Generated from source by `scripts/gen-cordis-catalog.ts` (verified fresh by `pnp
 
 Unified live-preferred session query service.
 
-Exact reads, filters, and traces are backend-independent concrete behavior. A backend implements full-text observation, reconciliation, ranking, cursor generations, and query execution on the same `ctx.sessionQuery` service.
+Точные чтения, фильтры и трассы — конкретное поведение, независимое от бэкенда. Бэкенд реализует полнотекстовое наблюдение, сверку, ранжирование, поколения курсоров и исполнение запросов на том же сервисе `ctx.sessionQuery`.
 
 ```ts cordis-catalog
 /**

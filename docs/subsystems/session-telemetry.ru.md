@@ -2,7 +2,7 @@
 
 [English](session-telemetry.md) | [中文](session-telemetry.zh.md) | Русский
 
-Исходящая отчётность сессии разделена как [capability seam](../capability-seams.md): Service Definition и координатор захвата ([dsh-session-telemetry](../../packages/session/session-telemetry), `ctx.sessionTelemetry`) владеют точками захвата, фиксированной проекцией чанков, каскадом редактирования `session-telemetry/record`, курсором передачи и минимальным контрактом бэкенда; загружаемый развёртыванием Service Provider ([dsh-session-telemetry-otel](../../packages/session/session-telemetry-otel)) — это конвейер логов OpenTelemetry JS SDK, сконфигурированный дословно. Это одна необязательная возможность, а не часть стержня agent-loop, и ничто здесь не достигает запроса к модели. Аксиома границы — аспект harness'а заканчивается на `emit()`; батчинг, повторы, очередь и политика потерь принадлежат SDK отчётности — и отвергнутые альтернативы закреплены в [Agent Note о возрождении](../../.agents/notes/implemented/feature/2026-07-23-session-telemetry-otel-revival.md); контракты точек захвата, курсора и проекции живут в [README Service Definition](../../packages/session/session-telemetry/README.md).
+Исходящая отчётность сессии разделена как [capability seam](../capability-seams.ru.md): Service Definition и координатор захвата ([dsh-session-telemetry](../../packages/session/session-telemetry), `ctx.sessionTelemetry`) владеют точками захвата, фиксированной проекцией чанков, каскадом редактирования `session-telemetry/record`, курсором передачи и минимальным контрактом бэкенда; загружаемый развёртыванием Service Provider ([dsh-session-telemetry-otel](../../packages/session/session-telemetry-otel)) — это конвейер логов OpenTelemetry JS SDK, сконфигурированный дословно. Это одна необязательная возможность, а не часть стержня agent-loop, и отсюда ничего не попадает в запрос к модели. Аксиома границы — аспект harness заканчивается на `emit()`; батчинг, повторы, очередь и политика потерь принадлежат SDK отчётности — и отвергнутые альтернативы закреплены в [Agent Note о возрождении](../../.agents/notes/implemented/feature/2026-07-23-session-telemetry-otel-revival.md); контракты точек захвата, курсора и проекции живут в [README Service Definition](../../packages/session/session-telemetry/README.md).
 
 Источник: [`packages/session/session-telemetry/src/index.ts`](../../packages/session/session-telemetry/src/index.ts)
 
@@ -54,11 +54,11 @@ interface SessionTelemetryRecord {
 }
 ```
 
-Уходит только первый `assistant/chunk` каждой пары `(turn, step)` — сигнал о старте потока; остальные отбрасываются на захвате, поэтому разрывы `seq` на проводе рутинны и никогда не являются сигналом потери. Каждый другой тип [события сессии](session.ru.md), включая слитые плагинами, о которых seam никогда не слышал, проходит целиком. Доставка — best-effort: курсор отмечает переданные, а не доставленные записи; записи могут теряться (сбой, перезагрузка окна) и дублироваться (повторное усыновление без курсора, повторы SDK), поэтому получатели дедуплицируют записи канала `ledger` по `(session.id, event.seq)`; записи канала `ops` намеренно опускают эту идентичность — это сигналы для оповещения, а не записи для суммирования, и они вместо этого терпят дубликаты.
+Уходит только первый `assistant/chunk` каждой пары `(turn, step)` — сигнал о старте потока; остальные отбрасываются при захвате, поэтому разрывы `seq` при передаче обычны и никогда не являются сигналом потери. Каждый другой тип [события сессии](session.ru.md), включая слитые плагинами типы, которых сам seam не знает, проходит целиком. Доставка — best-effort: курсор отмечает переданные бэкенду, а не доставленные записи; записи могут теряться (сбой, перезагрузка окна) и дублироваться (повторное усыновление без курсора, повторы SDK), поэтому получатели дедуплицируют записи канала `ledger` по `(session.id, event.seq)`; записи канала `ops` намеренно опускают эту идентичность — это сигналы для оповещения, а не записи для суммирования, и вместо этого они допускают дубликаты.
 
 ## Раскрытие обмена данными
 
-Контракт подтверждения seam'а (им владеет [раздел о раскрытии обмена данными README Service Definition](../../packages/session/session-telemetry/README.md#the-sharing-disclosure)): каждый бэкенд раскрывает выбранную развёртыванием политику обмена данными через обязательный абстрактный член `sharing` на `ctx.sessionTelemetry`, а потребители показывают «не настроено» только когда сервис телеметрии вообще не смонтирован. Раскрытие сообщает текущую политику и никогда — доставку или удержание: передача является неблокирующей постановкой в очередь, а батчинг, повторы и политика потерь остаются за SDK отчётности.
+Контракт подтверждения seam (его владелец — [раздел о раскрытии обмена данными в README Service Definition](../../packages/session/session-telemetry/README.md#the-sharing-disclosure)): каждый бэкенд раскрывает выбранную развёртыванием политику обмена данными через обязательный абстрактный член `sharing` на `ctx.sessionTelemetry`, а потребители показывают «не настроено» только когда сервис телеметрии не смонтирован. Раскрытие сообщает текущую политику, но никогда — доставку или хранение: передача является неблокирующей постановкой в очередь, а батчинг, повторы и политика потерь остаются за SDK отчётности.
 
 ```ts type-equiv
 /**
@@ -119,11 +119,11 @@ interface SessionTelemetrySink {
 }
 ```
 
-`SessionTelemetryBackend` (`ctx.sessionTelemetry`, [сигнатуры](#ctxsessiontelemetry--sessiontelemetrybackend-abstract-seam)) — загружаемая форма контракта: одна реализация на контекст, дубликат при загрузке бросает исключение, — и бэкенд компонует `SessionTelemetryCoordinator` seam'а в своём конструкторе, чтобы установить сторону захвата.
+`SessionTelemetryBackend` (`ctx.sessionTelemetry`, [сигнатуры](#ctxsessiontelemetry--sessiontelemetrybackend-abstract-seam)) — загружаемая форма контракта: одна реализация на контекст, повторная загрузка бросает исключение, — и бэкенд компонует `SessionTelemetryCoordinator` данного seam в своём конструкторе, чтобы установить сторону захвата.
 
 ## Каскад редактирования: `session-telemetry/record`
 
-Каждая запись проходит [каскад](../cordis-primer.ru.md#семантика-waterfall-в-cordis) `session-telemetry/record` между проекцией и `emit()` ([запись события](#session-telemetryrecord--waterfall)). Seam не поставляет собственных правил: без смонтированного слушателя записи достигают бэкенда ровно в том виде, в каком захвачены, поэтому экспортированные данные настолько чисты, насколько чисты правила, смонтированные развёртыванием. Слушатели наслаиваются, преобразуя возвращаемое значение `next()`; возврат без `next()` заменяет всё нижележащее; бросающий исключение слушатель fail-closed задерживает эту одну запись внутри локализации координатора. Редактирование применяется только к экспортируемой копии — канонический журнал сессии никогда не переписывается.
+Каждая запись проходит [каскад](../cordis-primer.ru.md#семантика-waterfall-в-cordis) `session-telemetry/record` между проекцией и `emit()` ([описание события](#session-telemetryrecord--waterfall)). Seam не поставляет никаких собственных правил: без смонтированного слушателя записи достигают бэкенда ровно в том виде, в каком захвачены, поэтому экспортированные данные настолько чисты, насколько чисты правила, смонтированные развёртыванием. Слушатели образуют цепочку, преобразуя возвращаемое значение `next()`; возврат без `next()` заменяет всё нижележащее; бросающий исключение слушатель задерживает эту одну запись, а сбой перехватывается внутри координатора по принципу fail-closed. Редактирование применяется только к экспортируемой копии — канонический журнал сессии никогда не переписывается.
 
 <!-- BEGIN GENERATED cordis-surface (gen-cordis-catalog.ts) — do not edit between markers -->
 
@@ -137,7 +137,7 @@ Generated from source by `scripts/gen-cordis-catalog.ts` (verified fresh by `pnp
 
 ### `ctx.sessionTelemetry` — `SessionTelemetryBackend` (abstract seam)
 
-Loadable form of the backend contract: one implementation per context — the cordis `Service` registration under the `telemetry` key throws on a duplicate, cordis' standard behavior. A backend composes a SessionTelemetryCoordinator in its constructor to install the capture side.
+Загружаемая форма контракта бэкенда: одна реализация на контекст — регистрация cordis-`Service` под ключом `telemetry` бросает исключение при дубликате, стандартное поведение cordis. Бэкенд компонует `SessionTelemetryCoordinator` в своём конструкторе, чтобы установить сторону захвата.
 
 ```ts cordis-catalog
 /**
@@ -166,7 +166,7 @@ Source: [`packages/session/session-telemetry/src/index.ts`](../../packages/sessi
 
 #### `session-telemetry/record` — waterfall
 
-Transform one outbound record before it reaches the backend. This waterfall is the Service Definition's redaction extension point. It ships NO rules of its own: the innermost `next()` passes the record through unchanged, and with no listener mounted records reach the backend as captured, so exported data is exactly as clean as the rules a deployment mounts. Listeners stack by transforming `next()`'s return value; returning without `next()` replaces everything beneath. Dispatched synchronously on the capture hot path inside the coordinator's containment: a throwing listener withholds that one record (fail-closed) and never reaches the agent loop. Live capture dispatches at append time; on-demand capture dispatches while reading the canonical log. Redaction applies to the exported copy only; the canonical session log is never rewritten.
+Преобразует одну исходящую запись до того, как она достигнет бэкенда. Этот каскад — точка расширения редактирования у Service Definition. Собственных правил у него нет: внутренний `next()` проводит запись без изменений, а без смонтированного слушателя записи достигают бэкенда ровно в том виде, в каком захвачены, поэтому экспортированные данные настолько чисты, насколько чисты правила, смонтированные развёртыванием. Слушатели образуют цепочку, преобразуя возвращаемое значение `next()`; возврат без `next()` заменяет всё нижележащее. Диспетчеризация выполняется синхронно на горячем пути захвата внутри перехвата координатора: бросающий исключение слушатель задерживает эту одну запись (fail-closed) и никогда не достигает агентного цикла. Живой захват диспетчеризуется в момент добавления записи; захват по требованию — при чтении канонического журнала. Редактирование применяется только к экспортируемой копии; канонический журнал сессии никогда не переписывается.
 
 ```ts cordis-catalog
 /**

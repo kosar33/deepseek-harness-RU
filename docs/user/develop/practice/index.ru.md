@@ -53,7 +53,7 @@ Service Definition и инструмент остаются неизменным
 - Consumer зависит от Service Definition.
 - Service Provider и Consumer **не зависят друг от друга**.
 
-За актуальные встроенные семейства и ссылки на пакеты отвечает [справочник capability seam](../../../capability-seams.md).
+За актуальные встроенные семейства и ссылки на пакеты отвечает [справочник capability seam](../../../capability-seams.ru.md).
 
 ## Туториал: разработка трёхролевой возможности
 

@@ -1,4 +1,4 @@
-﻿import { existsSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -167,7 +167,9 @@ async function sendAndWait(agent: Agent): Promise<void> {
 describe('reset hints from flattened provider bodies', () => {
   const NOW = Date.UTC(2026, 7, 26, 12, 0, 0)
   const failureWith = (message: string, providerRetryAfterMs?: number) =>
-    ({ code: 'RATE_LIMIT', message, providerRetryAfterMs })
+    (providerRetryAfterMs === undefined
+      ? { code: 'RATE_LIMIT', message }
+      : { code: 'RATE_LIMIT', message, providerRetryAfterMs })
 
   it('prefers a validated adapter-surfaced retry hint over any body marker', () => {
     const failure = failureWith('"reset_at": "2030-01-01T00:00:00Z"', 5_000)

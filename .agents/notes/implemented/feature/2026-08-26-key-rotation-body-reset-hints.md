@@ -19,3 +19,7 @@ Through the pi-ai path wire errors arrive at the recovery seam flattened to mess
 **A per-provider parser registry** — rejected for lack of a second consumer: the three families cover the marker shapes providers actually embed, and unknown shapes already degrade safely to the midnight fallback.
 
 **Clamping oversized hints instead of rejecting them** — rejected: a value beyond any plausible quota window means the match is a different construct sharing the marker's wording, not a longer park; clamping would turn a parsing artifact into state.
+
+## Consequences
+
+Parks through flattening adapters now end at the provider's real window whenever that window survives in the body text, so exhausted-key lockouts and the chat countdown reflect minutes-scale limits instead of defaulting to midnight; bodies without markers keep today's behavior unchanged. The scan is best-effort by contract — new provider wordings degrade to the midnight fallback until added, and no marker family ever parks longer than before because every candidate must beat the fallback's plausibility bound.

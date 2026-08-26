@@ -1,6 +1,7 @@
 # Agent Note: Todo plan strip clears on the next turn
 
 Status: implemented
+Archived: 2026-08-25
 
 English | [中文](2026-07-28-todo-plan-clears-on-next-turn.zh.md)
 

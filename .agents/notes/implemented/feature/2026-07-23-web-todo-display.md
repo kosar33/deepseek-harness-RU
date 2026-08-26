@@ -12,9 +12,9 @@ English | [中文](2026-07-23-web-todo-display.zh.md)
 
 Consume `todo/write` as a Session side effect, not a surface node, and render it on two surfaces matching the split the TUI already draws.
 
-### Side-effect channel, converging with window replay
+### Host-computed projection, one authoritative value
 
-`applyEventSideEffects` gains a `todo/write` case (whole list, last write wins) and clears on `turn/start` ([turn-scoped plan lifetime](2026-07-28-todo-plan-clears-on-next-turn.md)). `rebuildDerivedFromWindow` sweeps the window from an empty plan and restores the tail-page seed only when the window never determined the plan (no `todo/write` and no `turn/start`); otherwise the in-window write/`turn/start` fold wins. Every `installWindow` caller is a tail request (`doOpen`, its gap re-pull, `repairGap`; `loadOlder` prepends without reseeding), which the host answers with the projection or omits it when no plan stands — so an absent field is the authoritative empty list and is assigned as such. That distinction matters on rollback: a live write whose host crashed before persisting leaves the log empty, and preserving the prior value instead would strand the rolled-back plan on screen indefinitely. `ConversationSnapshot.todos` is the read surface. This follows the event's own contract ("log-only UI state; never derived history"): surfacing each write as a conversation node would render superseded lists as if they were still standing.
+The plan strip reads the host-computed `todos` projection through `useProjection('todos')`: session-long last-write-wins over whole-list writes, surviving turn boundaries and errored turns ([plan strip lifetime](2026-08-25-todo-plan-persists-across-turns.md)). The value arrives on the tail history page's host-computed block and on `session/projection` push frames; an omitted key means the projection capability is absent, while a present `null` is the authoritative empty list before any write — the distinction keeps preset-owned projections from being wiped on cold reads. `ConversationSnapshot.todos` is the read surface, and each `todo_write` tool row still carries its own replacement list in its arguments, so per-write history stays visible in the flow regardless of which plan currently stands.
 
 ### TodoPanel: the durable list as a persistent strip
 

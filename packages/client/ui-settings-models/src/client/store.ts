@@ -7,7 +7,8 @@
  */
 
 import type {
-  ConfigurableProviderView, CredentialView, IApiClient, SettingsNamespaceView,
+  ConfigurableProviderView, CredentialView, IApiClient, KeyRotationRouteView, RpcResponse,
+  SettingsNamespaceView,
 } from '@deepseek-ai/dsh-api-remotes/client'
 import type { SnapshotStore } from '@deepseek-ai/dsh-client-runtime/client'
 import { createSnapshotStore } from '@deepseek-ai/dsh-client-runtime/client'
@@ -32,6 +33,8 @@ export interface ProviderRow {
   apiKeyEnv: string | undefined
   /** Credential state for {@link apiKeyEnv}, once described. */
   credential: CredentialView | undefined
+  /** Whether a mounted key-rotation pool holds at least one key for this route. */
+  rotationCovered: boolean
 }
 
 /** Page snapshot. */
@@ -125,11 +128,13 @@ export class ModelsSettingsStore {
   ) {}
 
   /**
-   * Refresh the whole page snapshot: the provider directory and the mirror's
-   * settings answer in parallel, then one batched credential describe over
-   * every referenced ref. Provider failure or absence of an initial settings
-   * answer keeps the last good rows and surfaces an error; a failed settings
-   * refresh reuses the mirror's held view.
+   * Refresh the whole page snapshot: the provider directory, the mirror's
+   * settings view, and the rotation-coverage probe answer in parallel, then
+   * one batched credential describe runs over every referenced ref. Provider
+   * failure or absence of an initial settings answer keeps the last good rows
+   * and surfaces an error; a failed settings refresh reuses the mirror's held
+   * view. A failed or absent rotation probe leaves every route uncovered
+   * rather than failing the load.
    * @returns nothing; the snapshot carries the outcome.
    */
   async load(): Promise<void> {
@@ -138,9 +143,15 @@ export class ModelsSettingsStore {
     let providers: ConfigurableProviderView[]
     let writable: boolean
     let views: readonly SettingsNamespaceView[]
+    let rotationResponse: RpcResponse<{ configured: boolean; routes: KeyRotationRouteView[] }> | undefined
     try {
-      const [providersResponse] = await Promise.all([
+      const [providersResponse, rotation] = await Promise.all([
         this.api.llm.providers({}),
+        // The same wire face the credential seat reads: an unmounted host
+        // plugin answers `{ configured: false }`, so the page degrades to the
+        // native-reference-only status instead of growing a second fact
+        // source for what serves a route.
+        Promise.resolve().then(() => this.api.llm.keyRotation({})).catch(() => undefined),
         this.describeFace.ensure(),
       ])
       if (!providersResponse.result.ok) throw new Error(providersResponse.result.error.message)
@@ -151,6 +162,7 @@ export class ModelsSettingsStore {
       providers = providersResponse.result.value.providers
       writable = mirrored.view.writable
       views = mirrored.view.namespaces
+      rotationResponse = rotation
     } catch (error) {
       if (generation !== this.generation) return
       this.store.update((s) => {
@@ -160,6 +172,13 @@ export class ModelsSettingsStore {
       return
     }
     const namespaces = new Map(views.map(view => [view.ns, view]))
+    const coveredProviders = rotationResponse?.result.ok === true && rotationResponse.result.value.configured
+      ? new Set(
+        rotationResponse.result.value.routes
+          .filter(route => route.keys.length > 0)
+          .map(route => route.provider),
+      )
+      : new Set<string>()
     const rows: ProviderRow[] = providers.map((entry) => {
       const namespace = namespaces.get(entry.settingsNs)
       const configured = namespace !== undefined
@@ -174,6 +193,7 @@ export class ModelsSettingsStore {
         removable,
         apiKeyEnv: apiKeyEnvOf(namespace, entry.settingsPath, this.schema),
         credential: undefined,
+        rotationCovered: coveredProviders.has(entry.provider),
       }
     })
     const refs = [...new Set(rows.flatMap(row => row.apiKeyEnv === undefined ? [] : [row.apiKeyEnv]))]
@@ -211,17 +231,18 @@ export class ModelsSettingsStore {
 /**
  * Whether a joined row can serve model requests as it stands: the route is
  * registered with the adapter registry, and whatever credential its resolved
- * profile names is stored. A profile naming no reference authenticates through
- * the provider's own path (the Bedrock chain, Vertex ADC, a gateway that needs
- * nothing), as does a live route with no settings address at all, so neither
- * owes this page a key.
+ * profile names is stored — or a mounted key-rotation pool holds keys for the
+ * route, since that override is what the request path itself consults. A
+ * profile naming no reference authenticates through the provider's own path
+ * (the Bedrock chain, Vertex ADC, a gateway that needs nothing), as does a
+ * live route with no settings address at all, so neither owes this page a key.
  * @param row - one joined provider row.
  * @returns whether the user already has this provider to talk to.
  */
 export function providerUsable(row: ProviderRow): boolean {
   if (!row.entry.active) return false
   if (row.apiKeyEnv === undefined) return true
-  return row.credential?.configured === true
+  return row.credential?.configured === true || row.rotationCovered
 }
 
 /** First-run onboarding readiness derived only from the shared Models join. */

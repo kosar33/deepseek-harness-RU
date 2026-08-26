@@ -73,7 +73,9 @@ export const Config: z<ConnectionConfig> = z.object({
  * privileged — `settings.describe` returns every exposed namespace's
  * configuration and `credentials.describe` reports whether an arbitrary
  * environment-variable name is configured and where from, which is
- * reconnaissance no anonymous caller should have. `trustedHosts` is a
+ * reconnaissance no anonymous caller should have. `llm.keyRotation` belongs
+ * beside them: it enumerates credential reference names a deployment uses and
+ * their live health. `trustedHosts` is a
  * DNS-rebinding fence, explicitly not authentication, so the whole
  * configuration plane stays loopback-same-origin until a real authentication
  * layer exists. `llm.discoverModels` belongs to that plane on both counts: it
@@ -116,6 +118,8 @@ const PRIVILEGED_METHODS = new Set([
   'credentials.set',
   'credentials.unset',
   'llm.discoverModels',
+  'llm.keyRotation',
+  'llm.keyRotationResetParks',
 ])
 
 /**

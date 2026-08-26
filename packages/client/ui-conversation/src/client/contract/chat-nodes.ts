@@ -50,6 +50,24 @@ export interface RetryChatData {
   readonly current: ModelRetryNode
 }
 
+/** One rotating-pool advance rendered as a slim marker line. */
+export interface KeyRotatedChatData {
+  readonly seq: number
+  readonly time: number
+  /** Registered provider route whose pool advanced. */
+  readonly provider: string
+  /** Label of the credential that served the failed attempt. */
+  readonly from: string
+  /** Label of the credential the next attempt uses. */
+  readonly to: string
+  /** Why the served credential was left. */
+  readonly cause: 'rate-limit' | 'vendor-relay'
+  /** ISO reset instant carried by a rate-limit park; absent otherwise. */
+  readonly resetAt?: string
+  /** Trimmed upstream text naming the failure; absent when none was usable. */
+  readonly reason?: string
+}
+
 /** Turn-local footer row that owns actions and optional feature contributions. */
 export interface TurnTailChatData {
   readonly turn: number

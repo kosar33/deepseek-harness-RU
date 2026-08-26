@@ -45,6 +45,9 @@
       "path": "../../llm/token-meter"
     },
     {
+      "path": "../../llm/llm-key-rotation"
+    },
+    {
       "path": "../../llm/llm-retry"
     },
     {

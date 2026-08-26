@@ -1,6 +1,6 @@
-/** Page-store join: directory × namespaces × credentials, with last-good rows on failure. */
+/** Page-store join: directory × namespaces × credentials × rotation coverage, with last-good rows on failure. */
 import { describe, expect, it } from 'vitest'
-import type { RpcResponse } from '@deepseek-ai/dsh-api-remotes/client'
+import type { KeyRotationRouteView, RpcResponse } from '@deepseek-ai/dsh-api-remotes/client'
 import { SettingsDescribeMirror } from '@deepseek-ai/dsh-client-ui-settings/src/client/settings-mirror.ts'
 import { settingsSchema } from './settings-schema.client.ts'
 import { messageOf, ModelsSettingsStore } from '../src/client/store.ts'
@@ -45,12 +45,14 @@ function api(overrides: {
   providers?: () => Promise<RpcResponse<{ providers: typeof DIRECTORY }>>
   describeSettings?: () => Promise<RpcResponse<{ writable: boolean; namespaces: typeof NAMESPACES }>>
   describeCredentials?: (refs: string[]) => Promise<RpcResponse<{ credentials: Record<string, unknown> }>>
+  keyRotation?: () => Promise<RpcResponse<{ configured: boolean; routes: KeyRotationRouteView[] }>>
 } = {}) {
   const seenRefs: string[][] = []
   const face = {
     llm: {
       providers: overrides.providers ?? (() => Promise.resolve(ok({ providers: DIRECTORY }))),
       models: () => Promise.resolve(ok({ groups: [], failures: [] })),
+      keyRotation: overrides.keyRotation ?? (() => Promise.resolve(ok({ configured: false, routes: [] }))),
     },
     settings: {
       describe: overrides.describeSettings ?? (() => Promise.resolve(ok({ writable: true, hasDocument: false, namespaces: NAMESPACES }))),
@@ -88,17 +90,70 @@ describe('ModelsSettingsStore', () => {
       removable: false,
       apiKeyEnv: 'DEEPSEEK_API_KEY',
       credential: { configured: false, writable: true },
+      rotationCovered: false,
     })
     expect(byProvider.get('openai')).toMatchObject({
       configured: true,
       removable: true,
       apiKeyEnv: 'OPENAI_API_KEY',
       credential: { configured: true },
+      rotationCovered: false,
     })
     expect(byProvider.get('anthropic')).toMatchObject({ configured: false, removable: false })
     expect(byProvider.get('anthropic')?.apiKeyEnv).toBeUndefined()
     expect(byProvider.get('ghost')).toMatchObject({ configured: false, removable: false })
     expect(state.namespaces.get('llm-pi-ai')?.ns).toBe('llm-pi-ai')
+  })
+
+  it('marks routes a mounted key-rotation pool covers, keys required', async () => {
+    const { face, mirror } = api({
+      keyRotation: () => Promise.resolve(ok({
+        configured: true,
+        routes: [{
+          provider: 'openai',
+          activeLabel: 'OPENAI_KEYROTATION_1',
+          keys: [{
+            label: 'OPENAI_KEYROTATION_1',
+            source: 'reference',
+            reference: 'OPENAI_KEYROTATION_1',
+            status: { state: 'usable' },
+          }],
+        }],
+      })),
+    })
+    const store = new ModelsSettingsStore(face, settingsSchema, mirror)
+    await store.load()
+    const byProvider = new Map(store.store.getSnapshot().rows.map(row => [row.entry.provider, row]))
+    expect(byProvider.get('openai')).toMatchObject({ rotationCovered: true })
+    // A route the pool does not name stays uncovered.
+    expect(byProvider.get('deepseek-official')).toMatchObject({ rotationCovered: false })
+  })
+
+  it('reads an answer with no keys as no coverage', async () => {
+    const { face, mirror } = api({
+      keyRotation: () => Promise.resolve(ok({
+        configured: true,
+        routes: [{ provider: 'openai', activeLabel: '', keys: [] }],
+      })),
+    })
+    const store = new ModelsSettingsStore(face, settingsSchema, mirror)
+    await store.load()
+    expect(store.store.getSnapshot().rows.find(row => row.entry.provider === 'openai'))
+      .toMatchObject({ rotationCovered: false })
+  })
+
+  it('degrades a failed or rejected rotation probe to uncovered rows without failing the load', async () => {
+    const refused = api({ keyRotation: () => Promise.resolve(fail('no such wire method')) })
+    const refusedStore = new ModelsSettingsStore(refused.face, settingsSchema, refused.mirror)
+    await refusedStore.load()
+    expect(refusedStore.store.getSnapshot()).toMatchObject({ status: 'ready' })
+    expect(refusedStore.store.getSnapshot().rows.every(row => row.rotationCovered === false)).toBe(true)
+
+    const rejected = api({ keyRotation: () => Promise.reject(new Error('rotation transport down')) })
+    const rejectedStore = new ModelsSettingsStore(rejected.face, settingsSchema, rejected.mirror)
+    await expect(rejectedStore.load()).resolves.toBeUndefined()
+    expect(rejectedStore.store.getSnapshot()).toMatchObject({ status: 'ready', error: null })
+    expect(rejectedStore.store.getSnapshot().rows.every(row => row.rotationCovered === false)).toBe(true)
   })
 
   it('degrades the credential badge, not the page, when the credential domain fails', async () => {

@@ -38,6 +38,7 @@ import type { PresetBearingSession } from '@deepseek-ai/dsh-agent-presets'
 import type {} from '@deepseek-ai/dsh-tools'
 import type {
   ApiProxy, ConfigurableProviderView, CredentialView, GoalRef, HistoryEntry, HostFrame,
+  KeyRotationKeyView, KeyRotationRouteView,
   ModelCatalogFailure, ModelProviderGroup,
   ModelReasoning, MuxFrame, PromptContentPart, QuestionResponsePayload, SessionListMetadata, SessionProjectionsBlock, SessionSearchItem,
   QueuedInboxItem, SessionSummary, SettingsNamespaceView, SubagentAddress, JobView, ToolEventView,
@@ -3321,6 +3322,53 @@ export function createApiProxy(ctx: Context, defaults: ApiProxyDefaults): ApiPro
             details: { settingsNs, ...baseURL === undefined ? {} : { baseURL } },
           })
         }
+      },
+
+      keyRotation(request) {
+        // Structural read of the dsh-llm-key-rotation state face, whose
+        // snapshot rows are wire-compatible with the views below: this proxy
+        // stays decoupled from the plugin package, and an absent service means
+        // no composition mounts the plugin — reported, not failed.
+        const rotation = ctx.get('llmKeyRotation') as
+          | { snapshot(): readonly { provider: string; activeLabel: string; keys: readonly KeyRotationKeyView[] }[] }
+          | undefined
+        if (rotation === undefined) return Promise.resolve(ok(request, { configured: false, routes: [] }))
+        const routes: KeyRotationRouteView[] = rotation.snapshot().map(route => ({
+          provider: route.provider,
+          activeLabel: route.activeLabel,
+          keys: route.keys.map(key => ({
+            label: key.label,
+            source: key.source,
+            ...key.reference === undefined ? {} : { reference: key.reference },
+            status: key.status,
+          })),
+        }))
+        return Promise.resolve(ok(request, { configured: true, routes }))
+      },
+
+      keyRotationResetParks(request) {
+        // Same decoupling as the snapshot read above: the face is structural,
+        // an absent service answers the dormant envelope, and the fresh
+        // routes ride back so a caller folds them like a refresh.
+        const rotation = ctx.get('llmKeyRotation') as
+          | {
+            resetParks(route: string): boolean
+            snapshot(): readonly { provider: string; activeLabel: string; keys: readonly KeyRotationKeyView[] }[]
+          }
+          | undefined
+        if (rotation === undefined) return Promise.resolve(ok(request, { configured: false, routes: [] }))
+        rotation.resetParks(request.payload.provider)
+        const routes: KeyRotationRouteView[] = rotation.snapshot().map(route => ({
+          provider: route.provider,
+          activeLabel: route.activeLabel,
+          keys: route.keys.map(key => ({
+            label: key.label,
+            source: key.source,
+            ...key.reference === undefined ? {} : { reference: key.reference },
+            status: key.status,
+          })),
+        }))
+        return Promise.resolve(ok(request, { configured: true, routes }))
       },
     },
 

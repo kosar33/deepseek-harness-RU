@@ -11,13 +11,14 @@ import { compactionDefinition } from '../src/client/conversation-nodes/compactio
 import { unknownFallbackDefinition } from '../src/client/conversation-nodes/fallback.ts'
 import { nextStepInboxDefinition, nextTurnInboxDefinition } from '../src/client/conversation-nodes/inbox.ts'
 import { messageDefinition } from '../src/client/conversation-nodes/message.ts'
+import { keyRotatedDefinition } from '../src/client/conversation-nodes/key-rotated.ts'
 import { retryDefinition } from '../src/client/conversation-nodes/retry.ts'
 import { toolDefinition } from '../src/client/conversation-nodes/tool.ts'
 import { turnErrorDefinition } from '../src/client/conversation-nodes/turn-error.ts'
 import { turnMaxTokensDefinition } from '../src/client/conversation-nodes/turn-max-tokens.ts'
 import { turnTailDefinition } from '../src/client/conversation-nodes/turn-tail.ts'
 import type {
-  AssistantChatData, ManualCompactionChatData, RetryChatData, ToolChatData, TurnTailChatData,
+  AssistantChatData, KeyRotatedChatData, ManualCompactionChatData, RetryChatData, ToolChatData, TurnTailChatData,
 } from '../src/client/contract/chat-nodes.ts'
 
 const DEFINITIONS: readonly ConversationNodeDefinition[] = [
@@ -29,6 +30,7 @@ const DEFINITIONS: readonly ConversationNodeDefinition[] = [
   commandDefinition,
   compactionDefinition,
   retryDefinition,
+  keyRotatedDefinition,
   turnErrorDefinition,
   turnMaxTokensDefinition,
   turnTailDefinition,
@@ -648,6 +650,38 @@ describe('built-in conversation node Definitions', () => {
     expect(node(current, 'context')).toBeUndefined()
     expect(node(current, 'assistant-step')).toBeUndefined()
     expect((node(current, 'tool-call')?.data as ToolChatData).root).not.toHaveProperty('kind')
+  })
+
+  it('renders each key-rotated record as its own marker node', () => {
+    const value = assembler([
+      at(1, 'turn/start', { turn: 1 }),
+      at(2, 'step/start', { turn: 1, step: 1 }),
+      at(3, 'llm/key-rotated', {
+        provider: 'openrouter',
+        from: 'KEY_1',
+        to: 'KEY_2',
+        cause: 'rate-limit',
+        resetAt: '2026-08-26T00:00:00.000Z',
+        reason: 'rate_limit strike',
+      }),
+      at(4, 'llm/key-rotated', {
+        provider: 'openrouter',
+        from: 'KEY_2',
+        to: 'KEY_3',
+        cause: 'vendor-relay',
+      }),
+      at(5, 'step/end', { turn: 1, step: 1 }),
+      at(6, 'turn/end', { turn: 1, reason: { kind: 'stop' } }),
+    ])
+    const snap = snapshot(value)
+    const nodes = [...snap.nodes.values()].filter(
+      candidate => candidate.kind === 'key-rotated',
+    ) as ReadonlyArray<{ data: KeyRotatedChatData }>
+    expect(nodes.map(entry => entry.data)).toMatchObject([
+      { from: 'KEY_1', to: 'KEY_2', cause: 'rate-limit', resetAt: '2026-08-26T00:00:00.000Z' },
+      { from: 'KEY_2', to: 'KEY_3', cause: 'vendor-relay' },
+    ])
+    expect(nodes[1]!.data).not.toHaveProperty('resetAt')
   })
 
   it('assembles retry chains and keeps manual and automatic compaction ownership separate', () => {

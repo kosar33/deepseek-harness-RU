@@ -1,0 +1,255 @@
+/* Provider-card credential seat, drawn in the Models-section design language
+ * (ModelsSection.module.css): 12/18 captions, 32px fields over `border-l2`
+ * hairlines, capsule controls (h36 r18), square glyph affordances, and every
+ * color through a `--dsw-alias-*` token. The sibling stylesheet cannot be
+ * imported across packages, so its declarations are mirrored here; class
+ * names stay this package's own because the component specs assert
+ * `chipActive` / `chipParked`. */
+
+.seat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Mirrors ModelsSection `.fieldLabel`. */
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--dsw-alias-label-secondary);
+}
+
+/* Mirrors ModelsSection `.error`. */
+.error {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-state-error-primary);
+}
+
+/* Mirrors ModelsSection `.advancedHint`. */
+.hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+/* The per-row state pill: one key's whole health on that key's single line,
+ * between the value field and the move/remove affordances. */
+.rowChip {
+  flex: none;
+  max-width: 34%;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-secondary);
+  white-space: nowrap;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dsw-alias-state-success-primary);
+  flex: none;
+}
+
+.chipParked .dot {
+  background: var(--dsw-alias-state-warn-primary);
+}
+
+.chipActive {
+  color: var(--dsw-alias-label-primary);
+  font-weight: 600;
+}
+
+.countdown {
+  color: var(--dsw-alias-label-secondary);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 2px 0 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rowIndex {
+  flex: none;
+  width: 18px;
+  text-align: right;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-secondary);
+  font-family: var(--ds-font-family-code);
+}
+
+.ref {
+  flex: none;
+  max-width: 45%;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-secondary);
+  font-family: var(--ds-font-family-code);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Mirrors ModelsSection `.input`; the sizing fields come from the row's flex
+ * layout instead of the column field it sits in there. */
+.value {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 22px;
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-primary);
+}
+
+.value:focus {
+  outline: none;
+  border-color: var(--dsw-alias-brand-primary);
+}
+
+.value::placeholder {
+  color: var(--dsw-alias-label-dimmed);
+}
+
+.value:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Mirrors ModelsSection `.iconButton`: square, label-free affordances that
+ * announce themselves through aria-label. */
+.rowAction {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--dsw-alias-label-tertiary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.rowAction:hover:not(:disabled) {
+  background: var(--dsw-alias-interactive-bg-hover);
+  color: var(--dsw-alias-label-primary);
+}
+
+.rowAction:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--dsw-alias-border-l3);
+}
+
+.rowAction:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+/* Mirrors ModelsSection `.primaryButton` / `.secondaryButton`: the capsule
+ * pair the surrounding card already uses for its own actions. */
+.addButton,
+.saveButton {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 22px;
+  cursor: pointer;
+}
+
+/* The reset capsule right-aligns alone; the card's Apply owns committing. */
+.resetButton {
+  margin-left: auto;
+}
+
+.saveButton {
+  border: none;
+  background: var(--dsw-alias-button-primary-fill);
+  color: var(--dsw-alias-label-primary-foreground);
+}
+
+.addButton {
+  border: 1px solid var(--dsw-alias-border-l2);
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+}
+
+.resetButton {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 22px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+  cursor: pointer;
+}
+
+.addButton:hover:not(:disabled),
+.resetButton:hover:not(:disabled) {
+  background: var(--dsw-alias-interactive-bg-hover-solid);
+}
+
+.addButton:disabled,
+.resetButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.addButton:focus-visible,
+.resetButton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--dsw-alias-border-l3);
+}

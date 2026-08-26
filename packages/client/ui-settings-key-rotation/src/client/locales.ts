@@ -1,0 +1,85 @@
+/** Copy dictionaries for the provider-card credential seat of key rotation. */
+
+/** English strings (the key-set source of truth for this triplet). */
+export const en = {
+  title: 'Key rotation',
+  keys: 'API keys',
+  retry: 'Retry',
+  loadFailed: 'Loading the rotation state failed',
+  readOnly: 'The settings document is read-only in this deployment.',
+  activeChip: 'active',
+  usableChip: 'usable',
+  parkedChip: 'parked',
+  resetCountdownHours: 'Limit resets in {h} h {m} min',
+  resetCountdownMinutes: 'Limit resets in {m} min',
+  keyValue: 'API key',
+  keyValuePlaceholder: 'Enter the API key',
+  keyStored: 'Stored — enter a new value to replace',
+  addKey: 'Add key',
+  removeKey: 'Delete key',
+  moveUp: 'Move up',
+  moveDown: 'Move down',
+  save: 'Save',
+  applying: 'Saving…',
+  conflict: 'Someone else changed these settings while this card was open. Close it and reopen to edit the current values.',
+  keyBlank: 'Enter the API key for this row, or delete the row.',
+  duplicateKey: 'Two rows hold the same key value; each row needs its own key.',
+  resetTimeouts: 'Reset timeouts',
+} as const
+
+/** Chinese strings, byte-equal defaults of the shipped UI copy. */
+export const zh: Record<keyof typeof en, string> = {
+  title: '密钥轮换',
+  keys: 'API 密钥',
+  retry: '重试',
+  loadFailed: '加载轮换状态失败',
+  readOnly: '当前部署中设置文档为只读。',
+  activeChip: '使用中',
+  usableChip: '可用',
+  parkedChip: '已停用',
+  resetCountdownHours: '限额将在 {h} 小时 {m} 分后重置',
+  resetCountdownMinutes: '限额将在 {m} 分钟后重置',
+  keyValue: 'API 密钥',
+  keyValuePlaceholder: '输入 API 密钥',
+  keyStored: '已保存——输入新值即可替换',
+  addKey: '添加密钥',
+  removeKey: '删除密钥',
+  moveUp: '上移',
+  moveDown: '下移',
+  save: '保存',
+  applying: '保存中…',
+  conflict: '此卡片打开期间设置又被其他修改更新。关闭后重新打开即可编辑最新值。',
+  keyBlank: '请输入该行的 API 密钥，或删除这一行。',
+  duplicateKey: '两行包含相同的密钥；每行需要自己的密钥。',
+  resetTimeouts: '重置停用时限',
+}
+
+/** Russian strings. */
+export const ru: Record<keyof typeof en, string> = {
+  title: 'Ротация ключей',
+  keys: 'API-ключи',
+  retry: 'Повторить',
+  loadFailed: 'Не удалось загрузить состояние ротации',
+  readOnly: 'В этом развёртывании документ настроек доступен только для чтения.',
+  activeChip: 'активен',
+  usableChip: 'доступен',
+  parkedChip: 'отложен',
+  resetCountdownHours: 'Лимит откатится через {h} ч {m} мин',
+  resetCountdownMinutes: 'Лимит откатится через {m} мин',
+  keyValue: 'API-ключ',
+  keyValuePlaceholder: 'Введите API-ключ',
+  keyStored: 'Сохранён — введите новое значение, чтобы заменить',
+  addKey: 'Добавить ключ',
+  removeKey: 'Удалить ключ',
+  moveUp: 'Вверх',
+  moveDown: 'Вниз',
+  save: 'Сохранить',
+  applying: 'Сохранение…',
+  conflict: 'Пока карточка была открыта, настройки изменились. Закройте её и откройте заново, чтобы редактировать актуальные значения.',
+  keyBlank: 'Введите API-ключ этой строки или удалите строку.',
+  duplicateKey: 'Две строки содержат одинаковый ключ; каждой строке нужен свой ключ.',
+  resetTimeouts: 'Сбросить таймауты',
+}
+
+/** Copy key of the key-rotation section dictionaries. */
+export type KeyRotationCopyKey = keyof typeof en

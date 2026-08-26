@@ -86,11 +86,38 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
      * layer and every registrant already depends on it for `ctx.settingsScope`.
      */
     'settings.general.item': { kind: 'list'; scope: 'root'; owner: SettingsGeneralItemOwnerProps }
+    /**
+     * The credential editor seat inside one provider card of the Models
+     * section, rendered exactly where the single API-key input would sit.
+     * The section dispatches with the edited route and keeps its native
+     * key field as the dispatch fallback, so a feature replaces the field
+     * for every provider only while it is actually mounted. Declared at
+     * runtime by the feature that owns the Models section; the type lives
+     * here so feature plugins collaborate without depending on one another.
+     */
+    'settings.models.credential': { kind: 'single'; scope: 'root'; owner: SettingsModelsCredentialOwnerProps }
   }
 }
 /** Owner share of a General preference row (the section supplies nothing). */
 export interface SettingsGeneralItemOwnerProps {
   /** Marker field: item owner props are intentionally empty. */
+  children?: never
+}
+
+/** Owner share of a provider card's credential seat (the section names the route). */
+export interface SettingsModelsCredentialOwnerProps {
+  /** Provider route id whose credentials the seat edits. */
+  provider: string
+  /**
+   * Mutable commit-hook holder the bound seat fills in: the card's Apply
+   * awaits `current` first and treats a returned string as the card's own
+   * failure message, so one Apply press lands the keys and the section
+   * fields together or neither. The holder object is created once per
+   * mounted editor; `current` stays undefined while no seat is bound (the
+   * native field path) and after the seat unmounts.
+   */
+  commitSeat?: { current?: (() => Promise<string | undefined>) | undefined }
+  /** Marker field: the owner passes no children. */
   children?: never
 }
 

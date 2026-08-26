@@ -5,6 +5,7 @@ import { registerCommandConversationNode } from './command.ts'
 import { registerCompactionConversationNode } from './compaction.ts'
 import { registerUnknownConversationFallback } from './fallback.ts'
 import { registerInboxConversationNodes } from './inbox.ts'
+import { registerKeyRotatedConversationNode } from './key-rotated.ts'
 import { registerMessageConversationNode } from './message.ts'
 import { registerRetryConversationNode } from './retry.ts'
 import { registerToolConversationNode } from './tool.ts'
@@ -24,6 +25,7 @@ export function registerConversationNodes(ctx: Context): void {
   registerCommandConversationNode(ctx)
   registerCompactionConversationNode(ctx)
   registerRetryConversationNode(ctx)
+  registerKeyRotatedConversationNode(ctx)
   registerTurnErrorConversationNode(ctx)
   registerTurnMaxTokensConversationNode(ctx)
   registerTurnTailConversationNode(ctx)

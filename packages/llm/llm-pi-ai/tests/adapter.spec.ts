@@ -412,8 +412,10 @@ describe('PiAiAdapter provider routing', () => {
 
 describe('provider profile lifecycle', () => {
   it('keeps adapter helpers off the package root', () => {
+    // `resolveProfiles` and the two credential-seam adapters are deliberately
+    // root-exported as the reuse channel for sibling adapter families (see
+    // dsh-llm-key-rotation); every other helper stays internal.
     for (const helper of [
-      'resolveProfiles',
       'toPiContext',
       'toPiReplayState',
       'toPiAssistant',
@@ -1005,5 +1007,27 @@ describe('abort wiring', () => {
     }
     await new Promise(resolve => setTimeout(resolve, 20))
     expect(server.requests).toHaveLength(1)
+  })
+})
+
+describe('llmApiKeyOverride preference', () => {
+  it('authenticates from the override face when it answers with a key', async () => {
+    const server = await mockServer([{ events: textEvents }])
+    const ctx = await harness(server.url)
+    // The key-rotation plugin provides this optional service; a test double
+    // stands in for its resolve.
+    ctx.provide('llmApiKeyOverride', { resolve: () => Promise.resolve('rotated-key') })
+
+    await assemble(ctx, { model: 'deepseek-v4-flash', messages: [] })
+    expect(server.headers[0]?.authorization).toBe('Bearer rotated-key')
+  })
+
+  it('falls through to the native credential when the override answers undefined', async () => {
+    const server = await mockServer([{ events: textEvents }])
+    const ctx = await harness(server.url)
+    ctx.provide('llmApiKeyOverride', { resolve: () => Promise.resolve(undefined) })
+
+    await assemble(ctx, { model: 'deepseek-v4-flash', messages: [] })
+    expect(server.headers[0]?.authorization).toBe('Bearer test-key')
   })
 })

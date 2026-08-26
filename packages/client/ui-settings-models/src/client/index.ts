@@ -124,6 +124,7 @@ export function apply(ctx: ClientContext): void {
     order: 10,
     label: () => t('nav'),
     inject: injected,
+    children: { 'settings.models.credential': { kind: 'single', scope: 'root' } },
   }, ModelsSection))
   ctx.slots.inject('settings.onboarding', () => ctx.slots.register({
     name: 'settings.onboarding',

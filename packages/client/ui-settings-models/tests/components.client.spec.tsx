@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
 /** Section, setup-card, and hand-written editor behavior over a scripted wire face. */
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import type { ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import Schema from '@deepseek-ai/schemastery'
 import { bindSnapshotSelector } from '@deepseek-ai/dsh-client-test-runtime'
-import type { RpcResponse, SettingsNamespaceView } from '@deepseek-ai/dsh-api-remotes/client'
+import type { KeyRotationRouteView, RpcResponse, SettingsNamespaceView } from '@deepseek-ai/dsh-api-remotes/client'
 import {
   ModelsSection, needsSetup, providerCopy, providerTargetLabel, removeProviderProfile,
 } from '../src/client/ModelsSection.tsx'
@@ -161,6 +162,8 @@ function scriptedFace(overrides: {
         ],
       }))),
       models: vi.fn(() => Promise.resolve(ok({ groups: [], failures: [] }))),
+      keyRotation: vi.fn(async (): Promise<RpcResponse<{ configured: boolean; routes: KeyRotationRouteView[] }>> =>
+        ok({ configured: false, routes: [] })),
     },
     settings: {
       describe: vi.fn(() => Promise.resolve(ok({ writable: true, hasDocument: false, namespaces: wireNamespaces() }))),
@@ -185,7 +188,10 @@ function scriptedFace(overrides: {
 
 type WireFace = ConstructorParameters<typeof ModelsSettingsStore>[0]
 
-async function mountFace(scripted: ReturnType<typeof scriptedFace>) {
+async function mountFace(
+  scripted: ReturnType<typeof scriptedFace>,
+  renderSlot?: NonNullable<ModelsSectionProps['renderSlot']>,
+) {
   const { face, update, replace, mutate, set, unset } = scripted
   const mirror = new SettingsDescribeMirror(face as never)
   const controller = new ModelsSettingsStore(face as unknown as WireFace, settingsSchema, mirror)
@@ -196,13 +202,17 @@ async function mountFace(scripted: ReturnType<typeof scriptedFace>) {
     api: face as never,
     schema: settingsSchema,
     t,
+    ...renderSlot === undefined ? {} : { renderSlot },
   }
   const view = render(<ModelsSection {...injected} />)
   return { view, face, update, replace, mutate, set, unset, controller, mirror }
 }
 
-async function mountSection(overrides: Parameters<typeof scriptedFace>[0] = {}) {
-  return mountFace(scriptedFace(overrides))
+async function mountSection(
+  overrides: Parameters<typeof scriptedFace>[0] = {},
+  renderSlot?: NonNullable<ModelsSectionProps['renderSlot']>,
+) {
+  return mountFace(scriptedFace(overrides), renderSlot)
 }
 
 /**
@@ -236,10 +246,60 @@ describe('ModelsSection', () => {
     expect(document.body.textContent).toBe('')
   })
 
+  it('replaces the key input with the bound credential seat on every open card', async () => {
+    // The widened owner keeps the concrete mock assignable to the generic
+    // dispatch signature while its call list stays inspectable.
+    const seatDispatch = vi.fn((
+      key: 'settings.models.credential',
+      owner: { provider?: string },
+      _opts?: { fallback?: ReactNode },
+    ): ReactNode => key === 'settings.models.credential' ? `CREDENTIAL-SEAT:${owner.provider}` : null)
+    const renderSlot: NonNullable<ModelsSectionProps['renderSlot']> = seatDispatch
+    await mountSection({}, renderSlot)
+    // The DeepSeek row opens its editor through Edit, and its card dispatches
+    // the declared seat with the edited route and the native field as fallback.
+    fireEvent.click(screen.getByRole('button', { name: deepSeekCopy(en.editProvider) }))
+    const rowCall = seatDispatch.mock.calls.find(([, owner]) => owner.provider === 'deepseek-official')
+    expect(rowCall?.[0]).toBe('settings.models.credential')
+    expect(rowCall?.[1]).toEqual({ provider: 'deepseek-official', commitSeat: expect.anything() })
+    expect(rowCall?.[2]?.fallback).toBeDefined()
+    expect(screen.queryByLabelText(en.keyInput)).toBeNull()
+    expect(screen.getByText('CREDENTIAL-SEAT:deepseek-official')).toBeTruthy()
+
+    // One card at a time: opening the add card closed the row editor, and its
+    // editor dispatches the same seat with the adopted route.
+    fireEvent.click(screen.getByText(en.add))
+    await screen.findByLabelText(en.provider)
+    const addCall = seatDispatch.mock.calls.find(([, owner]) => owner.provider === 'anthropic')
+    expect(addCall?.[0]).toBe('settings.models.credential')
+    expect(addCall?.[1]).toEqual({ provider: 'anthropic', commitSeat: expect.anything() })
+    expect(addCall?.[2]?.fallback).toBeDefined()
+    expect(screen.queryByLabelText(en.keyInput)).toBeNull()
+    expect(screen.getByText('CREDENTIAL-SEAT:anthropic')).toBeTruthy()
+  })
+
+  it('keeps the native key field rendering through the seat fallback', async () => {
+    // The dispatch carries the native field as the fallback node; a bound
+    // seat that defers to it keeps the ordinary key input on the card.
+    const seatDispatch = vi.fn((
+      _key: 'settings.models.credential',
+      _owner: { provider?: string },
+      opts?: { fallback?: ReactNode },
+    ): ReactNode => opts?.fallback ?? null)
+    const renderSlot: NonNullable<ModelsSectionProps['renderSlot']> = seatDispatch
+    await mountSection({}, renderSlot)
+    fireEvent.click(screen.getByRole('button', { name: deepSeekCopy(en.editProvider) }))
+    const dispatch = seatDispatch.mock.calls.find(([, owner]) => owner.provider === 'deepseek-official')
+    expect(dispatch?.[0]).toBe('settings.models.credential')
+    expect(dispatch?.[1]).toEqual({ provider: 'deepseek-official', commitSeat: expect.anything() })
+    expect(dispatch?.[2]?.fallback).toBeDefined()
+    expect(screen.getByLabelText(en.keyInput)).toBeTruthy()
+  })
+
   it('renders the unkeyed whole-section provider as an open setup card in the first-run posture', async () => {
     await mountFirstRun()
     // Nothing is reachable yet, and DeepSeek has no configured credential and
-    // no stored apiKey → setup card.
+    // no stored apiKey в†’ setup card.
     expect(screen.getByText('DeepSeek')).toBeTruthy()
     expect(screen.getByLabelText(en.keyInput)).toBeTruthy()
     expect(screen.getByText('openai')).toBeTruthy()
@@ -287,6 +347,36 @@ describe('ModelsSection', () => {
     expect(screen.getByText('zombie').closest('li')?.querySelector('[role="img"]')).toBeNull()
   })
 
+  it('shows the configured dot while a mounted rotation pool covers the route', async () => {
+    const mounted = await mountSection()
+    // The native reference stops resolving while the rotation pool takes the
+    // route over: the dot must read the same fact that serves requests.
+    mounted.face.credentials.describe.mockImplementation((payload: { refs: string[] }) =>
+      Promise.resolve(ok({
+        credentials: Object.fromEntries(payload.refs.map(ref => [ref, { configured: false, writable: true }])),
+      })))
+    mounted.face.llm.keyRotation.mockImplementation(() => {
+      const routes: KeyRotationRouteView[] = [{
+        provider: 'openai',
+        activeLabel: 'OPENAI_KEYROTATION_1',
+        keys: [{
+          label: 'OPENAI_KEYROTATION_1',
+          source: 'reference',
+          reference: 'OPENAI_KEYROTATION_1',
+          status: { state: 'usable' },
+        }],
+      }]
+      return Promise.resolve(ok({ configured: true, routes }))
+    })
+    await act(async () => { await mounted.controller.load() })
+    const covered = screen.getByRole('img', { name: en.credentialConfigured })
+    expect(covered.className).toContain('credentialDotConfigured')
+    expect(covered.closest('li')?.textContent).toContain('openai')
+    // A route the pool does not name and whose reference is unset stays red.
+    const missing = screen.getByRole('img', { name: en.credentialMissing })
+    expect(missing.closest('li')?.textContent).toContain('DeepSeek')
+  })
+
   it('turns the setup card into a row once the credential reports configured', async () => {
     const { face } = await mountFirstRun()
     face.credentials.describe.mockImplementation((payload: { refs: string[] }) => Promise.resolve(ok({
@@ -315,6 +405,7 @@ describe('ModelsSection', () => {
       removable: false,
       apiKeyEnv: 'X',
       credential,
+      rotationCovered: false,
     })
     expect(needsSetup(row(undefined), false)).toBe(true)
     expect(needsSetup(row({ configured: true, writable: true }), false)).toBe(false)
@@ -421,6 +512,39 @@ describe('ModelsSection', () => {
       await Promise.resolve()
     })
     expect(onClose).toHaveBeenCalledWith(true)
+  })
+
+  it('stands down the required-key gate while a bound credential seat owns the commit', async () => {
+    const { face } = scriptedFace()
+    const renderSlot: NonNullable<ModelsSectionProps['renderSlot']> = vi.fn((
+      key: 'settings.models.credential',
+      owner: { provider?: string },
+      _opts?: { fallback?: ReactNode },
+    ): ReactNode => key === 'settings.models.credential' ? `CREDENTIAL-SEAT:${owner.provider}` : null)
+    const { ProviderEditor } = await import('../src/client/ProviderEditor.tsx')
+    render(<ProviderEditor
+      provider="deepseek-official"
+      displayName="DeepSeek"
+      hideTitle
+      namespace={wireNamespaces()[0]!}
+      schema={settingsSchema}
+      settingsPath={[]}
+      api={face as never}
+      t={t}
+      readOnly={false}
+      credentialOnly
+      credentialRequired
+      credentialSlot={renderSlot}
+      onClose={vi.fn()}
+    />)
+    // The seat replaced the key field entirely…
+    expect(screen.queryByLabelText(en.keyInput)).toBeNull()
+    expect(screen.getByText('CREDENTIAL-SEAT:deepseek-official')).toBeTruthy()
+    // …so an empty required key no longer disables Apply or raises the
+    // native "must type a key" failure: a bound seat owns its own commit,
+    // and the gate would deadlock against an input that never renders.
+    expect(screen.getByText<HTMLButtonElement>(en.apply).disabled).toBe(false)
+    expect(screen.queryByText(en.keyRequired)).toBeNull()
   })
 
   it('applies customized deepseek fields as path ops', async () => {
@@ -611,7 +735,7 @@ describe('ModelsSection', () => {
     ['the composition entry', { models: [{ id: 'pinned-by-deployment' }] }],
   ])('restores %s the moment the override is dropped, not after a reload', async (_label, base) => {
     // The regression: reset read the EFFECTIVE value, which still carries the
-    // stored override until the unset is applied — so the rows did not change
+    // stored override until the unset is applied вЂ” so the rows did not change
     // and the catalog only looked restored after reopening the card.
     const { face } = scriptedFace()
     const stored = { models: [{ id: 'user-only-model', name: 'User Only' }] }
@@ -651,7 +775,7 @@ describe('ModelsSection', () => {
 
   it('keeps every row\'s unreadable text, not just the last one edited', async () => {
     // The regression: one active buffer meant editing a second row displaced
-    // the first, which then fell back to rendering its stored NaN as `NaN` —
+    // the first, which then fell back to rendering its stored NaN as `NaN` вЂ”
     // losing the text the user was told they could still correct.
     await mountDeepSeekCard()
     fireEvent.click(screen.getByText(en.customized))
@@ -699,7 +823,7 @@ describe('ModelsSection', () => {
 
   it('drops the typed text when reset replaces the rows it annotated', async () => {
     // The regression: reset removed the override but left the buffer, so an
-    // inherited row displayed text no settings layer stores — and because an
+    // inherited row displayed text no settings layer stores вЂ” and because an
     // unreadable buffer never settles, it stayed there indefinitely.
     const { mutate } = await mountDeepSeekCard({
       mutate: vi.fn(() => Promise.resolve(ok(wireNamespaces()[0]))),
@@ -1063,7 +1187,7 @@ describe('ModelsSection', () => {
     fireEvent.change(screen.getByLabelText<HTMLInputElement>(en.baseUrl), { target: { value: 'https://next' } })
     fireEvent.click(screen.getByText(en.apply))
     await screen.findByText('connection lost')
-    // Not stuck in `applying…`: the finally cleared busy, so Apply is live again.
+    // Not stuck in `applyingвЂ¦`: the finally cleared busy, so Apply is live again.
     expect(screen.getByText(en.apply)).toBeTruthy()
   })
 
@@ -1232,9 +1356,9 @@ describe('ModelsSection', () => {
 
     // The setup card is the first one on the page, above the add block.
     fireEvent.click(screen.getAllByText(en.cancel)[0] as HTMLElement)
-    // The add card kept its draft…
+    // The add card kept its draftвЂ¦
     expect(screen.getByLabelText(en.provider)).toBeTruthy()
-    // …and DeepSeek collapsed to an ordinary row carrying the missing-key dot.
+    // вЂ¦and DeepSeek collapsed to an ordinary row carrying the missing-key dot.
     expect(screen.getAllByLabelText(en.keyInput)).toHaveLength(1)
     expect(screen.getAllByRole('img', { name: en.credentialMissing })
       .some(dot => dot.closest('li')?.textContent?.includes('DeepSeek') === true)).toBe(true)
@@ -1355,7 +1479,7 @@ describe('ModelsSection', () => {
 })
 
 describe('apiKeyFailure', () => {
-  it('treats a blank field as no failure — it means keep the stored key', () => {
+  it('treats a blank field as no failure вЂ” it means keep the stored key', () => {
     expect(apiKeyFailure('')).toBeUndefined()
   })
 
@@ -1379,11 +1503,11 @@ describe('apiKeyFailure', () => {
 
   it.each([
     ['an emoji', 'sk-\u{1F600}'],
-    ['CJK text', 'sk-你好'],
-    ['full-width punctuation', 'sk-abc，'],
+    ['CJK text', 'sk-дЅ еҐЅ'],
+    ['full-width punctuation', 'sk-abcпјЊ'],
     ['an interior space', 'sk-abc def'],
     ['a C0 control character', 'sk-abc\x01'],
-    ['a latin-1 character', 'sk-café'],
+    ['a latin-1 character', 'sk-cafГ©'],
   ])('fails %s as illegal characters', (_label, draft) => {
     expect(apiKeyFailure(draft)).toBe('keyIllegalCharacters')
   })

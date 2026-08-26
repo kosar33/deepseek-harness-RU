@@ -476,6 +476,20 @@ Source: [`packages/hooks/hook-protocol/src/types.ts:31`](../packages/hooks/hook-
 
 ### `llm/*`
 
+<a id="llmkey-rotated--log-only"></a>
+
+#### `llm/key-rotated` — log-only
+
+```ts persistence-catalog
+/**
+ * Durable record written when the sticky position of one rotating pool
+ * advances onto its next credential after a failed request attempt.
+ */
+'llm/key-rotated': LlmKeyRotatedEventData
+```
+
+Source: [`packages/llm/llm-key-rotation/src/types.ts:13`](../packages/llm/llm-key-rotation/src/types.ts)
+
 <a id="llmretry--log-only"></a>
 
 #### `llm/retry` — log-only

@@ -2057,3 +2057,25 @@ describe('plugin registration and config', () => {
     expect(ctx.llm.listProviders()).toEqual([])
   })
 })
+
+describe('llmApiKeyOverride preference', () => {
+  it('authenticates from the override face when it answers with a key', async () => {
+    const server = await mockServer([{ kind: 'sse', events: textEvents }])
+    const ctx = await harness(server.url)
+    // The key-rotation plugin provides this optional service; a test double
+    // stands in for its resolve.
+    ctx.provide('llmApiKeyOverride', { resolve: () => Promise.resolve('rotated-key') })
+
+    await assemble(ctx, { model: 'deepseek-v4-flash', messages: [] })
+    expect(server.headers[0]?.authorization).toBe('Bearer rotated-key')
+  })
+
+  it('falls through to the configured credential when the override answers undefined', async () => {
+    const server = await mockServer([{ kind: 'sse', events: textEvents }])
+    const ctx = await harness(server.url)
+    ctx.provide('llmApiKeyOverride', { resolve: () => Promise.resolve(undefined) })
+
+    await assemble(ctx, { model: 'deepseek-v4-flash', messages: [] })
+    expect(server.headers[0]?.authorization).toBe('Bearer test-key')
+  })
+})

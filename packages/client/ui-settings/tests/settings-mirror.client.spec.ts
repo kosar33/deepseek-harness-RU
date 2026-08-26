@@ -70,6 +70,17 @@ describe('SettingsDescribeMirror', () => {
     expect(mirror.getSnapshot().view?.namespaces).toHaveLength(1)
   })
 
+  it('stringifies a rejection that is not an Error instance', async () => {
+    const describeCall = vi.fn()
+      .mockRejectedValueOnce('cable pulled')
+      .mockResolvedValueOnce(described([view('theme', 1)]))
+    const mirror = new SettingsDescribeMirror({ settings: { describe: describeCall } } as never)
+    await mirror.ensure()
+    expect(mirror.getSnapshot()).toMatchObject({ status: 'idle', error: 'cable pulled' })
+    await mirror.ensure()
+    expect(mirror.getSnapshot()).toMatchObject({ status: 'ready', error: null })
+  })
+
   it('returns to idle after a first read that never succeeded, so ensure retries', async () => {
     const describeCall = vi.fn()
       .mockRejectedValueOnce(new Error('offline'))
